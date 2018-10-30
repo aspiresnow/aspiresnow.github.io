@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://yoursite-url/2018/02/04/Git%E4%BD%BF%E7%94%A8/</loc>
+        <lastmod>2018-10-30T13:13:54.478Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://yoursite-url/2018/09/12/codePies/</loc>
         <lastmod>2018-10-30T12:59:38.809Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -121,14 +129,6 @@
     <url>
         <loc>http://yoursite-url/2018/09/28/spring/spring%E4%BA%8B%E5%8A%A1/</loc>
         <lastmod>2018-09-30T08:50:26.888Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://yoursite-url/2018/02/04/Git%E4%BD%BF%E7%94%A8/</loc>
-        <lastmod>2018-09-19T08:48:05.066Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

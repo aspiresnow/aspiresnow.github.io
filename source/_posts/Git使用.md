@@ -1,12 +1,10 @@
----
 title: Git的使用
-date: 2018-02-04 10:26:48
 tags:
-- Git
+  - Git
 categories:
-- java工具
+  - java工具
+date: 2018-02-04 10:26:48
 ---
-
 # Git的使用
 
 ## git中的提交逻辑
@@ -183,7 +181,7 @@ git branch -vv	#查看本地分支和远程分支的关联关系
 git branch xx	#新建一个分支，但依然停留在当前分支
 git checkout xx	#切换到指定分支，并更新工作区
 git checkout -b xx	#新建一个分支，并切换到该分支
-git push -u origin 本地当前分支:远程分支名	#将本地分支推送到远程创建分支
+git push -u origin 本地当前分支	#将本地分支推送到远程创建分支
 git branch -d xx	#删除分支
 git push origin --delete [origin/branch]	#删除远程分支
 git branch --set-upstream-to=origin/远程分支 本地分支	#绑定本地分支和远程分支的关系

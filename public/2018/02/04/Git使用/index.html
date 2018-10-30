@@ -14,7 +14,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Git的使用 - Beantech | 豆科技
+          Git的使用 - aspireSnow | 爱雪
         
     </title>
 
@@ -96,7 +96,7 @@
                         <h1>Git的使用</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
-                            Posted by John Doe on
+                            Posted by lizhi on
                             2018-02-04
                         </span>
                     </div>
@@ -121,7 +121,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Your Title</a>
+            <a class="navbar-brand" href="/">aspiresnow</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -278,7 +278,7 @@
 <h2><span id="分支-branch">分支 branch</span></h2>
 <p>在开发过程中往往会需要多个开发任务并行开发，或者多人同时操作一个项目时，往往会有很多冲突，这个时候就需要用到git的分支。当需要单独开发一个任务时，从主分支上拉出一个新的分支，然后开发完毕后，将主分支的代码merge到自己的分支上，解决冲突后，再讲自己的分支merge到主分支上。</p>
 <h3><span id="常用命令">常用命令</span></h3>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">git branch	#列出所有本地分支</span><br><span class="line">git branch -r	#列出所有远程分支</span><br><span class="line">git branch -a	#列出所有本地分支和远程分支</span><br><span class="line">git branch -vv	#查看本地分支和远程分支的关联关系</span><br><span class="line">git branch xx	#新建一个分支，但依然停留在当前分支</span><br><span class="line">git checkout xx	#切换到指定分支，并更新工作区</span><br><span class="line">git checkout -b xx	#新建一个分支，并切换到该分支</span><br><span class="line">git push -u origin 本地当前分支:远程分支名	#将本地分支推送到远程创建分支</span><br><span class="line">git branch -d xx	#删除分支</span><br><span class="line">git push origin --delete [origin/branch]	#删除远程分支</span><br><span class="line">git branch --set-upstream-to=origin/远程分支 本地分支	#绑定本地分支和远程分支的关系</span><br><span class="line">git checkout -b 本地分支名x origin/远程分支名x	#从远程分支下拉</span><br><span class="line">git branch 本地分支名 --track orign/远程分支名	#新建一个分支，与指定的远程分支建立追踪关系</span><br><span class="line">git checkout -  #切换到上一个分支</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">git branch	#列出所有本地分支</span><br><span class="line">git branch -r	#列出所有远程分支</span><br><span class="line">git branch -a	#列出所有本地分支和远程分支</span><br><span class="line">git branch -vv	#查看本地分支和远程分支的关联关系</span><br><span class="line">git branch xx	#新建一个分支，但依然停留在当前分支</span><br><span class="line">git checkout xx	#切换到指定分支，并更新工作区</span><br><span class="line">git checkout -b xx	#新建一个分支，并切换到该分支</span><br><span class="line">git push -u origin 本地当前分支	#将本地分支推送到远程创建分支</span><br><span class="line">git branch -d xx	#删除分支</span><br><span class="line">git push origin --delete [origin/branch]	#删除远程分支</span><br><span class="line">git branch --set-upstream-to=origin/远程分支 本地分支	#绑定本地分支和远程分支的关系</span><br><span class="line">git checkout -b 本地分支名x origin/远程分支名x	#从远程分支下拉</span><br><span class="line">git branch 本地分支名 --track orign/远程分支名	#新建一个分支，与指定的远程分支建立追踪关系</span><br><span class="line">git checkout -  #切换到上一个分支</span><br></pre></td></tr></table></figure>
 <h3><span id="合并分支">合并分支</span></h3>
 <h4><span id="git-merge">git merge</span></h4>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge [branch1]   #将branch1合并到当前分支上</span><br></pre></td></tr></table></figure>
@@ -380,14 +380,6 @@
                 <ul class="list-inline">
 
                     
-                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
-                    
-                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
-                    
-                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
-                    
-                        <li><a href="#" target="_blank">It Helps SEO</a></li>
-                    
                 </ul>
                 
             </div>
@@ -466,19 +458,10 @@
                 
 
                 
-                    <li>
-                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
-                            <span class="fa-stack fa-lg">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                            </span>
-                        </a>
-                    </li>
-                
 
                 
                     <li>
-                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                        <a target="_blank" href="https://github.com/aspiresnow">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>
@@ -488,19 +471,10 @@
                 
 
                 
-                    <li>
-                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
-                            <span class="fa-stack fa-lg">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-                            </span>
-                        </a>
-                    </li>
-                
 
                 </ul>
                 <p class="copyright text-muted">
-                    Copyright &copy; John Doe 2018 
+                    Copyright &copy; lizhi 2018 
                     <br>
                     Theme by <a href="http://huangxuan.me">Hux</a> 
                     <span style="display: inline-block; margin: 0 5px;">
