@@ -43,7 +43,7 @@ ExecutorService基于池化的线程来执行用户提交的任务，通常可�
 
 ### 线程池的实现方式
 
-​					`ThreadPoolExecutor的构造函数`
+					`ThreadPoolExecutor的构造函数`
 
 ```java
 public ThreadPoolExecutor(int corePoolSize,
@@ -397,7 +397,7 @@ class Task implements Runnable {
 
 运行结果
 
-```
+```verilog
 pool-1-thread-1start excute
 pool-1-thread-3start excute
 pool-1-thread-2start excute

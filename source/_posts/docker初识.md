@@ -32,7 +32,7 @@ Docker容器理念是单进程，即一个容器只起一个进程（不太现�
 
 使用国内的ustc镜像会快点，需要修改或创建/etc/docker/daemon.json
 
-```
+```properties
 {
   "registry-mirrors": ["http://hub-mirror.c.163.com"]
 }
@@ -156,28 +156,28 @@ Docker容器理念是单进程，即一个容器只起一个进程（不太现�
 
       - CMD：设置镜像启动时执行的指令或脚本，该指令只能在文件中存在一次，如果有多个，执行最后一条
 
-         ```sheel
+         ```shell
          CMD ["executable","param1","param2"] (like an exec, this is the preferred form)  
          CMD command param1 param2 (as a shell)
          ```
 
       - ENTRYPOINT：设置container启动时执行的操作，可以多次设置，但是只有最后一个有效
 
-         ```sheel
+         ```shell
          ENTRYPOINT ["executable", "param1", "param2"] (like an exec, the preferred form)  
          ENTRYPOINT command param1 param2 (as a shell) 
          ```
 
          - 该指令的使用分为两种情况，一种是独自使用，另一种和CMD指令配合使用。
             当独自使用时，如果你还使用了CMD命令且CMD是一个完整的可执行的命令，那么CMD指令和ENTRYPOINT会互相覆盖只有最后一个CMD或者ENTRYPOINT有效。
-            ```sheel
+            ```shell
             # CMD指令将不会被执行，只有ENTRYPOINT指令被执行  
             CMD echo “Hello, World!”  
             ENTRYPOINT ls -l  
             ```
          - 另一种用法和CMD指令配合使用来指定ENTRYPOINT的默认参数，这时CMD指令不是一个完整的可执行命令，仅仅是参数部分；ENTRYPOINT指令只能使用JSON方式指定执行命令，而不能指定参数。
 
-            ```sheel
+            ```shell
             FROM ubuntu  
             CMD ["-l"]  
             ENTRYPOINT ["/usr/bin/ls"]  

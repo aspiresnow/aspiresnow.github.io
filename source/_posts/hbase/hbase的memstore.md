@@ -40,7 +40,7 @@ HBase会在如下几种情况下触发flush操作，**需要注意的是MemStore
 
 上述flush流程可以通过日志信息查看：
 
-```
+```xml
 /******* prepare阶段 ********/
 2016-02-04 03:32:41,516 INFO  [MemStoreFlusher.1] regionserver.HRegion: Started memstore flush for sentry_sgroup1_data,{\xD4\x00\x00\x01|\x00\x00\x03\x82\x00\x00\x00?\x06\xDA`\x13\xCAE\xD3C\xA3:_1\xD6\x99:\x88\x7F\xAA_\xD6[L\xF0\x92\xA6\xFB^\xC7\xA4\xC7\xD7\x8Fv\xCAT\xD2\xAF,1452217805884.572ddf0e8cf0b11aee2273a95bd07879., current region memstore size 128.9 M
 
@@ -67,7 +67,7 @@ HBase会在如下几种情况下触发flush操作，**需要注意的是MemStore
 
 相关JVM配置以及HBase配置：
 
-```
+```properties
 maxHeap = 71
 hbase.regionserver.global.memstore.upperLimit = 0.35
 hbase.regionserver.global.memstore.lowerLimit = 0.30
@@ -75,7 +75,7 @@ hbase.regionserver.global.memstore.lowerLimit = 0.30
 
 基于上述配置，可以得到触发Region Server级别的总Memstore内存和为24.9G，如下所示：
 
-```
+```properties
 2015-10-12 13:05:16,232 INFO  [regionserver60020] regionserver.MemStoreFlusher: globalMemStoreLimit=24.9 G, globalMemStoreLimitLowMark=21.3 G, maxHeap=71 G
 ```
 

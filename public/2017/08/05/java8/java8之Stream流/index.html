@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          java8之Stream流 - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/08/05/java8/java8之Stream流/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                            
+                        </div>
+                        <h1>java8之Stream流</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2017-08-05
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="java8之stream流">java8之Stream流</span></h1>
+<p>Stream是java8的新特性之一，为了方便操作集合类数据结构，结合lambda表达式能够更好的处理集合的遍历、查询、映射、聚合等操作。</p>
+<a id="more"></a>
+<h2><span id="原理">原理</span></h2>
+<h3><span id="流的工作过程">流的工作过程</span></h3>
+<ul>
+<li>一个数据源(如集合)来执行一个查询;</li>
+<li>多个中间操作链，形成一条流的流水线;</li>
+<li>一个终端操作，执行流水线，并能生成结果。</li>
+</ul>
+<h3><span id="特点">特点</span></h3>
+<ul>
+<li>数据源可以是无限，但是不存储任何数据</li>
+<li>流只能遍历一次，遍历完后，流就被关闭了，如果要再次遍历，需要重新获取一下</li>
+<li>支持并行，充分利用计算机多核CPU的特性</li>
+</ul>
+<h3><span id="操作类型">操作类型：</span></h3>
+<ul>
+<li><strong>Intermediate</strong>：一个流可以后面跟随零个或多个 intermediate 操作。其目的主要是打开流，做出某种程度的数据映射/过滤，然后返回一个新的流，交给下一个操作使用。这类操作都是<strong>惰性化</strong>的，就是说，仅仅调用到这类方法，并没有真正开始流的遍历。</li>
+<li><strong>Terminal</strong>：一个流只能有一个 terminal 操作，当这个操作执行后，流就关闭了，无法再被操作。所以这必定是流的最后一个操作。Terminal 操作的执行，才会真正开始流的遍历，并且会生成一个结果。</li>
+</ul>
+<p>注意:<strong>流是从一串中间操作到一个终端操作为一个循环执行，然后再从第一个中间操作开始循环流中的元素，而不是每个中间操作遍历完后再遍历下一个中间操作。</strong></p>
+<h3><span id="并行parallestream">并行(paralleStream)</span></h3>
+<ul>
+<li>jdk8可以充分利用多核CPU的特性，实现并行处理。在使用流的时候调用**.paralle()**就可以获取一个并行流</li>
+<li>并行流内部默认使用<strong>ForkJoinPool</strong>，默认的线程数量就是处理器的数量，这个值由Runtime.getRuntime().availableProcessors()得到的。<strong>可 以 通 过 java.util.concurrent.ForkJoinPool.common. parallelism来改变线程大小</strong></li>
+<li>在使用并行流的时候，一定要保证操作是无状态的，不然会遇到一些不可知的问题</li>
+<li>影响并行流性能的五要素是：数据大小、源数据结构、值是否装箱、可用的 CPU 核数量，以及处理每个元素所花的时间</li>
+</ul>
+<h3><span id="基本类型流">基本类型流</span></h3>
+<p>在对包装类型操作时，存在着大量的拆箱和装箱操作，为了避免拆装箱的成本，jdk8提供了一些专门处理基本类型的流，如IntStream、DoubleStream、LongStream，可以通过Stream的<strong>mapToInt()</strong>、<strong>mapToDouble()</strong>、**mapToLong()**方法得到，再操作完基本类型后，可以调用基本类型流的 <strong>boxed()</strong> 方法转换为对象流</p>
+<h2><span id="创建流">创建流</span></h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. 由值创建流：Stream.of(<span class="string">"a"</span>,<span class="string">"b"</span>);</span><br><span class="line"><span class="number">2</span>. 由数组创建流：<span class="keyword">int</span>[] numbers = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;Arrays.stream(numbers);</span><br><span class="line"><span class="number">3</span>. 由文件创建流：java.io.BufferedReader.lines()</span><br><span class="line"><span class="number">4</span>. Stream.iterate(<span class="number">0</span>, n -&gt; n + <span class="number">2</span>).limit(<span class="number">10</span>)  </span><br><span class="line"><span class="number">5</span>. 通过接收一个supplier创建：Stream.generate(Math::random).limit(<span class="number">10</span>)  </span><br><span class="line"><span class="number">6</span>. 通过集合创建: list.stream()</span><br><span class="line"><span class="number">7</span>. 基本类型范围创建：IntStream evenNumbers = IntStream.rangeClosed(<span class="number">1</span>, <span class="number">100</span>)<span class="comment">//从1到100</span></span><br><span class="line">IntStream evenNumbers = IntStream.range(<span class="number">1</span>, <span class="number">100</span>)<span class="comment">//从1到99</span></span><br></pre></td></tr></table></figure>
+<h3><span id="语句例子">语句例子</span></h3>
+<ul>
+<li>
+<p>Peek可以使用peek来进行调试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; result =numbers.stream() </span><br><span class="line">     .peek(x -&gt;System.out.println(<span class="string">"from stream: "</span> + x))</span><br><span class="line">     .map(x -&gt; x + <span class="number">17</span>)</span><br><span class="line">     .peek(x -&gt; System.out.println(<span class="string">"after map: "</span> + x))</span><br><span class="line">     .filter(x -&gt; x % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">     .peek(x -&gt; System.out.println(<span class="string">"after filter: "</span> + x))</span><br><span class="line">     .limit(<span class="number">3</span>)</span><br><span class="line">     .peek(x -&gt; System.out.println(<span class="string">"after limit: "</span> + x))</span><br><span class="line">     .collect(toList());</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>双层for循环 (flatMap 用于将映射后的多个流合并成一个流,即扁平化流,用于处理返回值是Stream的东东)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers1 = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">List&lt;Integer&gt; numbers2 = Arrays.asList(<span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">List&lt;<span class="keyword">int</span>[]&gt; pairs =numbers1.stream().flatMap(</span><br><span class="line">  i -&gt;numbers2.stream().map(j -&gt; <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;i, j&#125;)</span><br><span class="line">).collect(Collectors.toList());</span><br><span class="line"> <span class="comment">//其结果是[(1, 3),(1, 4),(2,3),(2,4)]。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>聚合</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">List&lt;Integer&gt; reduce = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>).reduce(list, (List&lt;Integer&gt; a, Integer x) -&gt; &#123;</span><br><span class="line">  a.add(x);</span><br><span class="line">  <span class="keyword">return</span> a;</span><br><span class="line">&#125;, <span class="keyword">new</span> BinaryOperator&lt;List&lt;Integer&gt;&gt;() &#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">apply</span><span class="params">(List&lt;Integer&gt; integers, List&lt;Integer&gt; integers2)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//				integers.addAll(integers2);</span></span><br><span class="line">    <span class="keyword">return</span> integers;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">System.out.println(reduce);<span class="comment">//[1, 2, 3, 4]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> reduce = IntStream.range(<span class="number">1</span>, <span class="number">10</span>).reduce(<span class="number">0</span>, (s1, s2) -&gt; s1 + s2);<span class="comment">//45</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>根据对象中的某个属性去重,</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Person&gt; list = Lists.newArrayList(p1,p2,p3,p4,p5);</span><br><span class="line">List&lt;Person&gt; uniqueList = list.stream().collect(Collectors.collectingAndThen(</span><br><span class="line">                Collectors.toCollection(() -&gt; <span class="keyword">new</span> TreeSet&lt;&gt;((s1,s2)-&gt;&#123;</span><br><span class="line">                  	<span class="comment">//名称相同的时候 数量+1</span></span><br><span class="line">                    <span class="keyword">if</span>(s1.getName().equals(s2.getName())&amp;&amp;s1!=s2)&#123;</span><br><span class="line">                        s2.setCount(s1.getCount()+s2.getCount());</span><br><span class="line">                    &#125;</span><br><span class="line">                  	<span class="comment">//根据Person对象中的name去重</span></span><br><span class="line">                    <span class="keyword">return</span> s1.getName().compareTo(s2.getName());</span><br><span class="line">                &#125;)), ArrayList::<span class="keyword">new</span>));</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>list和array之间的互转</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; l = Lists.newArrayList(<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>);</span><br><span class="line">String[] array = l.stream().toArray(String[]::<span class="keyword">new</span>);</span><br><span class="line">List&lt;String&gt; l2 = Stream.of(array).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>排序、取最大、最小值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;String&gt; sortedStream = stream.sorted(String::compareTo);</span><br><span class="line">Optional maxOptionnal = stream.min(String::compareTo);</span><br><span class="line">IntStream.range(<span class="number">1</span>,<span class="number">10</span>).max();</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>过滤</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; ll = Lists.newArrayList(<span class="string">"a"</span>,<span class="string">""</span>,<span class="string">"b"</span>);</span><br><span class="line">ll.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>anyMatch、allMatch、noneMatch</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> b = IntStream.of(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">10</span>).anyMatch((s) -&gt; s % <span class="number">3</span> == <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2><span id="参考">参考</span></h2>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/" target="_blank" rel="noopener">Java 8 中的 Streams API 详解</a></p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/08/05/java8/java8之Comparator/" data-toggle="tooltip" data-placement="top" title="java8之Comparator">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/08/05/java8/java8之lambda表达式/" data-toggle="tooltip" data-placement="top" title="java8之lambda表达式">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/08/05/java8/java8之Stream流/";
+    var disqus_url = "http://yoursite-url/2017/08/05/java8/java8之Stream流/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

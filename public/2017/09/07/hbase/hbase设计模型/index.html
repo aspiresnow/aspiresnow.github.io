@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          hbase数据模型 - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/09/07/hbase/hbase设计模型/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                            
+                        </div>
+                        <h1>hbase数据模型</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2017-09-07
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="hbase设计模型">Hbase设计模型</span></h1>
+<h2><span id="hbase基本组件">HBase基本组件</span></h2>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/17-8-6/72109526.jpg" alt="image"></p>
+<ul>
+<li>
+<p>Client</p>
+<ul>
+<li>使用HBase RPC机制与HMaster和HRegionServer进行通信</li>
+<li>Client与HMaster进行通信进行管理类操作</li>
+<li>Client与HRegionServer进行数据读写类操作</li>
+<li>Client访问ZK获取_ROOT_表位置，获取集群的属性</li>
+<li>缓存Region的位置信息来加快对HBase的访问</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p>HMaster</p>
+<p>HBase中可以启动多个HMaster，通过Zookeeper保证总有一个Active Master运行。主要负责Table和Region的管理工作：</p>
+<ul>
+<li>管理用户对Table的增删改操作</li>
+<li>负责Region Split后新Region的分布,管理HRS的负载均衡</li>
+<li>发现失效的HRS重新分配其上的HR</li>
+<li>Client对HBase数据的操作并不需要HMaster参与，仅仅维护者Table和HR的元数据信息，负载很低</li>
+</ul>
+</li>
+<li>
+<p>HRegion Server</p>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/17-8-6/22930446.jpg" alt="image"></p>
+<ul>
+<li>负责响应client的I\O请求，存储hbase的数据文件，查询并返回数据</li>
+<li>HRS上存储多个Region</li>
+<li>HRS负责切分Region，当一个Region中的文件大小超过某个阈值(hbase.hregion.max.filesize)时，开始分裂成两个新Region，并由HMaster实现负载均衡，将新的分配到其他的HRS，同时删除旧Region</li>
+<li>不要给RegionServer太大堆内存，堆内存在使用过程中会产生大量碎片，一旦full gc时间过长，master会判定slave进程已经死掉，并将其从slave工作列表中移除</li>
+</ul>
+</li>
+<li>
+<p>ZooKeeper</p>
+<ul>
+<li>通过选举，保证任何时候，集群中只有一个HMaster。ZK的引入使得HMaster不再是单点故障。</li>
+<li>HBase依赖ZooKeeper提供消息通信机制，避免了master和region服务器之间的心跳信息的传递。HMaster与HRS启动时会向ZK注册，并定时向ZK发送心跳。实时监控HRS的状态，将HRS上线和下线信息实时通知给HMaster。</li>
+<li><strong>Zookeeper存储了-ROOT-表地址(所有Region的寻址入口)、HMaster地址</strong>。</li>
+<li>存储Hbase的schema,包括有哪些table，每个table有哪些column family</li>
+</ul>
+</li>
+</ul>
+<h2><span id="存储模型">存储模型</span></h2>
+<ul>
+<li>Namespace
+<ul>
+<li>命名空间是对表的逻辑分组，同一个空间下的表有类似的用途</li>
+<li>配额管理：制一个namespace可以使用的资源，资源包括region和table等</li>
+<li>命名空间安全管理：提供了另一个层面的多租户安全管理</li>
+<li>Region服务器组：一个命名空间或一张表，可以被固定到一组regionservers上，从而保证了数据隔离性</li>
+<li>hbase内部有两个预定义的命名空间 hbase(系统表命名空间)和default(未指定命名空间的表自动归类)</li>
+<li>create_namespace ‘ns’              create ‘ns:tableName’,‘f1’</li>
+</ul>
+</li>
+<li>Table
+<ul>
+<li>在hbase中，每张表在hbase的根目录下都有自己的目录，在表目录下有一个.tableinfo的文件存储表的结构信息</li>
+<li>一张表初始时只有一个Region，向Region插入数据时，会检查region的大小，确保其不会超过配置的最大值，如果超过了限制，系统会在<code>中间键</code>(midlle key)处将这个region拆分成两个大致相等的region，通过HMaster负责均衡分布到其他ReginServer上</li>
+<li>一个Region只会存储一张表的数据</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p>Region</p>
+<ul>
+<li>
+<p>在表目录下存在每个Region的目录，Region目录下有个.regininfo文件存储region的信息</p>
+</li>
+<li>
+<p>Region中的数据<strong>按照Row Key字典顺序排列</strong></p>
+</li>
+<li>
+<p>HBase自动把表水平（按Row）划分成多个区域(region)，每个region会保存一个表里面某段连续的数据</p>
+</li>
+<li>
+<p>每个表一开始只有一个region，随着数据不断插入表，region不断增大，当增大到一个阀值的时候，region就会等分会两个新的region；当table中的行不断增多，就会有越来越多的region。这样一张完整的表被保存在多个Region 上。拆分的同时会更新.META.表。</p>
+</li>
+<li>
+<p>Region是HBase中分布式存储和负载均衡的最小单元（默认256M）。最小单元表示不同的Region可以分布在不同的HRegionServer上。但一个Region不会拆分到多个server上。</p>
+</li>
+<li>
+<p>一个Region有多个Store，一个Store包含一个MemStore(内存数据)和多个StoreFile(磁盘数据)， 每个StoreFile保存一个ColumnFamily，其中StoreFile存储在HDFS上，对应为HFile文件。</p>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/17-8-6/28630158.jpg" alt="image"></p>
+<p>​</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Store</p>
+<ul>
+<li>
+<p>一个Region包含多个Stroe，每个Store保存一个Column Family的所有数据</p>
+</li>
+<li>
+<p>一个列族可以有多个StoreFile，但一个StoreFile只能存储一个列族的数据</p>
+</li>
+<li>
+<p>一个Store包含一个位于内存中的MemStore和多个位于硬盘的StoreFile</p>
+</li>
+</ul>
+</li>
+<li>
+<p>MemStore</p>
+<ul>
+<li>MemStore处于内存中，默认64MB，用于内存级别接收client端的操作</li>
+<li>一旦KeyValue的写入WAL中，数据就会放到MemStore中，如果MemStore写满会刷写到磁盘，生成一个新的StoreFile</li>
+<li>客户端检索数据时，先在MemStore找，找不到再找StoreFile。</li>
+</ul>
+</li>
+<li>
+<p>HLog(WAL)日志</p>
+<p>由于MemStore中的数据是存储在内存中的，一旦系统出错或者宕机，一旦HRS意外退出，<strong>MemStore</strong>中的内存数据就会丢失，为防止这种情况，引入WAL，写MemStore之前先写入日志，Memstore刷写成一个StoreFile后再删除日志。</p>
+</li>
+<li>
+<p>StoreFile</p>
+<ul>
+<li>对HFile的简单封装，实际的物理存储文件</li>
+</ul>
+</li>
+</ul>
+<h2><span id="数据模型">数据模型</span></h2>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/17-8-14/25315218.jpg" alt="image"></p>
+<ul>
+<li>
+<p>Rowkey</p>
+<ul>
+<li>
+<p>Row key按照字典序存储，要充分考虑排序存储这个特性，将经常一起读取的行存储放到一起(位置相关性)。</p>
+</li>
+<li>
+<p>字典序对int排序的结果是1,10,100,11,2,20,21,…,9。要保持整形的自然序，行键必须用0作左填充。</p>
+</li>
+<li>
+<p>行的一次读写是原子操作 (不论一次读写多少列)，使得多用户不能并发对同一个行进行更新操作。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Column Family(列族)</p>
+<ul>
+<li>
+<p>建表时手动指定，包含一个或者多个列</p>
+</li>
+<li>
+<p>列族中的数据都是以二进制的形式保存在hdfs上，没有数据类型</p>
+</li>
+<li>
+<p>不能重命名列族，通常做是法先创建新的列族，然后将数据复制过去，最后再删除旧的列族。</p>
+</li>
+<li>
+<p>每个列族存储在HDFS上的一个单独文件中</p>
+</li>
+<li>
+<p>访问控制、磁盘和内存的使用统计都是在列族层面进行的</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Column</p>
+<ul>
+<li>列族下可以添加任意多个列</li>
+<li>列名在添加数据时动态添加，无需在建表时指定。没有具体的数据类型</li>
+</ul>
+</li>
+<li>
+<p>TimeStamp</p>
+<ul>
+<li>默认值使用系统时间戳，如果应用程序要避免数据时间戳冲突，就必须自己生成具有唯一性的时间戳。</li>
+<li>为了避免数据存在过多版本造成的的管理 (包括存贮和索引)负担，HBase提供了两种数据版本回收方式。一是保存数据的最后n个版本，二是保存最近一段时间内的版本（即设置HColumnDescriptor.setTimeToLive(); 比如最近七天）。用户可以针对每个列族单独进行设置。</li>
+</ul>
+</li>
+<li>
+<p>Cell</p>
+<ul>
+<li>HBase中通过&quot; tableName + RowKey + ColumnKey &quot;确定的唯一存贮单元称为Cell。</li>
+<li>每个Cell都保存着同一份数据的多个版本，每个版本通过时间戳Time Stamp来索引。</li>
+<li>每个cell中，不同版本的数据按照时间倒序排列，即最新的数据排在最前面。</li>
+<li>Cell的每个值通过4个键tableName + RowKey + ColumnKey + Timestamp =&gt; value唯一确定一个KeyValue</li>
+</ul>
+</li>
+<li>
+<p>KeyValue</p>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/17-9-12/53822290.jpg" alt="image"></p>
+<ul>
+<li>KeyValue就是一个简单的byte数组，以两个分别表示键长度和值长度的定长数字开始。通过这两个值可以忽略键直接访问值</li>
+<li>每一个KeyValue实例包含了行键、列键和时间戳索引和值 (Table,RowKey,Family,Column,Timestamp)—&gt;value，(Timestamp是一个 64 位Java的long型)，数据按照一个四维坐标系统来组织：行键、列族、列限定符和时间版本</li>
+<li>多个KeyValue之间的存储是有序的</li>
+<li>KeyValue所有可能存在的形式 Put、Delete、DeleteColumn、DeleteFamily</li>
+</ul>
+</li>
+</ul>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/09/08/hbase/hbase的增删改查/" data-toggle="tooltip" data-placement="top" title="hbase读写操作">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/09/06/hbase/hbase认识与安装配置/" data-toggle="tooltip" data-placement="top" title="hbase认识与安装配置">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/09/07/hbase/hbase设计模型/";
+    var disqus_url = "http://yoursite-url/2017/09/07/hbase/hbase设计模型/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

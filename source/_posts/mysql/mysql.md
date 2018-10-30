@@ -1,25 +1,18 @@
 ---
 title: mysql
-catalog: 保证内存可见性
-date: 2017-09-01 10:51:24
-subtitle: ""
-header-img: 
+date: 2017-11-22 17:25:26
 tags:
 - mysql
 categories:
-- 数据库
+- mysql
 
 ---
 
 # Mysql
 
-mysql
-
-<!--more-->
-
 show variables like '%thread%';
 
-```
+```shell
 | Variable_name                           | Value                     |
 +-----------------------------------------+---------------------------+
 | innodb_purge_threads                    | 1                         |
@@ -42,7 +35,7 @@ show variables like '%thread%';
 
  show variables like '%conn%';
 
-```
+```shell
 +-----------------------------------------------+-----------------+
 | Variable_name                                 | Value           |
 +-----------------------------------------------+-----------------+
@@ -60,7 +53,7 @@ show variables like '%thread%';
 
 show status like '%conn%';  查看当前mysql实例连接数情况
 
-```
+```shell
 +-----------------------------------------------+------------+
 | Variable_name                                 | Value      |
 +-----------------------------------------------+------------+
@@ -83,7 +76,7 @@ show status like '%conn%';  查看当前mysql实例连接数情况
 
 show variables like '%slow%';
 
-```java
+```shell
 +---------------------------+----------------------------------------------+
 | Variable_name             | Value                                        |
 +---------------------------+----------------------------------------------+
@@ -97,7 +90,7 @@ show variables like '%slow%';
 
  show variables like '%long_query%';
 
-```
+```shell
 +-----------------+----------+
 | Variable_name   | Value    |
 +-----------------+----------+

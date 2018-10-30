@@ -1,8 +1,14 @@
 ---
-title: 数据结构之tree
+title: 数据结构
 date: 2017-11-22 17:25:26
 tags:
+- todo
+categories:
+- java
+
 ---
+
+# 数据结构
 
 问题-->逻辑结构-->存储结构-->实现操作
 

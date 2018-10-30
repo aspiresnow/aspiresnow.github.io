@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          hbase的RegionServer定位 - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/09/13/hbase/hbase的RegionServer定位/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                            
+                        </div>
+                        <h1>hbase的RegionServer定位</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2017-09-13
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="hbase的regionserver定位">hbase的RegionServer定位</span></h1>
+<h3><span id="hbase-使用三层类似b树的结构来保存region位置">Hbase 使用三层类似B+树的结构来保存region位置：</span></h3>
+<ol>
+<li>第一层是保存zookeeper里面的文件，它持有root region的位置。</li>
+<li>第二层root region是.META.表的第一个region其中保存了.META.z表其它region的位置。通过root region，我们就可以访问.META.表的数据。</li>
+<li>.META.是第三层，它是一个特殊的表，保存了Hbase中所有数据表的region 位置信息。</li>
+</ol>
+<h3><span id="-root-和-meta-表">-ROOT- 和 .META. 表</span></h3>
+<ul>
+<li>
+<p>-ROOT-表：记录了.META.表对应的HRS信息，<strong>-ROOT-表永远不会被split，只有一个Region</strong>。</p>
+</li>
+<li>
+<p>ZK中保存了-ROOT-表对应的HRS位置，默认的路径是 “/hbase/root-region-server”</p>
+</li>
+<li>
+<p>.META.表：记录了用户表对应的HRS信息，由于.META.表太大，会被切分成多个HR，存储在不同的HRS中。</p>
+</li>
+<li>
+<p>读取数据的流程：ZooKeeper --&gt; -ROOT-(单个Region) --&gt; .META.(多个) --&gt; HRS --&gt; 用户Table。3次网络操作</p>
+<p>读请求处理过程(无需借助HMaster)</p>
+</li>
+<li>
+<p>client会将查询过的位置信息保存缓存起来，缓存不会主动失效，因此如果client上的缓存全部失效，则需要进行6次网络来回，才能定位到正确的region(其中三次用来发现缓存失效，另外三次用来获取位置信息)。</p>
+</li>
+</ul>
+<p>在HBase中，大部分的操作都是在RegionServer完成的，Client端想要插入，删除，查询数据都需要先找到相应的RegionServer。什么叫相应的RegionServer？就是管理你要操作的那个Region的RegionServer。Client本身并不知道哪个RegionServer管理哪个Region，那么它是如何找到相应的RegionServer的？本文就是在研究源码的基础上揭秘这个过程。</p>
+<p>在前面的文章“HBase存储架构”中我们已经讨论了HBase基本的存储架构。在此基础上我们引入两个特殊的概念：-ROOT-和.META.。这是什么？它们是HBase的两张内置表，从存储结构和操作方法的角度来说，它们和其他HBase的表没有任何区别，你可以认为这就是两张普通的表，对于普通表的操作对它们都适用。它们与众不同的地方是HBase用它们来存贮一个重要的系统信息——Region的分布情况以及每个Region的详细信息。</p>
+<p>好了，既然我们前面说到**-ROOT-<strong>和</strong>.META.**可以被看作是两张普通的表，那么它们和其他表一样就应该有自己的表结构。没错，它们有自己的表结构，并且这两张表的表结构是相同的，在分析源码之后我将这个表结构大致的画了出来：</p>
+<p><strong>-ROOT-和.META.表结构</strong></p>
+<p><img src="http://dl.iteye.com/upload/picture/pic/124503/5120c136-5b0e-3d02-9ebc-f7ed08800532.jpg" alt="-ROOT-和.META.表结构"></p>
+<p>我们来仔细分析一下这个结构，每条Row记录了一个Region的信息。</p>
+<p>首先是RowKey，RowKey由三部分组成：TableName, StartKey 和 TimeStamp。RowKey存储的内容我们又称之为Region的Name。哦，还记得吗？我们在前面的文章中提到的，用来存放Region的文件夹的名字是RegionName的Hash值，因为RegionName可能包含某些非法字符。现在你应该知道为什么RegionName会包含非法字符了吧，因为StartKey是被允许包含任何值的。将组成RowKey的三个部分用逗号连接就构成了整个RowKey，这里TimeStamp使用十进制的数字字符串来表示的。这里有一个RowKey的例子：</p>
+<p>Java代码  <a href=""><img src="http://greatwqs.iteye.com/images/icon_star.png" alt="收藏代码"></a></p>
+<ol>
+<li>Table1,RK10000,12345678</li>
+</ol>
+<p>然后是表中最主要的Family：info，info里面包含三个Column：regioninfo, server, serverstartcode。其中regioninfo就是Region的详细信息，包括StartKey, EndKey 以及每个Family的信息等等。server存储的就是管理这个Region的RegionServer的地址。</p>
+<p>所以当Region被拆分、合并或者重新分配的时候，都需要来修改这张表的内容。</p>
+<p>到目前为止我们已经学习了必须的背景知识，下面我们要正式开始介绍Client端寻找RegionServer的整个过程。我打算用一个假想的例子来学习这个过程，因此我先构建了假想的-ROOT-表和.META.表。</p>
+<p>我们先来看.META.表，假设HBase中只有两张用户表：Table1和Table2，Table1非常大，被划分成了很多Region，因此在.META.表中有很多条Row用来记录这些Region。而Table2很小，只是被划分成了两个Region，因此在.META.中只有两条Row用来记录。这个表的内容看上去是这个样子的：</p>
+<p><strong>.META.行记录结构</strong></p>
+<p><img src="http://dl.iteye.com/upload/picture/pic/124499/951c379d-cc22-3ccd-a377-7a24d09ed479.jpg" alt=".META.行记录结构"></p>
+<p>现在假设我们要从Table2里面插寻一条RowKey是RK10000的数据。那么我们应该遵循以下步骤：</p>
+<p>\1. 从.META.表里面查询哪个Region包含这条数据。</p>
+<p>\2. 获取管理这个Region的RegionServer地址。</p>
+<p>\3. 连接这个RegionServer, 查到这条数据。</p>
+<p>好，我们先来第一步。问题是.META.也是一张普通的表，我们需要先知道哪个RegionServer管理了.META.表，怎么办？有一个方法，我们把管理.META.表的RegionServer的地址放到ZooKeeper上面不久行了，这样大家都知道了谁在管理.META.。</p>
+<p>貌似问题解决了，但对于这个例子我们遇到了一个新问题。因为Table1实在太大了，它的Region实在太多了，.META.为了存储这些Region信息，花费了大量的空间，自己也需要划分成多个Region。这就意味着可能有多个RegionServer在管理.META.。怎么办？在ZooKeeper里面存储所有管理.META.的RegionServer地址让Client自己去遍历？HBase并不是这么做的。</p>
+<p>HBase的做法是用另外一个表来记录.META.的Region信息，就和.META.记录用户表的Region信息一模一样。这个表就是-ROOT-表。这也解释了为什么-ROOT-和.META.拥有相同的表结构，因为他们的原理是一模一样的。</p>
+<p>假设.META.表被分成了两个Region，那么-ROOT-的内容看上去大概是这个样子的：</p>
+<p><strong>-ROOT-行记录结构</strong></p>
+<p><img src="http://dl.iteye.com/upload/picture/pic/124501/d1f2e0e1-52a2-3946-8a0d-a6c7bda41cff.jpg" alt="-ROOT-行记录结构"></p>
+<p>这么一来Client端就需要先去访问-ROOT-表。所以需要知道管理-ROOT-表的RegionServer的地址。这个地址被存在ZooKeeper中。默认的路径是：</p>
+<p>Java代码  <a href=""><img src="http://greatwqs.iteye.com/images/icon_star.png" alt="收藏代码"></a></p>
+<ol>
+<li>/hbase/root-region-server</li>
+</ol>
+<p>等等，如果-ROOT-表太大了，要被分成多个Region怎么办？嘿嘿，HBase认为-ROOT-表不会大到那个程度，因此-ROOT-只会有一个Region，这个Region的信息也是被存在HBase内部的。</p>
+<p>现在让我们从头来过，我们要查询Table2中RowKey是RK10000的数据。整个路由过程的主要代码在org.apache.hadoop.hbase.client.HConnectionManager.TableServers中：</p>
+<p>Java代码  <a href=""><img src="http://greatwqs.iteye.com/images/icon_star.png" alt="收藏代码"></a></p>
+<ol>
+<li>private HRegionLocation locateRegion(final byte[] tableName,</li>
+<li>​        final byte[] row, boolean useCache) throws IOException {</li>
+<li>​    if (tableName == null || tableName.length == 0) {</li>
+<li>​        throw new IllegalArgumentException(“table name cannot be null or zero length”);</li>
+<li>​    }</li>
+<li>​    if (Bytes.equals(tableName, ROOT_TABLE_NAME)) {</li>
+<li>​        synchronized (rootRegionLock) {</li>
+<li>​            // This block guards against two threads trying to find the root</li>
+<li>​            // region at the same time. One will go do the find while the</li>
+<li>​            // second waits. The second thread will not do find.</li>
+<li>​            if (!useCache || rootRegionLocation == null) {</li>
+<li>​                this.rootRegionLocation = locateRootRegion();</li>
+<li>​            }</li>
+<li>​            return this.rootRegionLocation;</li>
+<li>​        }</li>
+<li>​    } else if (Bytes.equals(tableName, META_TABLE_NAME)) {</li>
+<li>​        return locateRegionInMeta(ROOT_TABLE_NAME, tableName, row, useCache, metaRegionLock);</li>
+<li>​    } else {</li>
+<li>​        // Region not in the cache – have to go to the meta RS</li>
+<li>​        return locateRegionInMeta(META_TABLE_NAME, tableName, row, useCache, userRegionLock);</li>
+<li>​    }</li>
+<li>}</li>
+</ol>
+<p>这是一个递归调用的过程：</p>
+<p>Java代码  <a href=""><img src="http://greatwqs.iteye.com/images/icon_star.png" alt="收藏代码"></a></p>
+<ol>
+<li>获取Table2，RowKey为RK10000的RegionServer =&gt; 获取.META.，RowKey为Table2,RK10000, 99999999999999的RegionServer =&gt; 获取-ROOT-，RowKey为.META.,Table2,RK10000,99999999999999,99999999999999的RegionServer =&gt; 获取-ROOT-的RegionServer =&gt; 从ZooKeeper得到-ROOT-的RegionServer =&gt; 从-ROOT-表中查到RowKey最接近（小于） .META.,Table2,RK10000,99999999999999,99999999999999的一条Row，并得到.META.的RegionServer =&gt; 从.META.表中查到RowKey最接近（小于）Table2,RK10000, 99999999999999的一条Row，并得到Table2的RegionServer =&gt; 从Table2中查到RK10000的Row</li>
+</ol>
+<p>到此为止Client完成了路由RegionServer的整个过程，在整个过程中使用了添加“99999999999999”后缀并查找最接近（小于）RowKey的方法。对于这个方法大家可以仔细揣摩一下，并不是很难理解。</p>
+<p>最后要提醒大家注意两件事情：</p>
+<p>\1. 在整个路由过程中并没有涉及到MasterServer，也就是说HBase日常的数据操作并不需要MasterServer，不会造成MasterServer的负担。</p>
+<p>\2. Client端并不会每次数据操作都做这整个路由过程，很多数据都会被Cache起来。至于如何Cache，则不在本文的讨论范围之内。</p>
+<p>原</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/09/14/hbase/hbase的容错/" data-toggle="tooltip" data-placement="top" title="hbase的容错">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/09/10/hbase/hbase的表设计/" data-toggle="tooltip" data-placement="top" title="hbase的表设计">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/09/13/hbase/hbase的RegionServer定位/";
+    var disqus_url = "http://yoursite-url/2017/09/13/hbase/hbase的RegionServer定位/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

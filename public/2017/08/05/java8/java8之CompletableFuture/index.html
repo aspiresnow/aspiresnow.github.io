@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          java8之CompletableFuture - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/08/05/java8/java8之CompletableFuture/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                            
+                              <a class="tag" href="/tags/#多线程" title="多线程">多线程</a>
+                            
+                        </div>
+                        <h1>java8之CompletableFuture</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2017-08-05
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="java8之completablefuture">java8之CompletableFuture</span></h1>
+<p>CompletableFuture实现了Future接口，是jdk8新添加的对与并发编程的扩展支持。通过CompletableFuture可以方便的操作多个异步任务、执行结果的回调等操作。</p>
+<a id="more"></a>
+<h2><span id="completablefuture优点">CompletableFuture优点</span></h2>
+<p>jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞获取异步任务的结果。但是依然存在一些局限性，只能阻塞或者轮询去监控获取异步任务的结果，jdb8中的CompletableFuture实现了Future接口，同时扩展了异步编程中更多的需求</p>
+<ul>
+<li>可以再异步任务异常或者完成的时候回调通知监听者</li>
+<li>异步任务完成之后直接参与下个流程</li>
+<li>将两个异步任务合并为一个异步任务，其中的两个异步任务可以依次依赖执行，也可以同时执行</li>
+<li>仅获取多个异步任务中最快结束的任务返回结果</li>
+<li>parallelStream使用默认的ForkJoinPool无法修改线程数，而CompletableFuture可以指定线程池，默认跟parallelStream用的是一样的线程池</li>
+</ul>
+<h2><span id="用法">用法</span></h2>
+<p>jdk8之前使用futureTask创建一个有返回值的异步线程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Callable callable = () -&gt; <span class="number">0</span>d;</span><br><span class="line">FutureTask&lt;Double&gt; future = <span class="keyword">new</span> FutureTask&lt;Double&gt;(callable);</span><br><span class="line">Thread thread = <span class="keyword">new</span> Thread(future);</span><br><span class="line">thread.start();</span><br><span class="line">System.out.println(future.get());</span><br></pre></td></tr></table></figure>
+<p>jdk8提供了CompletableFuture，同样实现了future接口，可以通过以下方式创建一个带返回结果的异步任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">CompletableFuture&lt;Double&gt; completableFuture = <span class="keyword">new</span> CompletableFuture();</span><br><span class="line">Thread thread = <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">double</span> price = getPrice(product);</span><br><span class="line">    completableFuture.complete(price);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="comment">//发生异常时，工作线程会被kill，使用future将异常传递给调用线程</span></span><br><span class="line">    completableFuture.completeExceptionally(e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">thread.start();</span><br><span class="line">System.out.println(completableFuture.get());</span><br></pre></td></tr></table></figure>
+<p>CompletableFuture提供了静态方法，直接创建异步任务，同时也可以指定线程池，如果不指定，默认使用ForkJoinPool.commonPool()</p>
+<ul>
+<li>
+<p>创建不带返回结果的异步任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> CompletableFuture&lt;Void&gt; <span class="title">runAsync</span><span class="params">(Runnable runnable)</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> CompletableFuture&lt;Void&gt; <span class="title">runAsync</span><span class="params">(Runnable runnable,Executor executor)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>创建带返回结果的异步任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;U&gt; <span class="function">CompletableFuture&lt;U&gt; <span class="title">supplyAsync</span><span class="params">(Supplier&lt;U&gt; supplier)</span> </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> &lt;U&gt; CompletableFuture&lt;U&gt; <span class="title">supplyAsync</span><span class="params">(Supplier&lt;U&gt; supplier,Executor executor)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="获取值">获取值</span></h3>
+<p>CompletableFuture提供了多种获取异步任务返回值的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> T    <span class="title">get</span><span class="params">()</span>  <span class="comment">//阻塞等待直到有返回结果,抛出检查性异常</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T    <span class="title">get</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span>  <span class="comment">//阻塞等待指定时间,抛出检查性异常抛出非检查性异常</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T    <span class="title">getNow</span><span class="params">(T valueIfAbsent)</span>  <span class="comment">//如果结果已经计算完则返回结果或抛异常，否则返回给定的valueIfAbsent的值。</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T    <span class="title">join</span><span class="params">()</span>  <span class="comment">//阻塞等待直到有返回结果，抛出非检查性异常，当任务异常后，join会抛出RuntimeException,多次调用join会抛出CompletionException异常</span></span></span><br></pre></td></tr></table></figure>
+<h3><span id="状态检查">状态检查</span></h3>
+<p>可以通过isDone检查异步任务是否执行完毕，isCompletedExceptionally检查异步任务是否抛出异常结束</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isDone</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isCompletedExceptionally</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h3><span id="异步链式">异步链式</span></h3>
+<p>CompletableFuture的异步链式方法都提供了三个类型</p>
+<ul>
+<li>同一线程:跟调用者CompletableFuture使用同一个线程</li>
+<li>Async: 使用<code>ForkJoinPool.commonPool()</code>系统级公共线程池中的线程，默认是守护线程，(jvm退出守护线程即消亡)</li>
+<li>Async+指定executor: 使用指定的线程池中的线程执行</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> threadCount = <span class="number">2</span>;</span><br><span class="line">        AtomicInteger atomicInteger = <span class="keyword">new</span> AtomicInteger(<span class="number">1</span>);</span><br><span class="line">        executorService = Executors.newFixedThreadPool(threadCount, r -&gt; &#123;</span><br><span class="line">            Thread t = <span class="keyword">new</span> Thread(Thread.currentThread().getThreadGroup(), r, <span class="string">"test"</span>+atomicInteger.getAndIncrement());</span><br><span class="line">            t.setDaemon(<span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">return</span> t;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在执行一组异步操作的时候，一定不要将join和生成CompletableFuture的map放在一个链里面，不然会阻塞</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  List&lt;String&gt; parameters = Lists.newArrayList(<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>,<span class="string">"d"</span>);</span><br><span class="line">  List&lt;CompletableFuture&gt; futureList = parameters.stream().map(s -&gt; CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000L</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">"执行完毕:"</span> + s);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">  &#125;,executorService)).collect(Collectors.toList());</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  <span class="comment">//单独放在一个map链里面</span></span><br><span class="line">  futureList.stream().map(s -&gt; s.join()).forEach(System.out::println);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="thenapply">thenApply</span></h4>
+<p><strong>等待异步返回结果，将异步返回的结果作为参数，执行function转换结果</strong>。thenApply方法会跟异步任务使用同一个线程(异步任务很快的时候测试时用的main线程),Async方法会启用ForkJoinPool中的线程来执行function。如果不想用默认的ForkJoinPool，可以指定一个线程池。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">thenApply</span><span class="params">(Function&lt;? <span class="keyword">super</span> T,? extends U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">thenApplyAsync</span><span class="params">(Function&lt;? <span class="keyword">super</span> T,? extends U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">thenApplyAsync</span><span class="params">(Function&lt;? <span class="keyword">super</span> T,? extends U&gt; fn,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  System.out.println(<span class="string">"main start"</span>);</span><br><span class="line">  CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before first"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after first"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"first"</span>;</span><br><span class="line">  &#125;, executorService).thenApplyAsync((s) -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": get "</span> + s);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"second"</span>;</span><br><span class="line">  &#125;,executorService);</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  String join = future.join();</span><br><span class="line">  System.out.println(String.format(<span class="string">"future result %s"</span>,join));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">main start</span></span><br><span class="line"><span class="comment">test1: before first</span></span><br><span class="line"><span class="comment">main over</span></span><br><span class="line"><span class="comment">test1: after first</span></span><br><span class="line"><span class="comment">test2: get first</span></span><br><span class="line"><span class="comment">future result second</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4><span id="thenaccept">thenAccept</span></h4>
+<p>等待异步返回结果，将异步返回的结果作为参数，执行consumer消耗结果。同thenApply一样，唯一不同的是该方法没有返回值，直接消费异步结果，不再需要阻塞主线程获取异步结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenAccept</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenAcceptAsync</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenAcceptAsync</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> T&gt; action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="thenrun">thenRun</span></h4>
+<p>等待异步返回结果，然后执行任务。同thenApply一样，唯一不同的是该方法等待异步任务执行完毕后执行自己的任务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenRun</span><span class="params">(Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenRunAsync</span><span class="params">(Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">thenRunAsync</span><span class="params">(Runnable action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="thencompose">thenCompose</span></h4>
+<p>合并两个异步操作。等待第一个异步任务执行完毕，将结果作为第二个异步任务的参数来执行第二个异步任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletableFuture&lt;U&gt; <span class="title">thenCompose</span><span class="params">(Function&lt;? <span class="keyword">super</span> T, ? extends CompletionStage&lt;U&gt;&gt; fn)</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> &lt;U&gt; CompletableFuture&lt;U&gt; <span class="title">thenComposeAsync</span><span class="params">(Function&lt;? <span class="keyword">super</span> T, ? extends CompletionStage&lt;U&gt;&gt; fn)</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> &lt;U&gt; CompletableFuture&lt;U&gt; <span class="title">thenComposeAsync</span><span class="params">(Function&lt;? <span class="keyword">super</span> T, ? extends CompletionStage&lt;U&gt;&gt; fn,<span class="keyword">public</span> &lt;U&gt; CompletableFuture&lt;U&gt; thenComposeAsync(Function&lt;? <span class="keyword">super</span> T, ? extends CompletionStage&lt;U&gt;&gt; fn)</span>)</span></span><br></pre></td></tr></table></figure>
+<h4><span id="thencombine">thenCombine</span></h4>
+<p>合并两个异步操作。同时执行两个异步操作，等待两个都执行完毕后将两个异步操作的结果合并转换后返回一个future，调用join方法获取结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U,V&gt; <span class="function">CompletionStage&lt;V&gt; <span class="title">thenCombine</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiFunction&lt;? <span class="keyword">super</span> T,? <span class="keyword">super</span> U,? extends V&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U,V&gt; <span class="function">CompletionStage&lt;V&gt; <span class="title">thenCombineAsync</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiFunction&lt;? <span class="keyword">super</span> T,? <span class="keyword">super</span> U,? extends V&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U,V&gt; <span class="function">CompletionStage&lt;V&gt; <span class="title">thenCombineAsync</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiFunction&lt;? <span class="keyword">super</span> T,? <span class="keyword">super</span> U,? extends V&gt; fn,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  System.out.println(<span class="string">"main start"</span>);</span><br><span class="line">  CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before first"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after first"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"first"</span>;</span><br><span class="line">  &#125;, executorService).thenCombineAsync(CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before second"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after second"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"second"</span>;</span><br><span class="line">  &#125;,executorService), (s1, s2) -&gt;  s1 + <span class="string">":"</span> + s2);</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  String join = future.join();</span><br><span class="line">  System.out.println(String.format(<span class="string">"future result %s"</span>,join));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">main start</span></span><br><span class="line"><span class="comment">test1: before first</span></span><br><span class="line"><span class="comment">test1: after first</span></span><br><span class="line"><span class="comment">main over</span></span><br><span class="line"><span class="comment">test2: get first</span></span><br><span class="line"><span class="comment">future result second</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4><span id="thenacceptboth">thenAcceptBoth</span></h4>
+<p>合并两个异步操作,同thenCombine一样，唯一不同是该方法直接消费两个异步任务的结果，不再需要阻塞主线程获取异步结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;Void&gt; <span class="title">thenAcceptBoth</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> U&gt; action)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;Void&gt; <span class="title">thenAcceptBothAsync</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> U&gt; action)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;Void&gt; <span class="title">thenAcceptBothAsync</span><span class="params">(CompletionStage&lt;? extends U&gt; other,BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> U&gt; action,     Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="runafterboth">runAfterBoth</span></h4>
+<p>合并两个异步操作,同thenCombine一样，唯一不同是该方法等待两个异步任务执行完毕后，执行自己的任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterBoth</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterBothAsync</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterBothAsync</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="applytoeither">applyToEither</span></h4>
+<p>两个异步操作，任意一个返回结果，再调用join的时候就返回接口，其中一个未执行完毕的任务会继续执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">applyToEither</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Function&lt;? <span class="keyword">super</span> T, U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">applyToEitherAsync</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Function&lt;? <span class="keyword">super</span> T, U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">applyToEitherAsync</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Function&lt;? <span class="keyword">super</span> T, U&gt; fn,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  System.out.println(<span class="string">"main start"</span>);</span><br><span class="line">  CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before first"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after first"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"first"</span>;</span><br><span class="line">  &#125;, executorService).applyToEitherAsync(CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before second"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after second"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"second"</span>;</span><br><span class="line">  &#125;, executorService), (s) -&gt; s);</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  String join = future.join();</span><br><span class="line">  System.out.println(String.format(<span class="string">"future result %s"</span>,join));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">main start</span></span><br><span class="line"><span class="comment">test1: before first</span></span><br><span class="line"><span class="comment">test2: before second</span></span><br><span class="line"><span class="comment">main over</span></span><br><span class="line"><span class="comment">test1: after first</span></span><br><span class="line"><span class="comment">future result first</span></span><br><span class="line"><span class="comment">test2: after second</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4><span id="accepteither">acceptEither</span></h4>
+<p>同理acceptEither</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">acceptEither</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">acceptEitherAsync</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">acceptEitherAsync</span><span class="params">(CompletionStage&lt;? extends T&gt; other,Consumer&lt;? <span class="keyword">super</span> T&gt; action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="runaftereither">runAfterEither</span></h4>
+<p>同理runAfterEither，两个异步任务任意一个执行完毕就执行 runAfterEither 参数中的任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterEither</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterEitherAsync</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;Void&gt; <span class="title">runAfterEitherAsync</span><span class="params">(CompletionStage&lt;?&gt; other,Runnable action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="exceptionally">exceptionally</span></h4>
+<p>异常处理，当异步任务出现异常的时候处理方式,相当于 try-catch-finnaly中的catch，<strong>可以调用程序指定的回调函数，通知外界执行异常</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;T&gt; <span class="title">exceptionally</span><span class="params">(Function&lt;Throwable, ? extends T&gt; fn)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="whencomplete">whenComplete</span></h4>
+<p>try-catch-finnaly中的finnaly在返回结果前执行,接收两个参数，result和exception,一种是正常执行，返回值。另外一种是遇到异常抛出造成程序的中断，<strong>可以调用程序指定的回调函数，通知外界执行完毕</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;T&gt; <span class="title">whenComplete</span><span class="params">(BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> Throwable&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;T&gt; <span class="title">whenCompleteAsync</span><span class="params">(BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> Throwable&gt; action)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> CompletionStage&lt;T&gt; <span class="title">whenCompleteAsync</span><span class="params">(BiConsumer&lt;? <span class="keyword">super</span> T, ? <span class="keyword">super</span> Throwable&gt; action,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  System.out.println(<span class="string">"main start"</span>);</span><br><span class="line">  CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": before first"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(<span class="number">1</span> == <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"fff"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">": after first"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"first"</span>;</span><br><span class="line">  &#125;, executorService).exceptionally(e -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">"异常："</span>+e.getMessage());</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"exception"</span>;</span><br><span class="line">  &#125;).whenComplete((r,e) -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">"finnaly result:"</span>+(r!=<span class="keyword">null</span>?r:<span class="string">""</span>));</span><br><span class="line">    System.out.println(<span class="string">"finnaly exception:"</span>+(e!=<span class="keyword">null</span>?e.getMessage():<span class="string">""</span>));</span><br><span class="line">  &#125;);</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  String join = future.join();</span><br><span class="line">  System.out.println(String.format(<span class="string">"future result %s"</span>,join));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">main start</span></span><br><span class="line"><span class="comment">test1: before first</span></span><br><span class="line"><span class="comment">main over</span></span><br><span class="line"><span class="comment">异常：java.lang.RuntimeException: fff</span></span><br><span class="line"><span class="comment">finnaly result:exception</span></span><br><span class="line"><span class="comment">finnaly exception:</span></span><br><span class="line"><span class="comment">future result exception</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4><span id="handle">handle</span></h4>
+<p>运行完成时，对结果的处理，跟whenComplete一样，不过调用该方法会有返回值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">handle</span><span class="params">(BiFunction&lt;? <span class="keyword">super</span> T, Throwable, ? extends U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">handleAsync</span><span class="params">(BiFunction&lt;? <span class="keyword">super</span> T, Throwable, ? extends U&gt; fn)</span></span>;</span><br><span class="line"><span class="keyword">public</span> &lt;U&gt; <span class="function">CompletionStage&lt;U&gt; <span class="title">handleAsync</span><span class="params">(BiFunction&lt;? <span class="keyword">super</span> T, Throwable, ? extends U&gt; fn,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4><span id="allof">allOf</span></h4>
+<p>等待一组异步任务都执行完毕</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">  List&lt;String&gt; parameters = Lists.newArrayList(<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>,<span class="string">"d"</span>);</span><br><span class="line">  CompletableFuture[] futureList = parameters.stream().map(s -&gt; CompletableFuture.supplyAsync(() -&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Thread.currentThread().sleep(<span class="number">1000L</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(Thread.currentThread().getName() + <span class="string">"执行完毕:"</span> + s);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">  &#125;,executorService)).toArray(CompletableFuture[]::<span class="keyword">new</span>);</span><br><span class="line">  System.out.println(<span class="string">"main over"</span>);</span><br><span class="line">  CompletableFuture&lt;Void&gt; voidCompletableFuture = CompletableFuture.allOf(futureList);</span><br><span class="line">  Void join = voidCompletableFuture.join();</span><br><span class="line">  System.out.println(<span class="string">"all run over"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">main over</span></span><br><span class="line"><span class="comment">test1执行完毕:a</span></span><br><span class="line"><span class="comment">test2执行完毕:b</span></span><br><span class="line"><span class="comment">test1执行完毕:c</span></span><br><span class="line"><span class="comment">test2执行完毕:d</span></span><br><span class="line"><span class="comment">all run over</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4><span id="anyof">anyOf</span></h4>
+<p>等待一组任意一个异步任务执行完毕</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/08/05/java8/java8之Collector/" data-toggle="tooltip" data-placement="top" title="java8之Collector">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/08/05/java8/java8之Optional/" data-toggle="tooltip" data-placement="top" title="java8之Optional">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                        
+                          <a class="tag" href="/tags/#多线程" title="多线程">多线程</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/08/05/java8/java8之CompletableFuture/";
+    var disqus_url = "http://yoursite-url/2017/08/05/java8/java8之CompletableFuture/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

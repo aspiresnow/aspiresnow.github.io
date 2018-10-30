@@ -7,6 +7,8 @@ categories:
 - 大数据
 ---
 
+# hbase的BlockCache
+
 和其他数据库一样，优化IO也是HBase提升性能的不二法宝，而提供缓存更是优化的重中之重。最理想的情况是，所有数据都能够缓存到内存，这样就不会有任何文件IO请求，读写性能必然会提升到极致。然而现实是残酷的，随着请求数据的不断增多，将数据全部缓存到内存显得不合实际。幸运的是，我们并不需要将所有数据都缓存起来，根据二八法则，80%的业务请求都集中在20%的热点数据上，因此将这部分数据缓存起就可以极大地提升系统性能。
 
 HBase在实现中提供了两种缓存结构：MemStore和BlockCache。其中MemStore称为写缓存，HBase执行写操作首先会将数据写入MemStore，并顺序写入HLog，等满足一定条件后统一将MemStore中数据刷新到磁盘，这种设计可以极大地提升HBase的写性能。不仅如此，MemStore对于读性能也至关重要，假如没有MemStore，读取刚写入的数据就需要从文件中通过IO查找，这种代价显然是昂贵的！BlockCache称为读缓存，HBase会将一次文件查找的Block块缓存到Cache中，以便后续同一请求或者邻近数据查找请求，可以直接从内存中获取，避免昂贵的IO操作。MemStore相关知识可以戳这里，本文将重点分析BlockCache。
@@ -119,7 +121,7 @@ BucketCache方案的配置说明一直被HBaser所诟病，官方一直没有相
 
 heap模式
 
-```
+```xml
 <hbase.bucketcache.ioengine>heap</hbase.bucketcache.ioengine>
 //bucketcache占用整个jvm内存大小的比例
 <hbase.bucketcache.size>0.4</hbase.bucketcache.size>
@@ -129,7 +131,7 @@ heap模式
 
 offheap模式
 
-```
+```xml
 <hbase.bucketcache.ioengine>offheap</hbase.bucketcache.ioengine>
 <hbase.bucketcache.size>0.4</hbase.bucketcache.size>
 <hbase.bucketcache.combinedcache.percentage>0.9</hbase.bucketcache.combinedcache.percentage>
@@ -137,7 +139,7 @@ offheap模式
 
 file模式
 
-```
+```xml
 <hbase.bucketcache.ioengine>file:/cache_path</hbase.bucketcache.ioengine>
 //bucketcache缓存空间大小，单位为MB
 <hbase.bucketcache.size>10 * 1024</hbase.bucketcache.size>

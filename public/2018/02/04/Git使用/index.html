@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          Git的使用 - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2018/02/04/Git使用/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Git" title="Git">Git</a>
+                            
+                        </div>
+                        <h1>Git的使用</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2018-02-04
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="git的使用">Git的使用</span></h1>
+<h2><span id="git中的提交逻辑">git中的提交逻辑</span></h2>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/18-1-29/76019026.jpg" alt="image"></p>
+<ul>
+<li>Workspace：工作区，工作使用的地方，是当前能看到的最新的代码</li>
+<li>Index / Stage：暂存区，.git目录下的index文件，通过<code>git status</code>可以查看暂存区状态</li>
+<li>Repository：仓库区（或本地仓库）</li>
+<li>Remote：远程仓库</li>
+</ul>
+<h2><span id="git配置">Git配置</span></h2>
+<ul>
+<li>
+<p>配置git提交时的名称和邮箱</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name "lizhi.zhang"</span><br><span class="line">git config --global user.email "lizhi.zhang@xxx.com"</span><br><span class="line">git config --global color.ui true #开启颜色</span><br><span class="line">git config --global alias.st status #设置命令简写</span><br><span class="line">git config --unset user.email #删除用户email信息</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2><span id="head">HEAD</span></h2>
+<p>HEAD，它始终指向当前所处分支的最新的提交点。你所处的分支变化了，或者产生了新的提交点，HEAD就会跟着改变。</p>
+<h2><span id="git常用的指令">git常用的指令</span></h2>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/18-1-29/62404687.jpg" alt="image"></p>
+<h3><span id="git-add">git add</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .	#添加当前目录的所有文件到暂存区(只包含新增和修改，不包括删除)</span><br><span class="line">git add	-A    #保存全部增删改</span><br><span class="line">git add	 files   #添加指定文件到暂存区</span><br></pre></td></tr></table></figure>
+<h3><span id="git-rm">git rm</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rm [file1][file2]... #删除工作区文件，并且将这次删除放入暂存区</span><br><span class="line">git rm --cache xxx #从暂存区移除</span><br></pre></td></tr></table></figure>
+<h3><span id="git-commit">git commit</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git commit  -m "message" #提交暂存区的指定文件到本地仓库,message代表说明信息</span><br><span class="line">git commit --amend -m "message"  #使用一次新的commit，替代上一次提交</span><br><span class="line">git commit -v #提交时显示所有的diff信息</span><br></pre></td></tr></table></figure>
+<h3><span id="git-checkout">git checkout</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git checkout [files..]	#一般用来覆盖工作区，如果不指定提交点的时候，默认使用暂存区覆盖工作区</span><br><span class="line">git checkout . #使用暂存区所有文件覆盖工作区</span><br><span class="line">git checkout [commit] [files...] #使用本地仓库的commit覆盖工作区</span><br><span class="line">git checkout head [files...] #使用本地仓库覆盖工作区</span><br><span class="line">git checkout branchName	#切换分支</span><br></pre></td></tr></table></figure>
+<h3><span id="git-fetch">git fetch</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch #获取远程库的变化到本地库</span><br></pre></td></tr></table></figure>
+<h3><span id="git-pull">git pull</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git pull = git fetch+git merge</span><br><span class="line">git pull --rebase = git fetch + git rebase</span><br><span class="line">git pull origin 远程分支:本地分支 #拉取远程代码到工作区分支</span><br></pre></td></tr></table></figure>
+<h3><span id="git-push">git push</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git push [origin/bracnh] #推送本地分支变动到远程分支，如果本地和远程分支已经绑定，不需要输入名称</span><br><span class="line">git push -u origin master –f #强行推送当前分支到远程分支，即使有冲突</span><br></pre></td></tr></table></figure>
+<h3><span id="git-reset">git reset</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git reset --soft [commit] [file]	#只改变提交点(本地仓库)，暂存区和工作目录的内容都不改变</span><br><span class="line">git reset --mixed [commit] [file]	#改变提交点(本地仓库)，同时改变暂存区的内容，工作区不变</span><br><span class="line">git reset --hard [commit] [file]	#暂存区、工作区的内容都会被修改到与提交点完全一致的状态</span><br><span class="line">git reset --hard HEAD [file]	#让工作区回到上次提交时的状态</span><br></pre></td></tr></table></figure>
+<h3><span id="git-revert">git revert</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git revert head	#撤销前一次 commit</span><br><span class="line">git revert commitNo	#撤销指定的提交</span><br></pre></td></tr></table></figure>
+<p>revert和reset区别</p>
+<ul>
+<li>
+<p>git revert用一个新提交来消除一个历史提交所做的任何修改;git reset是直接删除指定的commit。</p>
+</li>
+<li>
+<p>在回滚这一操作上看，效果差不多。但是在日后继续merge以前的老版本时有区别。因为git revert是用一次逆向的commit“中和”之前的提交，因此日后合并老的branch时，导致这部分改变不会再次出现，减少冲突。但是git reset是之间把某些commit在某个branch上删除，因而和老的branch再次merge时，这些被回滚的commit应该还会被引入，产生很多冲突。</p>
+</li>
+<li>
+<p>git reset 是把HEAD向后移动了一下，而git revert是HEAD继续前进，只是新的commit的内容和要revert的内容正好相反，能够抵消要被revert的内容。</p>
+</li>
+</ul>
+<p><img src="http://omdq6di7v.bkt.clouddn.com/18-1-29/63781244.jpg" alt="image"></p>
+<h3><span id="git-log">git log</span></h3>
+<p>用于查看git的提交历史日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git log --graph —pretty=oneline #查看树形的历史提交日志</span><br><span class="line">git log --stat #查看提交记录及记录中提交的文件</span><br><span class="line">git log -S [关键词] #根据关键词搜索提交历史</span><br><span class="line">git log -p [file] #显示该文件相关的每一次diff</span><br><span class="line">git blame [file] #显示该文件什么人在什么时间修改过</span><br><span class="line">git reflog #查看当前分支最近几次提交</span><br></pre></td></tr></table></figure>
+<h3><span id="git-diff">git diff</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git diff	#比较工作区与暂存区区别</span><br><span class="line">git diff head [file] #比较工作区与本地库中区别</span><br><span class="line">git diff --cached [file] #比较暂存区与本地库区别</span><br><span class="line">git diff [commit1] [commit2] #显示两次提交之间的区别</span><br><span class="line">git diff branch1 branch2 [file] --stat #显示两个分支上该文件的区别</span><br><span class="line">git show [commit] #查看提交改变的详细内容</span><br></pre></td></tr></table></figure>
+<h3><span id="git-stash">git stash</span></h3>
+<p>当正在进行一些工作，工作区处于最新状态，这时需要切换到另外分支进行工作，但是又不想提交代码代码，这个时候就需要使用<code>git stash</code>对当前工作区进行暂存</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">git status #当前很多变动</span><br><span class="line">git stash save -a "msg"#暂存</span><br><span class="line">git status # 发现没有变动了</span><br><span class="line">git stash list # 查看暂存区列表</span><br><span class="line">git show stash@&#123;0&#125; # 查看暂存的改变是什么</span><br><span class="line">git stash apply stash@&#123;2&#125; #恢复暂存区，如果不指定，将恢复到最近的一个暂存</span><br><span class="line">git stash pop      # 应用最新的一次暂存的东西,并移除一个stash</span><br><span class="line">git stash drop &lt;stash@&#123;id&#125;&gt;  # 删除指定编号的stash，如果不指定编号，删除最新的</span><br><span class="line">git stash clear # 清空所有的stash</span><br><span class="line">git stash branch 分支名 stash@&#123;id&#125; #根据stash创建分支</span><br></pre></td></tr></table></figure>
+<h3><span id="git-cherry-pick">git cherry-pick</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick [commit] #可以选择另外一个分支上的一个commit，合并到当前分支</span><br></pre></td></tr></table></figure>
+<h2><span id="分支-branch">分支 branch</span></h2>
+<p>在开发过程中往往会需要多个开发任务并行开发，或者多人同时操作一个项目时，往往会有很多冲突，这个时候就需要用到git的分支。当需要单独开发一个任务时，从主分支上拉出一个新的分支，然后开发完毕后，将主分支的代码merge到自己的分支上，解决冲突后，再讲自己的分支merge到主分支上。</p>
+<h3><span id="常用命令">常用命令</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">git branch	#列出所有本地分支</span><br><span class="line">git branch -r	#列出所有远程分支</span><br><span class="line">git branch -a	#列出所有本地分支和远程分支</span><br><span class="line">git branch -vv	#查看本地分支和远程分支的关联关系</span><br><span class="line">git branch xx	#新建一个分支，但依然停留在当前分支</span><br><span class="line">git checkout xx	#切换到指定分支，并更新工作区</span><br><span class="line">git checkout -b xx	#新建一个分支，并切换到该分支</span><br><span class="line">git push -u origin 本地当前分支:远程分支名	#将本地分支推送到远程创建分支</span><br><span class="line">git branch -d xx	#删除分支</span><br><span class="line">git push origin --delete [origin/branch]	#删除远程分支</span><br><span class="line">git branch --set-upstream-to=origin/远程分支 本地分支	#绑定本地分支和远程分支的关系</span><br><span class="line">git checkout -b 本地分支名x origin/远程分支名x	#从远程分支下拉</span><br><span class="line">git branch 本地分支名 --track orign/远程分支名	#新建一个分支，与指定的远程分支建立追踪关系</span><br><span class="line">git checkout -  #切换到上一个分支</span><br></pre></td></tr></table></figure>
+<h3><span id="合并分支">合并分支</span></h3>
+<h4><span id="git-merge">git merge</span></h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge [branch1]   #将branch1合并到当前分支上</span><br></pre></td></tr></table></figure>
+<h4><span id="git-rebase">git rebase</span></h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase [branch1] #将branch1合并到当前分支上</span><br></pre></td></tr></table></figure>
+<p>**git merge **是把远程的修改拉下来然后和本地的修改合并，然后生成一个新的commit</p>
+<p><strong>git rebase</strong> 会将所有的提交合并到一条线上，并不会产生新的commit</p>
+<h2><span id="标签-tag">标签 tag</span></h2>
+<p>在git中分支是动态的，每一次提交，分支都一直在跟着提交变动，标签是分支在某个时刻的快照，标签是固定的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git tag  #列出所有的tag</span><br><span class="line">git tag -l 'rex'  #搜索tag</span><br><span class="line">git tag [tag]  #在当前的commit新建一个tag</span><br><span class="line">git tag [tag] [commit] #在指定的commit新建一个tag</span><br><span class="line">git tag -d [tag] #删除本地的tag  git push origin :[tag] #删除远程tag</span><br><span class="line">git show [tag] #查看tag信息</span><br><span class="line">git push origin [tag]  #将本地tag推送到远程</span><br><span class="line">git push origin --tags  #将本地所有的tag推送到远程</span><br><span class="line">git checkout -b [branch] [tag] #从tag拉一个分支</span><br></pre></td></tr></table></figure>
+<h2><span id="设置git的alias">设置git的alias</span></h2>
+<p>每次输入指令的全名称比较浪费时间，git提供了给指令设置alias的功能，通过设置alias提高命令输入速度</p>
+<p>在user目录下找到.gitconfig(没有就创建一个)然后编辑，加入以下命令</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[alias]</span><br><span class="line">    br = branch</span><br><span class="line">    ch = checkout</span><br><span class="line">    co = commit</span><br><span class="line">    st = status</span><br><span class="line">    pl = pull --rebase</span><br><span class="line">    ps = push</span><br><span class="line">    dt = difftool</span><br><span class="line">    l = log --stat</span><br><span class="line">    lg = log --graph --pretty=oneline</span><br><span class="line">    ca = commit -a</span><br><span class="line">    cm = commit -m </span><br><span class="line">    rv = revert</span><br><span class="line">    re = reset</span><br><span class="line">    cl = clone</span><br><span class="line">    fe = fetch</span><br><span class="line">    sh = stash</span><br><span class="line">    brv = branch -vv</span><br><span class="line">    ad = add .</span><br></pre></td></tr></table></figure>
+<h2><span id="一些配置">一些配置</span></h2>
+<ul>
+<li>
+<p>忽略一些未add的文件，避免add . 的时候将其add进去</p>
+<p>在 .git/info/exclude 中添加要忽略的文件，如要忽略 /test.log，则填写 test.log,这样在git add . 的时候将不会添加test.log到git版本控制</p>
+</li>
+<li>
+<p>忽略已纳入版本的文件修改，如本地修改的jdbc配置，又不想提交到远程仓库，所有就想在执行git add . 的时候不要将本地的修改提交</p>
+<p>使用 <strong>git update-index --assume-unchanged   xxx</strong>：可以忽略这个xxx文件的修改。从而不用提交到库里面。要想恢复该文件则执行 <strong>git update-index --no-assume-unchanged xxx</strong> 来恢复跟踪</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git update-index --assume-unchanged   xxx</span><br><span class="line">git update-index --no-assume-unchanged xxx</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2><span id="解决冲突">解决冲突</span></h2>
+<p>当多人在操作同一个分支的时候，由于并发工作，常常会产生代码冲突，如果在提交代码前，别的同事提交了代码，经常会由于冲突无法提交代码，这个时候就需要解决完冲突，然后重新提交。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git push  #提交，如果有冲突，会提示提交失败</span><br><span class="line">git pull #有冲突，拉取远程代码，</span><br><span class="line"><span class="meta">	#</span>如果能自动合并，会提示auto merge成功，然后再git push提交代码</span><br><span class="line"><span class="meta">	#</span>失败，需要手动解决冲突</span><br><span class="line">		1. git status #查看冲突情况</span><br><span class="line">		2. 打开冲突文件，解决冲突</span><br><span class="line">		3. git add . #解决完冲突后，一定要执行以下该命令，不然git状态为merging状态</span><br><span class="line">		4. git commit -m 'xxx' #提交代码</span><br><span class="line">		5. git push #推送到远程仓库</span><br></pre></td></tr></table></figure>
+<h3><span id="清除git提交历史记录">清除git提交历史记录</span></h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">1.Checkout</span><br><span class="line"></span><br><span class="line">   git checkout --orphan latest_branch</span><br><span class="line"></span><br><span class="line">2. Add all the files</span><br><span class="line"></span><br><span class="line">   git add -A</span><br><span class="line"></span><br><span class="line">3. Commit the changes</span><br><span class="line"></span><br><span class="line">   git commit -am "commit message"</span><br><span class="line"></span><br><span class="line">4. Delete the branch</span><br><span class="line"></span><br><span class="line">   git branch -D master</span><br><span class="line"></span><br><span class="line">5.Rename the current branch to master</span><br><span class="line"></span><br><span class="line">   git branch -m master</span><br><span class="line"></span><br><span class="line">6.Finally, force update your repository</span><br><span class="line"></span><br><span class="line">   git push -f origin master</span><br></pre></td></tr></table></figure>
+<h2><span id="更新fork工程">更新fork工程</span></h2>
+<p>fork 了别人的仓库后，原作者又更新了仓库，如何将自己的代码和原仓库保持一致</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">git remote -v  #查看远程仓库</span><br><span class="line"><span class="meta">#</span> origin  git@github.com:aspiresnow/spring-framework.git (fetch) </span><br><span class="line"><span class="meta">#</span> origin  git@github.com:aspiresnow/spring-framework.git (push)</span><br><span class="line">git remote add upstream https://github.com/spring-projects/spring-framework.git#添加被fork的远程仓库</span><br><span class="line">git remote -v</span><br><span class="line"><span class="meta">#</span> origin  git@github.com:aspiresnow/spring-framework.git (fetch)</span><br><span class="line"><span class="meta">#</span> origin  git@github.com:aspiresnow/spring-framework.git (push)</span><br><span class="line"><span class="meta">#</span> upstream        https://github.com/spring-projects/spring-framework.git (fetch)</span><br><span class="line"><span class="meta">#</span> upstream        https://github.com/spring-projects/spring-framework.git (push)</span><br><span class="line">git fetch upstream #同步被fork仓库的更新</span><br><span class="line">git merge upstream/mastegit r #把 upstream/master 分支合并到本地 master 上</span><br><span class="line">git push origin master # 推到origin远程</span><br></pre></td></tr></table></figure>
+<h1><span id="参考资料">参考资料</span></h1>
+<p><a href="https://www.jianshu.com/p/072587b47515" target="_blank" rel="noopener">一篇文章，教你学会Git</a></p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/05/15/netty/netty/" data-toggle="tooltip" data-placement="top" title="netty">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/11/23/多线程/java并发之Condition/" data-toggle="tooltip" data-placement="top" title="java并发之Condition">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Git" title="Git">Git</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2018/02/04/Git使用/";
+    var disqus_url = "http://yoursite-url/2018/02/04/Git使用/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

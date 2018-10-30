@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          docker初识 - Beantech | 豆科技
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2018/08/04/docker初识/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#docker" title="docker">docker</a>
+                            
+                        </div>
+                        <h1>docker初识</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by John Doe on
+                            2018-08-04
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Your Title</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="docker初识">docker初识</span></h1>
+<p>Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术，实现隔离，不需要操作系统另外开销。硬件是共享的,容器只能运行与底层宿主机相同或者相似的操作系统。</p>
+<p>容器与管理程序虚拟化有所不同，管理程序虚拟化通过中间层将一台或者多台独立的机器虚拟运行与物理硬件之上，而容器则是直接运行在操作系统内核之上的用户空间，容器技术可以让多个独立的用户空间运行在同一台宿主机上。</p>
+<a id="more"></a>
+<p>Docker核心：构建、运输、运行</p>
+<p>Docker组成：服务端、客户端，镜像、容器、 仓库</p>
+<p>Docker容器理念是单进程，即一个容器只起一个进程（不太现实感觉）</p>
+<p>优点：</p>
+<ul>
+<li>简化环境配置</li>
+<li>多版本测试</li>
+<li>环境配置一致性</li>
+<li>自动扩容(微服务)</li>
+</ul>
+<p>使用国内的ustc镜像会快点，需要修改或创建/etc/docker/daemon.json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;http://hub-mirror.c.163.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="安装">安装</span></h2>
+<ul>
+<li>
+<p>centos7下直接使用yum安装，yum install -y docker</p>
+</li>
+<li>
+<p>启动docker</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start docker &amp;  #启动docker服务</span><br><span class="line">systemctl enable docker #开机启动</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>镜像管理</p>
+<ul>
+<li>docker search  镜像名：搜索镜像</li>
+<li>docker pull 镜像名:版本号:获取镜像，不指定版本号，默认下载latest</li>
+<li>docker rmi imageId：删除一个镜像，如果镜像创建了容器则不能删除</li>
+<li>docker images ：查看docker中的所有镜像，每个镜像都有一个唯一的image id</li>
+<li>docker save centos &gt; /opt/centos.tar.gz ： 导出镜像</li>
+<li>docker load &lt; /opt/centos.tar.gz ：导入镜像</li>
+</ul>
+</li>
+<li>
+<p>容器管理</p>
+<ul>
+<li>docker run centos:7 /bin/bash：启动centos(7为镜像版本)镜像，并执行一条指令
+<ul>
+<li>-d：后台启动容器并打印容器id</li>
+<li>–name：指定名称</li>
+<li>-t：分配一个为终端进行登录</li>
+<li>-i：容器的标准输入为打开状态</li>
+<li>-m：指定内存</li>
+<li>-c：指定cpu占比</li>
+<li>-w：指定容器内用户的家目录</li>
+<li>-p: 指定端口映射关系</li>
+<li>-v: 指定文件目录的映射关系</li>
+</ul>
+</li>
+<li>docker run --rm  centos：容器停止后自动删除容器</li>
+<li>docker start 容器id：启动容器</li>
+<li>docker stop 容器id：停止容器</li>
+<li>docker rm -f 容器id：删除一个正在运行的容器</li>
+<li>docker ps：查看容器
+<ul>
+<li>-a：显示所有的容器，包括停止的</li>
+<li>-q：只列出容器id</li>
+</ul>
+</li>
+<li>docker attach 容器id：进入容器</li>
+<li>docker run -d centos:7 /bin/bash :后台启动，然后使用exec登录docker机器</li>
+<li>docker exec -it 容器名称：进入容器，再次exit不会停止容器</li>
+<li>exit: 退出容器，-it模式容器会自动终止，-d模式容器不会终止</li>
+<li>docker logs 容器id：查看容器id</li>
+<li>docker inspect 容器id: 查看容器运行的各种数据</li>
+<li><strong>nsenter</strong>：根据pid进入容器，使用exit退出后容器不停止
+<ul>
+<li>安装 yum install util-linux</li>
+<li>nsenter -t Pid -u -i -n -p：根据pid登录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>容器内命令</p>
+<ul>
+<li>docker cp 需要拷贝的文件或目录 容器名称:容器目录</li>
+<li>docker cp 容器名称:容器目录 需要拷贝的文件或目录</li>
+</ul>
+</li>
+<li>
+<p>网络访问</p>
+<ul>
+<li>docker run -P nginx：随机映射端口，容器启动时会随机出个端口映射nginx的80端口</li>
+<li>docker run -p hostPort:containerPort：使用宿主机端口映射docker机端口
+<ul>
+<li>-p ip:hostPort:containerPort</li>
+<li>-p ip::containerPort</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>数据卷</p>
+<ul>
+<li>docker run -it -v 宿主机目录:容器目录 镜像名：将物理机上的一个目录挂载到容器指定目录
+<ul>
+<li>在docker inspect 中看 Mounts底下的source</li>
+<li>-v src:dst：指定物理机的目录挂载到docker上
+<ul>
+<li>-v src:dst:rw：指定挂载目录的权限</li>
+</ul>
+</li>
+<li>–volumes-from 容器id/名字 ：让一个容器访问另一个容器的卷，达到nfs的效果</li>
+<li>docker run -it -volumns-from nfs容器id 容器id：启动一个访问nfs的容器</li>
+<li>数据卷容器停止之后，其他容器照样能访问数据卷容器上的目录</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2><span id="镜像制作">镜像制作</span></h2>
+<ul>
+<li>
+<p>手动制作</p>
+<ul>
+<li>docker run --name “mynginx” -it centos：从centos镜像启动一个容器</li>
+<li>安装 rmp -ivh <a href="https://mirrors.aliyun.com/epel/" target="_blank" rel="noopener">https://mirrors.aliyun.com/epel/</a></li>
+<li>安装nginx  yum install -y nginx</li>
+<li>docker commit -m “my nginx” 2e013dfc32c2 mynginx:v1 ：根据容器id打镜像，指定tag为v1</li>
+<li>docker images：查看是否有制作成功的 my nginx的镜像</li>
+<li>docker run -it  mynginx:v1：启动镜像，指定tag为v1,不然默认找latest的，修改nginx的配置文件</li>
+<li>vim /etc/nginx/nginx.confg：加上 daemon off;前天运行</li>
+<li>docker commit -m “my nginx” 2e013dfc32c2 mynginx:v2：重新 打镜像，指定tag为v2</li>
+<li>docker run -d -p 82:80 mynginx:v2 nginx：启动容器并启动nginx</li>
+</ul>
+</li>
+<li>
+<p><strong>DockerFile 构建</strong></p>
+<p>docker build 镜像:tag /test/dockFile</p>
+<ul>
+<li>
+<p>dockerfile组成</p>
+<ul>
+<li>基础镜像信息</li>
+<li>维护者信息</li>
+<li>镜像操作指令</li>
+<li>容器启动时执行指令</li>
+</ul>
+</li>
+<li>
+<p>语法</p>
+<ul>
+<li>
+<p>FROM：构建指令，<strong>必须指定且需要在Dockerfile其他指令的前面</strong>。后续的指令都依赖于该指令指定的image。FROM指令指定的基础image可以是官方远程仓库中的，也可以位于本地仓库</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>如果不指定tag，默认使用latest</span><br><span class="line">FROM &lt;image&gt;:&lt;tag&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>MAINTAINER：构建指令，用于将image的制作者相关的信息写入到image中。当我们对该image执行docker inspect命令时，输出中有相应的字段记录该信息。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MAINTAINER &lt;name&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>RUN：执行命令</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RUN &lt;command&gt; (the command is run in a shell - `/bin/sh -c`)  </span><br><span class="line">RUN ["executable", "param1", "param2" ... ]  (exec form)</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>CMD：设置镜像启动时执行的指令或脚本，该指令只能在文件中存在一次，如果有多个，执行最后一条</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CMD ["executable","param1","param2"] (like an exec, this is the preferred form)  </span><br><span class="line">CMD command param1 param2 (as a shell)</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>ENTRYPOINT：设置container启动时执行的操作，可以多次设置，但是只有最后一个有效</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENTRYPOINT ["executable", "param1", "param2"] (like an exec, the preferred form)  </span><br><span class="line">ENTRYPOINT command param1 param2 (as a shell)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>
+<p>该指令的使用分为两种情况，一种是独自使用，另一种和CMD指令配合使用。<br>
+当独自使用时，如果你还使用了CMD命令且CMD是一个完整的可执行的命令，那么CMD指令和ENTRYPOINT会互相覆盖只有最后一个CMD或者ENTRYPOINT有效。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> CMD指令将不会被执行，只有ENTRYPOINT指令被执行  </span><br><span class="line">CMD echo “Hello, World!”  </span><br><span class="line">ENTRYPOINT ls -l</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>另一种用法和CMD指令配合使用来指定ENTRYPOINT的默认参数，这时CMD指令不是一个完整的可执行命令，仅仅是参数部分；ENTRYPOINT指令只能使用JSON方式指定执行命令，而不能指定参数。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu  </span><br><span class="line">CMD ["-l"]  </span><br><span class="line">ENTRYPOINT ["/usr/bin/ls"]</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li>
+<p>USER：设置启动容器的用户，默认是root用户。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 指定memcached的运行用户  </span><br><span class="line">ENTRYPOINT ["memcached"]  </span><br><span class="line">USER daemon  </span><br><span class="line">或  </span><br><span class="line">ENTRYPOINT ["memcached", "-u", "daemon"]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>EXPOSE：指定映射端口，该指令会将容器中的端口映射成宿主机器中的某个端口。当你需要访问容器的时候，可以不是用容器的IP地址而是使用宿主机器的IP地址和映射后的端口</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 映射一个端口  </span><br><span class="line">EXPOSE port1  </span><br><span class="line"><span class="meta">#</span> 相应的运行容器使用的命令  </span><br><span class="line">docker run -p port1 image  </span><br><span class="line"><span class="meta">#</span> 映射多个端口  </span><br><span class="line">EXPOSE port1 port2 port3  </span><br><span class="line"><span class="meta">#</span> 相应的运行容器使用的命令  </span><br><span class="line">docker run -p port1 -p port2 -p port3 image  </span><br><span class="line"><span class="meta">#</span> 还可以指定需要映射到宿主机器上的某个端口号  </span><br><span class="line">docker run -p host_port1:port1 -p host_port2:port2 -p host_port3:port3 image</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>ENV：在image中设置一个环境变量</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ENV &lt;key&gt; &lt;value&gt;</span><br></pre></td></tr></table></figure>
+<p>设置了后，后续的RUN命令都可以使用，container启动后，可以通过docker inspect查看这个环境变量，也可以通过在docker run --env key=value时设置或修改环境变量。<br>
+假如你安装了JAVA程序，需要设置JAVA_HOME，那么可以在Dockerfile中这样写：<br>
+ENV JAVA_HOME /path/to/java/dirent</p>
+</li>
+<li>
+<p>ADD：从src复制文件到container的dest路径</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>&lt;src&gt; 是相对被构建的源目录的相对路径，可以是文件或目录的路径，也可以是一个远程的文件url;</span><br><span class="line"><span class="meta">#</span>&lt;dest&gt; 是container中的绝对路径</span><br><span class="line">ADD &lt;src&gt; &lt;dest&gt;</span><br></pre></td></tr></table></figure>
+<p>所有拷贝到container中的文件和文件夹权限为0755，uid和gid为0；如果是一个目录，那么会将该目录下的所有文件添加到container中，不包括目录；如果文件是可识别的压缩格式，则docker会帮忙解压缩（注意压缩格式）；如果<src>是文件且<dest>中不使用斜杠结束，则会将<dest>视为文件，<src>的内容会写入<dest>；如果<src>是文件且<dest>中使用斜杠结束，则会<src>文件拷贝到<dest>目录下</dest></src></dest></src></dest></src></dest></dest></src></p>
+</li>
+<li>
+<p>VOLUME：指定挂载点，使容器中的一个目录具有持久化存储数据的功能，该目录可以被容器本身使用，也可以共享给其他容器使用,运行通过该Dockerfile生成image的容器，/tmp/data目录中的数据在容器关闭后，里面的数据还存在</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FROM base  </span><br><span class="line">VOLUME ["/tmp/data"]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>WORKDIR：切换目录，可以多次切换(相当于cd命令)，对RUN,CMD,ENTRYPOINT生效</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">WORKDIR /path/to/workdir</span><br><span class="line"><span class="meta">#</span> 在 /p1/p2 下执行 vim a.txt  </span><br><span class="line">WORKDIR /p1 WORKDIR p2 RUN vim a.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>ONBUILD：在子镜像中执行,构建镜像时并不执行，而是在它的子镜像中执行</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ONBUILD &lt;Dockerfile关键字&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/09/10/linux/vim编辑器/" data-toggle="tooltip" data-placement="top" title="vim编辑器">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/07/30/maven实现环境切换/" data-toggle="tooltip" data-placement="top" title="maven实现环境切换">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#docker" title="docker">docker</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2018/08/04/docker初识/";
+    var disqus_url = "http://yoursite-url/2018/08/04/docker初识/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/YenYuHsuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/yu-hsuan-yen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; John Doe 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

@@ -2,7 +2,6 @@
 title: spring-boot初识
 date: 2017-10-20 18:18:04
 tags:
-- spring 
 - spring-boot
 categories:
 - spring
@@ -58,7 +57,7 @@ categories:
 
 - @EnableAutoConfiguration
 
-  - ​        这里我们只需要关心 @EnableAutoConfiguration 即可。这个注解是让Spring Boot*猜测 *你想怎么配置Spring，但实际上，它是根据你添加到classpath中的依赖来判断的。
+  -         这里我们只需要关心 @EnableAutoConfiguration 即可。这个注解是让Spring Boot*猜测 *你想怎么配置Spring，但实际上，它是根据你添加到classpath中的依赖来判断的。
 
 - SpringApplication.run(IndexController.class,args);
 
