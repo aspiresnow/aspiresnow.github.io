@@ -36,11 +36,11 @@ categories:
 
 ## 二、整体过程
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-18/68157555.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/codeGene1.jpg)
 
 配置解析按照元素及属性顺序解析
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-18/74647471.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/codeGene2.jpg)
 
 ## 三、代码片段
 
@@ -141,7 +141,7 @@ public class GeneratedJavaFile extends GeneratedFile {
 
 生成文件的元素对象关系图
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-18/91943829.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/codeGene3.jpg)
 
 最终生成的java文件都是`TopLevelClass`、`Interface`、`TopLevelEnumeration`,都继承了`CompilationUnit`类。在这些元素对象中实现了默认的格式化输出，当调用`JavaFormatter`的时候会调用元素的默认实现
 
