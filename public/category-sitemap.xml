@@ -63,13 +63,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/categories/spring/</loc>
-        <lastmod>2018-10-30T12:12:01.477Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/categories/mysql/</loc>
         <lastmod>2018-10-30T12:29:08.905Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -100,6 +93,13 @@
     <url>
         <loc>http://yoursite-url/categories/java%E5%B7%A5%E5%85%B7/</loc>
         <lastmod>2018-10-30T13:13:54.478Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/categories/spring/</loc>
+        <lastmod>2018-10-30T13:48:41.102Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

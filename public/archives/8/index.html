@@ -213,35 +213,6 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/14/hbase/hbase的WAL详解/">
-        <h2 class="post-title">
-            hbase的WAL详解
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            hbase的WAL详解
-WAL(Write-Ahead Logging)是一种高效的日志算法，基本原理是在数据写入之前首先顺序写入日志，然后再写入缓存，等到缓存写满之后统一落盘。之所以能够提升写性能，是因为WAL将一次随机写转化为了一次顺序写加一次内存写。提升写性能的同时，WAL可以保证数据的可靠性，即在任何情况下数据不丢失。假如一次写入完成之后发生了宕机，即使所有缓存中的数据丢失，也可以通......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2017-09-14
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#hbase" title="hbase">hbase</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
     <a href="/2017/09/14/hbase/hbase中HFile详解/">
         <h2 class="post-title">
             hbase中HFile详解
@@ -542,6 +513,41 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
 </div>
 <hr>
 
+<div class="post-preview">
+
+    <a href="/2017/09/04/消息队列/队列Queue/">
+        <h2 class="post-title">
+            队列Queue
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            队列Queue
+Queue接口与List、Set同一级别，都是继承了Collection接口。LinkedList实现了Queue接 口。
+Queue是一种数据结构．它有两个基本操作：在队列尾部加人一个元素，和从队列头部移除一个元素就是说，队列以一种先进先出的方式管理数据，如果你试图向一个 已经满了的阻塞队列中添加一个元素或者是从一个空的阻塞队列中移除一个元索，将导致线程阻塞．
+在多线程进行......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-09-04
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#多线程" title="多线程">多线程</a>
+            
+              <a href="/tags/#集合" title="集合">集合</a>
+            
+              <a href="/tags/#数据结构" title="数据结构">数据结构</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
 
 
 <!-- Pager -->
@@ -626,7 +632,7 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
             
         
             
-            <a href="/tags/#linux" title="linux" rel="2">linux</a>
+        
             
         
             
@@ -641,8 +647,6 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
         
             
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
-            
-        
             
         
     </div>

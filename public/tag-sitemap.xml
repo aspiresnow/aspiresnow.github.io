@@ -107,13 +107,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/spring/</loc>
-        <lastmod>2018-10-30T04:10:29.309Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/tags/todo/</loc>
         <lastmod>2018-10-30T12:00:52.140Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -165,6 +158,13 @@
     <url>
         <loc>http://yoursite-url/tags/Git/</loc>
         <lastmod>2018-10-30T13:13:54.478Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/spring/</loc>
+        <lastmod>2018-10-30T13:48:41.102Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
