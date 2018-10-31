@@ -55,7 +55,7 @@ public void setParentBeanFactory(BeanFactory parentBeanFactory) {
 }
 ```
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-20/54908296.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/XmlBeanFactory.jpg)
 
 ```java
 //XmlBeanDefinitionReader
@@ -207,7 +207,7 @@ public AbstractBeanDefinition parseBeanDefinitionElement(
 
 
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-25/39838794.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanDefinition.jpg)
 
 ResourceLoader—资源加载，处理import的时候用了
 
@@ -241,7 +241,7 @@ FailFastProblemReporter 用法
 - BeanDefinition载入， 将用户定义的bean表示为IOC容器内部的数据结构
 - BeanDefinition注册，BeanDefinitionRegistry注册到一个HashMap中
 
-![](http://omdq6di7v.bkt.clouddn.com/18-9-29/21686210.jpg)
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanLoad.jpg)
 
 
 
