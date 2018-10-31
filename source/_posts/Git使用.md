@@ -1,15 +1,20 @@
 title: Git的使用
 tags:
   - Git
+
 categories:
   - java工具
+
 date: 2018-02-04 10:26:48
+
 ---
 # Git的使用
 
 ## git中的提交逻辑
 
-![image](http://omdq6di7v.bkt.clouddn.com/18-1-29/76019026.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git4.jpg)
+
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git1.jpg)
 
 - Workspace：工作区，工作使用的地方，是当前能看到的最新的代码
 - Index / Stage：暂存区，.git目录下的index文件，通过`git status`可以查看暂存区状态
@@ -35,7 +40,19 @@ HEAD，它始终指向当前所处分支的最新的提交点。你所处的分�
 
 ## git常用的指令
 
-![image](http://omdq6di7v.bkt.clouddn.com/18-1-29/62404687.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git2.jpg)
+
+### git clone
+
+```shell
+git remote -v #查看远程信息
+git clone https://github.com/spring-projects/spring-framework.git #克隆远程仓库默认分支到本地
+
+#如果在本地创建了文件，想直接把远程仓库的东西到文件夹，也可以用下面这种方式 克隆
+git init #git init
+git remote add origin https://github.com/spring-projects/spring-framework.git #关联仓库
+git checkout -b master origin/master #拉取远程master分支到本地
+```
 
 ### git add
 
@@ -65,8 +82,8 @@ git commit -v #提交时显示所有的diff信息
 ```shell
 git checkout [files..]	#一般用来覆盖工作区，如果不指定提交点的时候，默认使用暂存区覆盖工作区
 git checkout . #使用暂存区所有文件覆盖工作区
-git checkout [commit] [files...] #使用本地仓库的commit覆盖工作区
-git checkout head [files...] #使用本地仓库覆盖工作区
+git checkout [commitId] [files...] #使用本地仓库的commit覆盖工作区
+git checkout HEAD [files...] #使用本地仓库覆盖工作区
 git checkout branchName	#切换分支
 ```
 
@@ -94,17 +111,17 @@ git push -u origin master –f #强行推送当前分支到远程分支，即使
 ### git reset
 
 ```shell
-git reset --soft [commit] [file]	#只改变提交点(本地仓库)，暂存区和工作目录的内容都不改变
-git reset --mixed [commit] [file]	#改变提交点(本地仓库)，同时改变暂存区的内容，工作区不变
-git reset --hard [commit] [file]	#暂存区、工作区的内容都会被修改到与提交点完全一致的状态
+git reset --soft [commitId] [file]	#只改变提交点(本地仓库)，暂存区和工作目录的内容都不改变
+git reset --mixed [commitId] [file]	#改变提交点(本地仓库)，同时改变暂存区的内容，工作区不变
+git reset --hard [commitId] [file]	#暂存区、工作区的内容都会被修改到与提交点完全一致的状态
 git reset --hard HEAD [file]	#让工作区回到上次提交时的状态
 ```
 
 ### git revert
 
 ```shell
-git revert head	#撤销前一次 commit
-git revert commitNo	#撤销指定的提交
+git revert HEAD	#撤销前一次 commit
+git revert commitId	#撤销指定的提交
 ```
 
 revert和reset区别
@@ -114,7 +131,7 @@ revert和reset区别
 
 - git reset 是把HEAD向后移动了一下，而git revert是HEAD继续前进，只是新的commit的内容和要revert的内容正好相反，能够抵消要被revert的内容。
 
-![image](http://omdq6di7v.bkt.clouddn.com/18-1-29/63781244.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git3.jpg)
 
 ### git log
 
@@ -133,12 +150,11 @@ git reflog #查看当前分支最近几次提交
 
 ```Shell
 git diff	#比较工作区与暂存区区别
-git diff head [file] #比较工作区与本地库中区别
+git diff HEAD [file] #比较工作区与本地库中区别
 git diff --cached [file] #比较暂存区与本地库区别
 git diff [commit1] [commit2] #显示两次提交之间的区别
 git diff branch1 branch2 [file] --stat #显示两个分支上该文件的区别
-git show [commit] #查看提交改变的详细内容
-
+git show [commitId] #查看提交改变的详细内容
 ```
 
 
@@ -165,8 +181,6 @@ git stash branch 分支名 stash@{id} #根据stash创建分支
 git cherry-pick [commit] #可以选择另外一个分支上的一个commit，合并到当前分支
 ```
 
-
-
 ## 分支 branch
 
 在开发过程中往往会需要多个开发任务并行开发，或者多人同时操作一个项目时，往往会有很多冲突，这个时候就需要用到git的分支。当需要单独开发一个任务时，从主分支上拉出一个新的分支，然后开发完毕后，将主分支的代码merge到自己的分支上，解决冲突后，再讲自己的分支merge到主分支上。
@@ -181,12 +195,12 @@ git branch -vv	#查看本地分支和远程分支的关联关系
 git branch xx	#新建一个分支，但依然停留在当前分支
 git checkout xx	#切换到指定分支，并更新工作区
 git checkout -b xx	#新建一个分支，并切换到该分支
-git push -u origin 本地当前分支	#将本地分支推送到远程创建分支
-git branch -d xx	#删除分支
-git push origin --delete [origin/branch]	#删除远程分支
-git branch --set-upstream-to=origin/远程分支 本地分支	#绑定本地分支和远程分支的关系
-git checkout -b 本地分支名x origin/远程分支名x	#从远程分支下拉
-git branch 本地分支名 --track orign/远程分支名	#新建一个分支，与指定的远程分支建立追踪关系
+git push -u origin local_branch	#将本地分支推送到远程创建分支
+git branch -d local_branch	#删除分支
+git push origin --delete [origin/remote_branch]	#删除远程分支
+git branch --set-upstream-to=origin/remote_branch  local_branch	#绑定本地分支和远程分支的关系
+git checkout -b 本地分支名x origin/remote_branch	#从远程分支下拉
+git checkout -b 本地分支名 --track orign/remote_branch#新建一个分支，与指定的远程分支建立追踪关系
 git checkout -  #切换到上一个分支
 ```
 
@@ -224,18 +238,15 @@ git push origin --tags  #将本地所有的tag推送到远程
 git checkout -b [branch] [tag] #从tag拉一个分支
 ```
 
-
-
 ## 设置git的alias
 
-每次输入指令的全名称比较浪费时间，git提供了给指令设置alias的功能，通过设置alias提高命令输入速度
+每次输入指令的全名称比较浪费时间，git提供了给指令设置alias的功能，通过设置alias提高命令输入速度，在user目录下找到.gitconfig(没有就创建一个)然后编辑，加入以下命令
 
-在user目录下找到.gitconfig(没有就创建一个)然后编辑，加入以下命令
-
-```xml
+```properties
 [alias]
     br = branch
     ch = checkout
+    chh = checkout HEAD
     co = commit
     st = status
     pl = pull --rebase
@@ -252,16 +263,20 @@ git checkout -b [branch] [tag] #从tag拉一个分支
     sh = stash
     brv = branch -vv
     ad = add .
-
+    me = merge
+    rb = rebase
+    cp = cherry-pick
 ```
 
-## 一些配置
+## 常见问题及解决
+
+### 忽略文件的改动
 
 - 忽略一些未add的文件，避免add . 的时候将其add进去
 
   在 .git/info/exclude 中添加要忽略的文件，如要忽略 /test.log，则填写 test.log,这样在git add . 的时候将不会添加test.log到git版本控制
 
-- 忽略已纳入版本的文件修改，如本地修改的jdbc配置，又不想提交到远程仓库，所有就想在执行git add . 的时候不要将本地的修改提交
+- 忽略已纳入版本的文件修改，如本地修改的jdbc配置，又不想提交到远程仓库，想在执行git add . 的时候不要将本地的修改提交
 
   使用 **git update-index -\-assume-unchanged   xxx**：可以忽略这个xxx文件的修改。从而不用提交到库里面。要想恢复该文件则执行 **git update-index -\-no-assume-unchanged xxx** 来恢复跟踪
 
@@ -270,7 +285,21 @@ git checkout -b [branch] [tag] #从tag拉一个分支
   git update-index --no-assume-unchanged xxx
   ```
 
-## 解决冲突
+### .gitigore不生效
+
+- 第一步首先查看下 .gitigore是不是在当前 git目录下，有可能是其他的一个git
+
+- .gitignore只能忽略原来没有被track的文件，如果文件已经被纳入版本管理中，则修改 .gitigore是无效的
+
+  ```shell
+  git rm -r --cached . #移除所有文件的跟踪,如果单个文件 git rm --cached xxx
+  #修改 .gitignore
+  git add . #添加跟踪
+  git commit -m ''
+  git push
+  ```
+
+### 解决冲突
 
 当多人在操作同一个分支的时候，由于并发工作，常常会产生代码冲突，如果在提交代码前，别的同事提交了代码，经常会由于冲突无法提交代码，这个时候就需要解决完冲突，然后重新提交。
 
@@ -291,32 +320,15 @@ git pull #有冲突，拉取远程代码，
 ### 清除git提交历史记录
 
 ```shell
-1.Checkout
-
-   git checkout --orphan latest_branch
-
-2. Add all the files
-
-   git add -A
-
-3. Commit the changes
-
-   git commit -am "commit message"
-
-4. Delete the branch
-
-   git branch -D master
-
-5.Rename the current branch to master
-
-   git branch -m master
-
-6.Finally, force update your repository
-
-   git push -f origin master
+git checkout --orphan latest_branch #Checkout
+git add -A #Add all the files
+git commit -am "commit message" #Commit the changes
+git branch -D master #Delete the branch
+git branch -m master #Rename the current branch to master
+git push -f origin master #Finally, force update your repository
 ```
 
-## 更新fork工程
+### 更新fork工程
 
 fork 了别人的仓库后，原作者又更新了仓库，如何将自己的代码和原仓库保持一致
 
@@ -331,7 +343,7 @@ git remote -v
 # upstream        https://github.com/spring-projects/spring-framework.git (fetch)
 # upstream        https://github.com/spring-projects/spring-framework.git (push)
 git fetch upstream #同步被fork仓库的更新
-git merge upstream/mastegit r #把 upstream/master 分支合并到本地 master 上
+git merge upstream/master #把 upstream/master 分支合并到本地 master 上
 git push origin master # 推到origin远程
 
 ```
