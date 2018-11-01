@@ -38,17 +38,17 @@ categories:
     - 共享变量使用不可变对象或者使用多个版本控制又无法达到线程之间一致性
     - 多个线程之间无法保证运行的顺序性
 
-  ![image](http://omdq6di7v.bkt.clouddn.com/17-9-29/34093455.jpg)
+  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/multiT1.jpg)
 
 - 事件驱动模式：
 
   将一个任务分解多步，每个步骤由一个线程去执行，类似生产线,会有多个生产线并存，并发生交叉，上个执行完毕后通过事件监听通知下个环节线程进行操作，各环节线程之间不存在并发操作共享变量情况
 
-  ![image](http://omdq6di7v.bkt.clouddn.com/17-9-30/15328264.jpg)
+  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/multiT2.jpg)
 
   每个环节中间加入channel，解耦两个环节线程
 
-  ![image](http://omdq6di7v.bkt.clouddn.com/17-9-29/89911687.jpg)
+  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/multiT3.jpg)
 
   - 优点
     - 各个环节线程不涉及同时操作共享变量，不需考虑并发问题

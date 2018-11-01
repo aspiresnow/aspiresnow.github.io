@@ -1,5 +1,6 @@
 ---
 title: spring-IOC
+catalog: true
 date: 2018-09-20 15:27:13
 tags:
 - spring 
@@ -10,7 +11,15 @@ categories:
 
 # spring-IOC
 
+---
+
+
+
 ## 一、bean
+
+---
+
+
 
 - bean属性
 

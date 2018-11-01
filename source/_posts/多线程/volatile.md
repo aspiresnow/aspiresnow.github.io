@@ -29,13 +29,13 @@ java编程语言允许线程访问共享变量，为了确保共享变量能被�
 
 缓存一致性协议。最出名的就是Intel 的MESI协议，MESI协议保证了每个缓存中使用的共享变量的副本是一致的。它核心的思想是：当CPU写数据时，如果发现操作的变量是共享变量，即在其他CPU中也存在该变量的副本，会发出信号通知其他CPU将该变量的缓存行置为无效状态，因此当其他CPU需要读取这个变量时，发现自己缓存中缓存该变量的缓存行是无效的，那么它就会从内存重新读取。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-10-18/76656449.jpg)s
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts3.jpg)
 
 ## java内存模型
 
 java中多线程共享的变量存储在主内存中，处理器CPU为了提高执行效率，每个线程都有自己的工作内存，工作内存保存了主内存的副本，线程要操作共享变量，实际操作的是线程工作内存的副本，操作完毕后再同步写入主内存，各个线程线程只能访问自己的工作内存，不可以访问其它线程的工作内存。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-3-16/94036726-file_1489675155616_9c8e.png)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts4.png)
 ​									`java中线程工作内存跟主内存的交互`
 
 Java内存模型规定了工作内存与主内存之间交互的协议，首先是定义了8种原子操作：
@@ -186,7 +186,7 @@ public class Counter {
 ```
 这段程序执行完毕后无法保证count的数量最终为1000，这是因为volatile只能保证使用count的时候去主内存读取到最新的值，但是在对count进行+1操作的时候，其它线程可能会对count进行修改+1然后写会主内存，造成最后的结果不是1000，如果要保证1000，还是要对整个read到write回主内存保证一致性，这就需要使用synchronized或者lock去实现了。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-9-28/70069501.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts5.jpg)
 
 ## 原理和实现机制
 

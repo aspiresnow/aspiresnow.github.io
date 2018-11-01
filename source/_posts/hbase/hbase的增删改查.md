@@ -21,7 +21,7 @@ categories:
 
 服务器端RegionServer接收到客户端的写入请求后，首先会反序列化为Put对象，然后执行各种检查操作，比如检查region是否是只读、memstore大小是否超过blockingMemstoreSize等。检查完成之后，一次写事务保证了数据写入memstore和WAL中才结束，然后对读操作可见。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-9-14/89638286.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase1.jpg)
 
 1. 获取行锁、Region更新共享锁： HBase中使用行锁保证对同一行数据的更新都是互斥操作，用以保证更新的原子性，要么更新成功，要么失败。
 

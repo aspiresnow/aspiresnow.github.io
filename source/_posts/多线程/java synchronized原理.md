@@ -118,7 +118,7 @@ public void test1() {
 
 在java中每个对象都可以作为一个锁，继承Object中的wait和notify方法，在hotspot虚拟机中，对象在内存的分布分为3个部分：对象头，实例数据，和对齐填充。在对象头中的Mark Word存储了对象的锁信息，Mark Word被设计成一个非固定的数据结构以便在极小的空间内存存储尽量多的数据，它会根据对象的状态复用自己的存储空间，也就是说，Mark Word会随着程序的运行发生变化，变化状态如下
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-10-28/87461048.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/sync1.jpg)
 
 ### monitor锁对象
 
@@ -126,7 +126,7 @@ public void test1() {
 
 在 java 虚拟机中，线程一旦进入到被synchronized修饰的方法或代码块时，指定的锁对象的对象头存储指向monitor对象的指针，这个过程称为锁对象的膨胀。同时monitor 中的Owner存放拥有该对象锁的线程的唯一标识，确保一次只能有一个线程执行该部分的代码，线程在获取锁之前不允许执行该部分的代码。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-10-28/44370183.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/sync2.jpg)
 
 **Owner**：初始时为NULL表示当前没有任何线程拥有该monitor record，当线程成功拥有该锁后保存持有锁的线程唯一标识，当锁被释放时又设置为NULL；
 
@@ -161,7 +161,7 @@ synchronized static void method2() {}
 
 **解除锁**：偏向锁使用了一种等到竞争出现才释放锁的机制，所以当其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，然后检查持有偏向锁的线程是否活着，如果线程不处于活动状态，则将对象头设置成无锁状态，如果线程仍然活着，拥有偏向锁的栈会被执行，遍历偏向对象的锁记录，栈中的锁记录和对象头的Mark Word要么重新偏向于其他线程，要么恢复到无锁或者标记对象不适合作为偏向锁，最后唤醒暂停的线程。
 
-![偏向锁](http://omdq6di7v.bkt.clouddn.com/17-10-28/40695590.jpg)
+![偏向锁](https://image-1257941127.cos.ap-beijing.myqcloud.com/sync3.jpg)
 
 ### 轻量级锁
 
@@ -173,7 +173,7 @@ synchronized static void method2() {}
 
 **释放锁**:首先使用原子的 CAS 操作来将Displaced Mark Word替换回到对象头，如果成功，则表示没有竞争发生。如果失败，表示当前锁存在竞争，锁就会膨胀成重量级锁。
 
-![轻量级锁](http://omdq6di7v.bkt.clouddn.com/17-10-28/21119997.jpg)
+![轻量级锁](https://image-1257941127.cos.ap-beijing.myqcloud.com/sync4.jpg)
 
 
 
@@ -197,7 +197,7 @@ synchronized static void method2() {}
 - 一旦有第二个线程访问锁对象，因为偏向锁不会主动释放，所以第二个线程可以看到对象时偏向状态，这时表明在这个对象上已经存在竞争了，检查原来持有该对象锁的线程是否依然存活，如果挂了，则可以将对象变为无锁状态，然后重新偏向新的线程，如果原来的偏向的线程依然存活，则马上执行那个线程的操作栈，检查该对象的使用情况，如果仍然需要持有偏向锁，则偏向锁升级为轻量级锁，（**偏向锁就是这个时候升级为轻量级锁的**）。如果不存在使用了，则可以将对象回复成无锁状态，然后重新偏向。
 - 轻量级锁认为竞争存在，但一般两个线程对于同一个锁的操作都会错开，或者存在竞争时线程进行几次**自旋**，另一个线程就会释放锁。 但是当自旋超过一定的次数后还无法获得对象锁，轻量级锁膨胀为重量级锁，重量级锁使除了拥有锁的线程以外的线程都阻塞，防止CPU空转。
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-10-28/39811669.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/sync5.jpg)
 
 
 ## 参考资料

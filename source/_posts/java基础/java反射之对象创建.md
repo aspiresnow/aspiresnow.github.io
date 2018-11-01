@@ -19,7 +19,7 @@ categories:
 
 <!--more-->
 
-```
+```java
 package cn.zlz.createobj;
 
 import java.io.FileInputStream;
@@ -141,6 +141,6 @@ public class Person implements Serializable, Cloneable {
 	}
 }
 ```
-## 参考
+
 
 ​	

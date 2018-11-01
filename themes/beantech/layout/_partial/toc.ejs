@@ -1,15 +1,15 @@
-<!-- Table of Contents -->
-<% if (page.catalog) { %>
-    <% if (is_post()){ %>
-      <aside id="sidebar">
-        <div id="toc" class="toc-article">
-        <strong class="toc-title"><%= __('Contents') %></strong>
-        <% if (toc(page.content) != ""){ %>
-          <%- toc(page.content, { "class": "toc-nav" }) %>
-        <% } else { %>
-          <ol class="nav"><%= __('none') %></ol>
-        <% } %>
-        </div>
-      </aside>
-    <% } %>
+ <!-- Table of Contents -->
+ <% if (is_post()){ %>
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style= "top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
 <% } %>

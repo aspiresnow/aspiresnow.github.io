@@ -118,7 +118,7 @@ Java代码  [![收藏代码](http://greatwqs.iteye.com/images/icon_star.png)]()
 
  这是一个递归调用的过程： 
 
-Java代码  [![收藏代码](http://greatwqs.iteye.com/images/icon_star.png)]()
+Java代码 
 
 1. 获取Table2，RowKey为RK10000的RegionServer => 获取.META.，RowKey为Table2,RK10000, 99999999999999的RegionServer => 获取-ROOT-，RowKey为.META.,Table2,RK10000,99999999999999,99999999999999的RegionServer => 获取-ROOT-的RegionServer => 从ZooKeeper得到-ROOT-的RegionServer => 从-ROOT-表中查到RowKey最接近（小于） .META.,Table2,RK10000,99999999999999,99999999999999的一条Row，并得到.META.的RegionServer => 从.META.表中查到RowKey最接近（小于）Table2,RK10000, 99999999999999的一条Row，并得到Table2的RegionServer => 从Table2中查到RK10000的Row  
 

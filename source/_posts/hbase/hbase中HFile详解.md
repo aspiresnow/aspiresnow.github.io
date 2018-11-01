@@ -17,7 +17,7 @@ HBase中KeyValue数据的存储格式，是Hadoop的二进制格式文件，有�
 
 HFile V2的逻辑结构如下图所示：
 
-![1](http://omdq6di7v.bkt.clouddn.com/17-9-19/84269403.jpg)
+![1](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile1.jpg)
 
 文件主要分为四个部分：Scanned block section，Non-scanned block section，Opening-time data section和Trailer。
 
@@ -31,15 +31,15 @@ Trailer：这部分主要记录了HFile的基本信息、各个部分的偏移�
 
 **HFile物理结构**
 
-**![2](http://omdq6di7v.bkt.clouddn.com/17-9-19/56042852.jpg)**
+**![2](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile2.jpg)**
 
 如上图所示， HFile会被切分为多个大小相等的block块，每个block的大小可以在创建表列簇的时候通过参数blocksize ＝> ‘65535’进行指定，默认为64k，**大号的Block有利于顺序Scan，小号Block利于随机查询**，因而需要权衡。而且所有block块都拥有相同的数据结构，如图左侧所示，HBase将block块抽象为一个统一的HFileBlock。HFileBlock支持两种类型，一种类型不支持checksum，一种不支持。为方便讲解，下图选用不支持checksum的HFileBlock内部结构：
 
-![3](http://omdq6di7v.bkt.clouddn.com/17-9-19/84308271.jpg)
+![3](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile3.jpg)
 
 上图所示HFileBlock主要包括两部分：BlockHeader和BlockData。其中BlockHeader主要存储block元数据，BlockData用来存储具体数据。block元数据中最核心的字段是BlockType字段，用来标示该block块的类型，HBase中定义了8种BlockType，每种BlockType对应的block都存储不同的数据内容，有的存储用户数据，有的存储索引数据，有的存储meta元数据。对于任意一种类型的HFileBlock，都拥有相同结构的BlockHeader，但是BlockData结构却不相同。下面通过一张表简单罗列最核心的几种BlockType，下文会详细针对每种BlockType进行详细的讲解：
 
-![4](http://omdq6di7v.bkt.clouddn.com/17-9-19/64479165.jpg)
+![4](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile4.jpg)
 
 **HFile中Block块解析**
 
@@ -49,7 +49,7 @@ Trailer：这部分主要记录了HFile的基本信息、各个部分的偏移�
 
 主要记录了HFile的基本信息、各个部分的偏移值和寻址信息，下图为Trailer内存和磁盘中的数据结构，其中只显示了部分核心字段：
 
-![5](http://omdq6di7v.bkt.clouddn.com/17-9-19/21019813.jpg)
+![5](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile5.jpg)
 
 HFile在读取的时候首先会解析Trailer Block并加载到内存，然后再进一步加载LoadOnOpen区的数据，具体步骤如下：
 
@@ -67,7 +67,7 @@ DataBlock是HBase中数据存储的最小单元，默认大小为64k。Data 块�
 
 DataBlock中主要存储用户的KeyValue数据（KeyValue后面一般会跟一个timestamp，图中未标出），而KeyValue结构是HBase存储的核心，每个数据都是以KeyValue结构在HBase中进行存储。KeyValue结构在内存和磁盘中可以表示为：
 
-![6](http://omdq6di7v.bkt.clouddn.com/17-9-19/8752401.jpg)
+![6](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile6.jpg)
 
 每个KeyValue都由4个部分构成，分别为key length，value length，key和value。其中key value和value length是两个固定长度的数值，而key是一个复杂的结构，首先是rowkey的长度，接着是rowkey，然后是ColumnFamily的长度，再是ColumnFamily，最后是时间戳和KeyType（keytype有四种类型，分别是Put、Delete、 DeleteColumn和DeleteFamily），value就没有那么复杂，就是一串纯粹的二进制数据。
 
@@ -75,15 +75,15 @@ DataBlock中主要存储用户的KeyValue数据（KeyValue后面一般会跟一�
 
 BloomFilter对于HBase的随机读性能至关重要，对于get操作以及部分scan操作可以剔除掉不会用到的HFile文件，减少实际IO次数，提高随机读性能。在此简单地介绍一下Bloom Filter的工作原理，Bloom Filter使用位数组来实现过滤，初始状态下位数组每一位都为0，如下图所示：
 
-![7](http://omdq6di7v.bkt.clouddn.com/17-9-19/14078567.jpg)
+![7](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile7.jpg)
 
 假如此时有一个集合S = {x1, x2, … xn}，Bloom Filter使用k个独立的hash函数，分别将集合中的每一个元素映射到｛1,…,m｝的范围。对于任何一个元素，被映射到的数字作为对应的位数组的索引，该位会被置为1。比如元素x1被hash函数映射到数字8，那么位数组的第8位就会被置为1。下图中集合S只有两个元素x和y，分别被3个hash函数进行映射，映射到的位置分别为（0，2，6）和（4，7，10），对应的位会被置为1:
 
-![8](http://omdq6di7v.bkt.clouddn.com/17-9-19/40774801.jpg)
+![8](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile8.jpg)
 
 现在假如要判断另一个元素是否是在此集合中，只需要被这3个hash函数进行映射，查看对应的位置是否有0存在，如果有的话，表示此元素肯定不存在于这个集合，否则有可能存在。下图所示就表示z肯定不在集合｛x，y｝中：
 
-![9](http://omdq6di7v.bkt.clouddn.com/17-9-19/2549118.jpg)
+![9](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile9.jpg)
 
 HBase中每个HFile都有对应的位数组，KeyValue在写入HFile时会先经过几个hash函数的映射，映射后将对应的数组位改为1，get请求进来之后再进行hash映射，如果在对应数组位上存在0，说明该get请求查询的数据不在该HFile中。
 
@@ -91,7 +91,7 @@ HFile中的位数组就是上述Bloom Block中存储的值，可以想象，一�
 
 在结构上每个位数组对应HFile中一个Bloom Block，为了方便根据Key定位具体需要加载哪个位数组，HFile V2又设计了对应的索引Bloom Index Block，对应的内存和逻辑结构图如下：
 
-![10](http://omdq6di7v.bkt.clouddn.com/17-9-19/22197798.jpg)
+![10](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile10.jpg)
 
 Bloom Index Block结构中totalByteSize表示位数组的bit数，numChunks表示Bloom Block的个数，hashCount表示hash函数的个数，hashType表示hash函数的类型，totalKeyCount表示bloom filter当前已经包含的key的数目，totalMaxKeys表示bloom filter当前最多包含的key的数目, Bloom Index Entry对应每一个bloom filter block的索引条目，作为索引分别指向’scanned block section’部分的Bloom Block，Bloom Block中就存储了对应的位数组。
 
@@ -119,7 +119,7 @@ HFile中除了Data Block需要索引之外，上一篇文章提到过Bloom Block
 
 Root Index Block表示索引树根节点索引块，可以作为bloom的直接索引，也可以作为data索引的根索引。而且对于single-level和mutil-level两种索引结构对应的Root Index Block略有不同，本文以mutil-level索引结构为例进行分析（single-level索引结构是mutual-level的一种简化场景），在内存和磁盘中的格式如下图所示：
 
-![22](http://omdq6di7v.bkt.clouddn.com/17-9-19/39022390.jpg)
+![22](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile11.jpg)
 
 其中Index Entry表示具体的索引对象，每个索引对象由3个字段组成，Block Offset表示索引指向数据块的偏移量，BlockDataSize表示索引指向数据块在磁盘上的大小，BlockKey表示索引指向数据块中的第一个key。除此之外，还有另外3个字段用来记录MidKey的相关信息，MidKey表示HFile所有Data Block中中间的一个Data Block，用于在对HFile进行split操作时，快速定位HFile的中间位置。需要注意的是single-level索引结构和mutil-level结构相比，就只缺少MidKey这三个字段。
 
@@ -129,7 +129,7 @@ Root Index Block会在HFile解析的时候直接加载到内存中，此处需�
 
 当HFile中Data Block越来越多，single-level结构的索引已经不足以支撑所有数据都加载到内存，需要分化为mutil-level结构。mutil-level结构中NonRoot Index Block作为中间层节点或者叶子节点存在，无论是中间节点还是叶子节点，其都拥有相同的结构，如下图所示：
 
-![23](http://omdq6di7v.bkt.clouddn.com/17-9-19/29023829.jpg)
+![23](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile12.jpg)
 
 和Root Index Block相同，NonRoot Index Block中最核心的字段也是Index Entry，用于指向叶子节点块或者数据块。不同的是，NonRoot Index Block结构中增加了block块的内部索引entry Offset字段，entry Offset表示index Entry在该block中的相对偏移量（相对于第一个index Entry)，用于实现block内的二分查找。所有非根节点索引块，包括Intermediate index block和leaf index block，在其内部定位一个key的具体索引并不是通过遍历实现，而是使用二分查找算法，这样可以更加高效快速地定位到待查找key。
 
@@ -137,7 +137,7 @@ Root Index Block会在HFile解析的时候直接加载到内存中，此处需�
 
 了解了HFile中数据索引块的两种结构之后，就来看看如何使用这些索引数据块进行数据的高效检索。整个索引体系类似于MySQL的B+树结构，但是又有所不同，比B+树简单，并没有复杂的分裂操作。具体见下图所示：
 
-![24](http://omdq6di7v.bkt.clouddn.com/17-9-19/12082475.jpg)
+![24](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile13.jpg)
 
 图中上面三层为索引层，在数据量不大的时候只有最上面一层，数据量大了之后开始分裂为多层，最多三层，如图所示。最下面一层为数据层，存储用户的实际keyvalue数据。这个索引树结构类似于InnoSQL的聚集索引，只是HBase并没有辅助索引的概念。
 
@@ -164,7 +164,7 @@ Root Index Block会在HFile解析的时候直接加载到内存中，此处需�
 
 具体keyvalue数据的append以及finalize过程在HFileWriterV2文件中，其中append流程可以大体表征为：
 
-![25](http://omdq6di7v.bkt.clouddn.com/17-9-19/76049260.jpg)
+![25](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile14.jpg)
 
 a. 预检查：检查key的大小是否大于前一个key，如果大于则不符合HBase顺序排列的原理，抛出异常；检查value是否是null，如果为null也抛出异常
 
@@ -180,7 +180,7 @@ e. 写入keyvalue：将keyvalue以流的方式写入输出流，同时需要写�
 
 memstore中所有keyvalue都经过append阶段输出到HFile后，会执行一次finalize过程，主要更新HFile中meta元数据块、索引数据块以及Trailer数据块，其中对索引数据块的更新是我们关心的重点，此处详细解析，上述append流程中c步骤’数据落盘并修改索引’会使得root index block不断增多，当增大到一定程度之后就需要分裂，分裂示意图如下图所示：
 
-![26](http://omdq6di7v.bkt.clouddn.com/17-9-19/3817222.jpg)
+![26](https://image-1257941127.cos.ap-beijing.myqcloud.com/hfile15.jpg)
 
 上图所示，分裂前索引结构为second-level结构，图中没有画出Data Blocks，根节点索引指向叶子节点索引块。finalize阶段系统会对Root Index Block进行大小检查，如果大小大于规定的大小就需要进行分裂，图中分裂过程实际上就是将原来的Root Index Block块分割成4块，每块独立形成中间节点InterMediate Index Block，系统再重新生成一个Root Index Block（图中红色部分），分别指向分割形成的4个interMediate Index Block。此时索引结构就变成了third-level结构。
 

@@ -121,7 +121,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
      ​
 
-   ![image](http://omdq6di7v.bkt.clouddn.com/17-9-4/28653757.jpg)
+   ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/tpool1.jpg)
 
    - 当一个线程完成任务时，它会从队列中取下一个任务来执行。
    - 当一个线程无事可做，超过一定的时间（keepAliveTime）时，线程池会判断，如果当前运行的线程数大于 corePoolSize，那么这个线程就被停掉。所以线程池的所有任务完成后，它最终会收缩到 corePoolSize 的大小。

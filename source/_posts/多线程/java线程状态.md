@@ -14,7 +14,7 @@ categories:
 
 <!--more-->
 
-![image](http://omdq6di7v.bkt.clouddn.com/17-10-20/35976214.jpg)
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts1.jpg)
 
 ### 线程间的状态转换:
 
