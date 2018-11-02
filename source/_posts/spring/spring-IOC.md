@@ -15,11 +15,48 @@ categories:
 
 
 
-## 一、bean
+## BeanFactory继承体系
 
----
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/beanFactory.png)
 
+Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。从继承图可以看出，BeanFactory的继承主要分成两个体系，一条是spring-context中ApplicationContext的继承体系，一条是spring-core中XMLBeanFactory的继承体系。首先简单介绍下spring-core继承体系中各个继承类的功能
 
+- BeanFactory:访问spring容器的根接口，主要提供了 getBean方法。通过id获取容器中bean对象
+- ListableBeanFactory:提供获取容器中所有bean对象的功能实现。通俗讲就是获取多个bean对象
+- HierarchicalBeanFactory：提供获取父类容器的功能
+- AutowireCapableBeanFactory:提供创建bean、配置bean、自动注入、bean初始化以及应用BeanPostProcesror的后处理器。
+- ConfigurableBeanFactory:提供配置spring容器的方法接口
+- ConfigurableListableBeanFactory：配置容器要忽略的类型和接口。综合了listable和configurable的功能。
+- AbstractBeanFactory:综合了FactoryBeanRegistrySupport的注册功能，并实现了部分容器的具体功能实现
+- AbstractAutowireCapableBeanFactory:对自动配置的具体实现，综合了AbstractBeanFactory的功能
+- DefaultListableBeanFactory:提供创建bean和获取bean的具体实现。并实现了BeanDefinition的注册功能
+
+## 加载Bean
+
+spring的加载bean的过程是将开发人员的spring配置转换为spring内部数据结构的过程，主要进行下面三步:
+
+1. Resource定位,解析配置文件路径及dom解析。
+2. BeanDefinition构建， 将用户定义的<bean>配置表示为IOC容器内部的数据结构
+3. BeanDefinition注册，将BeanDefinition对象注册到一个HashMap中，以bean id为key
+
+在spring-core中使用XmlBeanFactory作为BeanFactory的具体实现来作为spring容器。
+
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/XmlBeanFactory.jpg)
+
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanDefinition.jpg)
+
+![](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanLoad.jpg)
+
+- ResourceLoader：资源加载，处理import的时候用了
+- BeanDefinitionReader：
+- DocumentLoader：配置文件转换为Document
+- BeanDefinitionDocumentReader：读取Document并注册BeanDefinition
+- BeanDefinitionParserDelegate： 用来解析xml转换为BeanDefinition 用来解析 <bean>标签返回 BeanDefinitionHolder
+- XmlReaderContext：全局变量 存储 BeanDefinitionRegistry, XmlBeanDefinitionReader
+- BeanDefinitionReaderUtils：注册
+- BeanDefinitionRegistry：注册器  DefaultListableBeanFactory 实现了注册器功能
+
+对bean 定义载入IOC容器使用的方法是loadBeanDefinition,其中的大致过程如下：通过ResourceLoader来完成资源文件位置的定位，DefaultResourceLoader是默认的实现，同时上下文本身就给出了ResourceLoader的实现，可以从类路径，文件系统, URL等方式来定为资源位置。如果是XmlBeanFactory作为IOC容器，那么需要为它指定bean定义的资源，也就是说bean定义文件时通过抽象成Resource来被IOC容器处理的，容器通过BeanDefinitionReader来完成定义信息的解析和Bean信息的注册,往往使用的是XmlBeanDefinitionReader来解析bean的xml定义文件 - 实际的处理过程是委托给BeanDefinitionParserDelegate来完成的，从而得到bean的定义信息，这些信息在Spring中使用BeanDefinition对象来表示 - 这个名字可以让我们想到loadBeanDefinition,RegisterBeanDefinition这些相关的方法 - 他们都是为处理BeanDefinitin服务的，IoC容器解析得到BeanDefinition以后，需要把它在IOC容器中注册，这由IOC实现 BeanDefinitionRegistry接口来实现。注册过程就是在IOC容器内部维护的一个HashMap来保存得到的 BeanDefinition的过程。这个HashMap是IoC容器持有bean信息的场所，以后对bean的操作都是围绕这个HashMap来实现的
 
 - bean属性
 
@@ -64,7 +101,7 @@ public void setParentBeanFactory(BeanFactory parentBeanFactory) {
 }
 ```
 
-![](https://image-1257941127.cos.ap-beijing.myqcloud.com/XmlBeanFactory.jpg)
+
 
 ```java
 //XmlBeanDefinitionReader
@@ -216,41 +253,11 @@ public AbstractBeanDefinition parseBeanDefinitionElement(
 
 
 
-![](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanDefinition.jpg)
 
-ResourceLoader—资源加载，处理import的时候用了
-
-BeanDefinitionReader----
-
-DocumentLoader——配置文件转换为Document
-
-BeanDefinitionDocumentReader——读取Document并注册BeanDefinition
-
-BeanDefinitionParserDelegate 用来解析xml转换为BeanDefinition 用来解析 <bean>标签返回 BeanDefinitionHolder
-
-XmlReaderContext——全局变量 存储 BeanDefinitionRegistry, XmlBeanDefinitionReader
-
-BeanDefinitionReaderUtils——注册
-
-BeanDefinitionRegistry —— 注册器  DefaultListableBeanFactory 实现了注册器功能
-
-StringTokenizer 类  StringUtils.tokenizeToStringArray方法
-
-FailFastProblemReporter 用法
 
 
 
-初始化的入口在容器实现中的refresh()调用来完成 
-
-    * 对bean 定义载入IOC容器使用的方法是loadBeanDefinition,其中的大致过程如下：通过ResourceLoader来完成资源文件位置的定位，DefaultResourceLoader是默认的实现，同时上下文本身就给出了ResourceLoader的实现，可以从类路径，文件系统, URL等方式来定为资源位置。如果是XmlBeanFactory作为IOC容器，那么需要为它指定bean定义的资源，也就是说bean定义文件时通过抽象成Resource来被IOC容器处理的，容器通过BeanDefinitionReader来完成定义信息的解析和Bean信息的注册,往往使用的是XmlBeanDefinitionReader来解析bean的xml定义文件 - 实际的处理过程是委托给BeanDefinitionParserDelegate来完成的，从而得到bean的定义信息，这些信息在Spring中使用BeanDefinition对象来表示 - 这个名字可以让我们想到loadBeanDefinition,RegisterBeanDefinition这些相关的方法 - 他们都是为处理BeanDefinitin服务的，IoC容器解析得到BeanDefinition以后，需要把它在IOC容器中注册，这由IOC实现 BeanDefinitionRegistry接口来实现。注册过程就是在IOC容器内部维护的一个HashMap来保存得到的 BeanDefinition的过程。这个HashMap是IoC容器持有bean信息的场所，以后对bean的操作都是围绕这个HashMap来实现的
-
-
-
-- Resource定位 ，Resource接口，由ResourceLoader加载。
-- BeanDefinition载入， 将用户定义的bean表示为IOC容器内部的数据结构
-- BeanDefinition注册，BeanDefinitionRegistry注册到一个HashMap中
-
-![](https://image-1257941127.cos.ap-beijing.myqcloud.com/BeanLoad.jpg)
+StringTokenizer 类  StringUtils.tokenizeToStringArray方法
 
 
 
