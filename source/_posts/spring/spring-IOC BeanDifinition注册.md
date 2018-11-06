@@ -203,7 +203,7 @@ protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader() {
 }
 ```
 
-在调用documentReader之前，创建了一个XmlReaderContext
+在调用documentReader之前，创建了一个XmlReaderContext,在这里保存了本次加载的的XMLBeanDefinitionReader
 
 ```java
 public XmlReaderContext createReaderContext(Resource resource) {
