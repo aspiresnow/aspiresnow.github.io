@@ -212,3 +212,7 @@ private final Set<String> singletonsCurrentlyInCreation =
 ```
 
 IdentityHashMap
+
+beforeInstantiationResolved 是什么时候给BeanDefinition赋值这个属性的，用于控制aop的
+
+instantiationStrategy 这个创建策略是干啥的
