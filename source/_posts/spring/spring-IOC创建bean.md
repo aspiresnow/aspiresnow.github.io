@@ -10,26 +10,18 @@ categories:
 
 # spring-IOC创建bean
 
+## 循环依赖
 
+在创建bean的时候会存在依赖注入的情况，即A依赖B，B又依赖A。在创建bean的时候为了避免循环依赖，创建完bean对象后，依赖注入前，将未实例化完毕的bean提早曝光，也就是将ObjectFactory或者未添加依赖注入的bean加入到缓存中，这样下个bean创建时需要依赖上个bean则直接使用ObjectFactory或者未set依赖的bean。由于bean是个对象，后期的属性注入不会影响对象地址的变化
 
-AbstractBeanFactory.getBean
+只有单例模式setter注入才能解决循环依赖问题，构造器注入模式和原型模式在遇到循环依赖的情况下会直接抛出异常，构造器依赖注入无法创建对象，原型模式无法缓存。
 
-DefaultSingletonBeanRegistry.getSingleton
+**单例的缓存**
 
-AbstractAutowireCapableBeanFactory.createBean
-
-ConstructorResolver.autowireConstructor
-
-##### 缓存类
-
-- singletonObjects：beanName和bean实例之间关系
-- earlySingletonObjects：beanName和bean实例之间关系。通singletonObjects不同的是当一个bean还在创建过程中，就可以通过getBean方法获取到，主要用来检测循环引用
+- singletonObjects：beanName和bean实例之间关系，bean是已经完成依赖注入的bean
+- earlySingletonObjects：beanName和bean实例之间关系。bean还未完成依赖注入，是ObjectFactory getObject返回
 - singletonFactories：beanName和创建bean的工厂之间的关系 beanName---ObjectFactory
-- registeredSingletons：保存当前已注册的bean,包括ObjectFactory
-
-因为在创建单例bean的时候会存在依赖注入的情况，而在创建依赖的时候为了避免循环依赖，spring创建bean的原则是不等bean创建完成就会将创建bean的ObjectFactory提早曝光，也就是将ObjectFactory加入到缓存中，一旦下个bean创建时间需要依赖上个bean则直接使用ObjectFactory。缓存中记录的只是最原始的bean状态，需要进行实例化
-
-只有单例模式setter注入才会解决循环依赖问题，原型模式在遇到循环依赖的情况下会直接抛出异常，因为不允许缓存原型模式的bean.
+- registeredSingletons：保存当前已注册的beanName的集合,包括以上三种情况下的beanName
 
 ## 源码解读
 
@@ -853,8 +845,6 @@ protected void registerDisposableBeanIfNecessary(String beanName, Object bean, R
 }
 ```
 
-
-
 ### 处理FactoryBean
 
 FactoryBean接口，实现该接口可以通过getObject方法创建自己想要的bean对象。在初始化bean的时候，如果bean实现类了FactoryBean接口，则是返回getObject方法返回的对象，而不是创建实现FactoryBean接口的对象
@@ -892,15 +882,19 @@ protected Object getObjectForBeanInstance(
 }
 ```
 
-获取FactoryBean的getObject方法中定义的实体对象，注册到spring容器中，应用BeanPostProcessor的postProcessAfterInitialization处理器，保证spring容器中的实例都应用处理器
+获取FactoryBean的getObject方法中定义的实体对象，如果定义的 isSingleton() 返回的是true，则会将获取到的bean添加到一个缓存factoryBeanObjectCache中，保证单例。
+
+spring容器原则上保证容器中所有的bean都应用BeanPostProcessor的postProcessAfterInitialization处理器
 
 ```java
 protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
     //如果是单例模式 从单例缓存中取，并存到单例缓存中
     if (factory.isSingleton() && containsSingleton(beanName)) {
         synchronized (getSingletonMutex()) {
+            //先从缓存中获取
             Object object = this.factoryBeanObjectCache.get(beanName);
             if (object == null) {
+                //如果缓存中没有要的bean创建 并加入缓存
                 object = doGetObjectFromFactoryBean(factory, beanName);
                 Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
                 if (alreadyThere != null) {
@@ -928,8 +922,7 @@ protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanNam
             }
             return (object != NULL_OBJECT ? object : null);
         }
-    }
-    else {
+    } else {//原型模式每次都调用 getObject() 创建bean
         Object object = doGetObjectFromFactoryBean(factory, beanName);
         if (object != null && shouldPostProcess) {
             try {
@@ -957,7 +950,7 @@ private Object doGetObjectFromFactoryBean(final FactoryBean<?> factory, final St
                 object = AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                     @Override
                     public Object run() throws Exception {
-                        return factory.getObject();
+                        return factory.getObject();//调用getObject方法
                     }
                 }, acc);
             }
