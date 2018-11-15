@@ -914,7 +914,7 @@ protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanNam
                         }finally {
                             afterSingletonCreation(beanName);//singletonsCurrentlyInCreation
                         }
-                    }
+                    }//单例模式下添加缓存，保证单例
                     if (containsSingleton(beanName)) {
                         this.factoryBeanObjectCache.put(beanName, (object != null ? object : NULL_OBJECT));
                     }
