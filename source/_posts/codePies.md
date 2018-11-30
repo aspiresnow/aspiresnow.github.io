@@ -160,11 +160,12 @@ enum ESex{
     MAlE(1),
     FAMALE(2);
     private int code;
-}
-public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
-    Field enumField = ESex.class.getField("MAlE");
-    ReflectionUtils.makeAccessible(enumField);
-    ESex e = (ESex)enumField.get(null);
-    System.out.println(e.name() + " ：" + e.getCode());
+    
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+        Field enumField = ESex.class.getField("MAlE");
+        ReflectionUtils.makeAccessible(enumField);
+        ESex e = (ESex)enumField.get(null);
+        System.out.println(e.name() + " ：" + e.getCode());
+    }
 }
 ```
