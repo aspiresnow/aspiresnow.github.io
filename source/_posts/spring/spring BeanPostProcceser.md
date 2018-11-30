@@ -10,6 +10,10 @@ categories:
 
 # BeanPostProcceser
 
+applyMergedBeanDefinitionPostProcessors 这个方法中会调用 BeanPostProcessor的postProcessMergedBeanDefinition方法
+
+PostProcessorRegistrationDelegate 用于激活注册的BeanFactoryPostProcessor
+
 ReflectionUtils
 
 LocalVariableTableParameterNameDiscoverer 用于获取参数的名字
@@ -24,6 +28,8 @@ IdentityHashMap
 beforeInstantiationResolved 是什么时候给BeanDefinition赋值这个属性的，用于控制aop的
 
 instantiationStrategy 这个创建策略是干啥的
+
+
 
 
 

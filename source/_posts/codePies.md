@@ -150,3 +150,21 @@ while (counter == -1 || registry.containsBeanDefinition(id)) {
 ```
 
 StringTokenizer 类  StringUtils.tokenizeToStringArray方法
+
+枚举反射创建
+
+```java
+@AllArgsConstructor
+@Getter
+enum ESex{
+    MAlE(1),
+    FAMALE(2);
+    private int code;
+}
+public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+    Field enumField = ESex.class.getField("MAlE");
+    ReflectionUtils.makeAccessible(enumField);
+    ESex e = (ESex)enumField.get(null);
+    System.out.println(e.name() + " ：" + e.getCode());
+}
+```
