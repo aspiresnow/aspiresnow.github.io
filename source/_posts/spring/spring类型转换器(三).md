@@ -10,196 +10,109 @@ categories:
 
 # spring类型转换器(三)
 
-## Bean实例化的属性注入
+## 格式化Formatter
 
-调用BeanFactory的getBean方法会实例化Bean，第一步首先会反射创建一个目标对象，然后使用BeanWrapperImpll封装实例bean
+Converter用来将源数据类型转换目标数据类型，不过有时候一个数据类型会对应不同格式的字符串，如日期类型在不同国家显示的字符是不一样的，需要根据Locale进行转换，或者需要将日期类型转换为不同格式化的字符串，spring针对这种情况提供了Formatter接口来针对格式化进行处理。
 
-```java
-//反射创建对象
-Object beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
-BeanWrapper bw = new BeanWrapperImpl(beanInstance);//使用BeanWrapper包装
-this.beanFactory.initBeanWrapper(bw);//将BeanFactory中的类型转换器注册到BeanWrapper中
-```
+### Formatter
 
-初始化BeanWrapper就是将BeanFactory中定义的全局类型转换器注册到每个BeanWraper中，用于进行属性的类型转换
+Formatter接口继承了Printer和Parser接口，一个用于将对象格式化为本地化的字符串，一个将字符串转换为对象。
 
 ```java
-protected void initBeanWrapper(BeanWrapper bw) {
-    //将BeanFactory中的conversionService 添加到BeanWrapper中
-   bw.setConversionService(getConversionService());
-   registerCustomEditors(bw);
+public interface Formatter<T> extends Printer<T>, Parser<T> {
+}
+public interface Printer<T> {
+	String print(T object, Locale locale);
+}
+public interface Parser<T> {
+	T parse(String text, Locale locale) throws ParseException;
 }
 ```
 
-将BeanFactory中注册的 propertyEditorRegistrars和customEditors中的类型转换器添加BeanWrapper中。BeanWrapper实现了PropertyEditorRegistry接口
+可以通过在字段上面添加注解来实现对字段值的格式化。通过实现AnnotationFormatterFactory指定自定义的注解用以实现格式化。
 
 ```java
-protected void registerCustomEditors(PropertyEditorRegistry registry) {
-   PropertyEditorRegistrySupport registrySupport =
-         (registry instanceof PropertyEditorRegistrySupport ? (PropertyEditorRegistrySupport) registry : null);
-   if (registrySupport != null) {
-      registrySupport.useConfigValueEditors();
-   }//注册 propertyEditorRegistrars 中注册的类型转换器
-   if (!this.propertyEditorRegistrars.isEmpty()) {
-      for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
-         try {
-            registrar.registerCustomEditors(registry);
-         } catch (BeanCreationException ex) {
-           //...
-         }
-      }
-   }//注册 customEditors 添加的类型转换器
-   if (!this.customEditors.isEmpty()) {
-      for (Map.Entry<Class<?>, Class<? extends PropertyEditor>> entry : this.customEditors.entrySet()) {
-         Class<?> requiredType = entry.getKey();
-         Class<? extends PropertyEditor> editorClass = entry.getValue();
-         registry.registerCustomEditor(requiredType, BeanUtils.instantiateClass(editorClass));
-      }
+public interface AnnotationFormatterFactory<A extends Annotation> {
+    //声明允许添加format注解的字段类型
+    Set<Class<?>> getFieldTypes();
+    //格式化
+    Printer<?> getPrinter(A annotation, Class<?> fieldType);
+    //反格式化
+    Parser<?> getParser(A annotation, Class<?> fieldType);
+}
+```
+
+###FormattingConversionService
+
+在上章节的继承图中可以看到FormattingConversionService继承了GenericConversionService。同时实现了FormatterRegistry和ConverterRegistry接口
+
+FormatterRegistry扩展了ConverterRegistry接口，额外提供了注册Formatter、AnnotationFormatterFactory的功能
+
+```java
+public interface FormatterRegistry extends ConverterRegistry {
+   void addFormatter(Formatter<?> formatter);
+   void addFormatterForFieldType(Class<?> fieldType, Formatter<?> formatter);
+   void addFormatterForFieldType(Class<?> fieldType, Printer<?> printer, Parser<?> parser);
+   void addFormatterForFieldAnnotation(AnnotationFormatterFactory<? extends Annotation> annotationFormatterFactory);
+}
+```
+
+FormatterRegistrar接口用于批量注册Formatter的接口
+
+```java
+public interface FormatterRegistrar {
+  //批量注册
+   void registerFormatters(FormatterRegistry registry);
+}
+```
+
+FormattingConversionService
+
+
+
+### 例子
+
+```java
+public static void main(String[] args) throws NoSuchFieldException {
+    String today = "2018-12-04 12:21:32";
+    DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
+	//获取field
+    Field longDateField = Person.class.getDeclaredField("longDate");
+    Field shortDateField = Person.class.getDeclaredField("shortDate");
+    Field localDateTimeField = Person.class.getDeclaredField("localDateTime");
+    Object longDate = conversionService.convert(today, new TypeDescriptor(longDateField));
+    System.out.println(longDate);
+    Object shortDate = conversionService.convert(today, new TypeDescriptor(shortDateField));
+    System.out.println(shortDate);
+    Object localDateTime = conversionService.convert(today, new TypeDescriptor(localDateTimeField));
+    System.out.println(localDateTime);
+}
+
+@Data
+static class Person{
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date longDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date shortDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date localDateTime;
+
+}
+```
+
+## 源码
+
+首先来看DefaultFormattingConversionService，这个类是FormattingConversionService的默认实现类，FormattingConversionService实现了ConversionService接口，在BeanFactory中只有一个ConversionService变量，所以只能给spring容易配置一个ConversionService。那么到底应该用DefaultFormattingConversionService还是用DefaultConversionService？让我们来看DefaultFormattingConversionService的源码
+
+```java
+public DefaultFormattingConversionService(StringValueResolver embeddedValueResolver, boolean registerDefaultFormatters) {
+   setEmbeddedValueResolver(embeddedValueResolver);
+    //注册DefaultConversionService中的默认转换器
+   DefaultConversionService.addDefaultConverters(this);
+   if (registerDefaultFormatters) {
+      addDefaultFormatters(this);
    }
 }
 ```
 
-创建完BeanWrapperImpl并完成类型转换器的注册后，后续就是对值类型转换和属性注入了。调用applyPropertyValues 给对象的属性赋值。在设置值的时候会首先获取类型转换器，如果没有设置TypeConverter，那么类型转化的功能就由BeanWrapper来实现。
-
-```java
-protected void applyPropertyValues(String beanName, BeanDefinition mbd, BeanWrapper bw, PropertyValues pvs) {
-    //.....
-    TypeConverter converter = getCustomTypeConverter();//获取BeanFactory中的 typeConverter
-    if (converter == null) {//如果没有配置 使用BeanWrapper作为类型转换器
-        converter = bw;
-    }
-}
-```
-
-循环BeanDefinition中定义的属性值，然后根据匹配的Bean的属性类型进行类型转换
-
-```java
-BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this, beanName, mbd, converter);
-for (PropertyValue pv : original) {
-    //....
-    String propertyName = pv.getName();
-    Object originalValue = pv.getValue();
-    //解析el表达式 beanExpressionResolver，如果指定了属性的type直接在这转换
-    Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
-    Object convertedValue = resolvedValue;
-    boolean convertible = bw.isWritableProperty(propertyName) &&
-        !PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
-    if (convertible) {//进行类型转换
-        convertedValue = convertForProperty(resolvedValue, propertyName, bw, converter);
-    }
-}
-```
-
-调用BeanWrapper中的convertForProperty将属性值的类型转换为bean中属性的类型，这里会使用到TypeConverter和ConverterService进行类型转换
-
-```java
-private Object convertForProperty(Object value, String propertyName, BeanWrapper bw, TypeConverter converter) {
-    if (converter instanceof BeanWrapperImpl) {
-        return ((BeanWrapperImpl) converter).convertForProperty(value, propertyName);
-    } else { //如果有指定的的TyepConverter使用自定义的
-        PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
-        MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
-        return converter.convertIfNecessary(value, pd.getPropertyType(), methodParam);
-    }
-}
-```
-
-完成类型转换后，将属性值包装了MutablePropertyValues 类型，BeanWrapperImpl提供了属性的访问功能，调用BeanWrapperImpl的setPropertyValues对bean中的属性值进行设置,至此就完成了bean的属性注入
-
-```java
-bw.setPropertyValues(new MutablePropertyValues(deepCopy));
-```
-
-## ApplicationContext中的类型转换器
-
-通过以上流程可以知道，在BeanFactory中注册全局的类型转换器，实例化每个bean的时候都会根据BeanFactory中注册的类型转换器在BeanWrapper中创建一份类型转换器。类型转换的过程是在getBean的时候，所以最好是在调用getBean即实例化Bean之前向BeanFactory中注册自定义的类型转换器
-
-在使用ApplicationContext的时候，spring并没有暴露BeanFactory给我们，但是提供了一个BeanFactoryPostProcessor接口用于实现，spring会保证在实例化bean之前调用所有注册的BeanFactoryPostProcessor的实现类的postProcessBeanFactory方法。
-
-spring内部提供了一个 CustomEditorConfigurer 类，用于用户注册自定义类型转换器
-
-```java
-<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-    <property name="customEditors">
-        <map>
-            <entry key="example.ExoticType" value="example.ExoticTypeEditor"/>
-        </map>
-    </property>
-    <property name="propertyEditorRegistrars">
-        <list>
-            <ref bean="customPropertyEditorRegistrar"/>
-        </list>
-    </property>
-</bean>
-<bean id="customPropertyEditorRegistrar"
-    class="com.foo.editors.spring.CustomPropertyEditorRegistrar"/>
-```
-
-来看CustomEditorConfigurer的源码，实现了BeanFactoryPostProcessor和Ordered接口。在postProcessBeanFactory方法中向beanFactory中注册了自定义的类型转换器
-
-```java
-public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered {
-
-   private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
-   private PropertyEditorRegistrar[] propertyEditorRegistrars;
-   private Map<Class<?>, Class<? extends PropertyEditor>> customEditors;
-
-   @Override
-   public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-       //注册propertyEditorRegistrars
-      if (this.propertyEditorRegistrars != null) {
-         for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
-            beanFactory.addPropertyEditorRegistrar(propertyEditorRegistrar);
-         }
-      }//注册customEditors
-      if (this.customEditors != null) {
-         for (Map.Entry<Class<?>, Class<? extends PropertyEditor>> entry : this.customEditors.entrySet()) {
-            Class<?> requiredType = entry.getKey();
-            Class<? extends PropertyEditor> propertyEditorClass = entry.getValue();
-            beanFactory.registerCustomEditor(requiredType, propertyEditorClass);
-         }
-      }
-   }
-}
-```
-
-
-
-Validator` `ValidationUtils`
-
-`PropertyAccessorUtils`
-
-he most manual approach, which is not normally convenient or recommended, is to simply use the `registerCustomEditor()` method of the `ConfigurableBeanFactory` interface, assuming you have a `BeanFactory`reference.
-
-Another, slightly more convenient, mechanism is to use a special bean factory post-processor called `CustomEditorConfigurer`
-
-Another mechanism for registering property editors with the Spring container is to create and use a `PropertyEditorRegistrar`
-
-`GenericConverter` 用于处理复杂的converter  ArrayToCollectionConverter
-
-`ConditionalGenericConverter`
-
-`ConversionService`   `ConversionServiceFactory`
-
-If no ConversionService is registered with Spring, the original PropertyEditor-based system is used.
-
-```java
-<bean id="conversionService"
-    class="org.springframework.context.support.ConversionServiceFactoryBean"/>
-```
-
-`FormattingConversionServiceFactoryBean`
-
-`TypeDescriptor`
-
-`Formatter`  `DateTimeFormatAnnotationFormatterFactory` `FormattingConversionServiceFactoryBean`
-
-If you are using Spring MVC remember to explicitly configure the conversion service that is used. For Java based `@Configuration` this means extending the`WebMvcConfigurationSupport` class and overriding the `mvcConversionService()` method. For XML you should use the `'conversion-service'` attribute of the `mvc:annotation-driven` element
-
-
-
-
-
-NumberUtils
-
-WebUtils
+从源码可以看出，DefaultFormattingConversionService完全是对DefaultConversionService的扩展，在构造函数中调用了DefaultConversionService的addDefaultConverters完全拥有了DefaultConversionService所有的功能，所以只需要使用DefaultFormattingConversionService就可以

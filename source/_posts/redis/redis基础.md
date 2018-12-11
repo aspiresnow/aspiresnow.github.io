@@ -38,7 +38,7 @@ redis上各个数据之间数据是相互隔离的。但是由于redis是单线�
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/redis/redis%E4%BC%A0%E8%BE%93.png)
 
-每次客户端调用都会经历 **发送命令**、**执行命令**、**返回结果** 三个过程。redis是单线程处理的，所以一条命令从客户端到服务端不会立刻被执行，所有的命令都会进入一个队列中，然后逐条执行。由于网络传输无法保证顺序，所以redis无法保证从多个客户端发送的多条命令的执行顺序，当时可以确定不会有两条命令同时被执行。
+每次客户端调用都会经历 **发送命令**、**执行命令**、**返回结果** 三个过程。redis是单线程处理的，所以一条命令从客户端到服务端不会立刻被执行，所有的命令都会进入一个队列中，然后逐条执行。由于网络传输无法保证顺序，所以redis无法保证从多个客户端发送的多条命令的执行顺序，但是可以保证不会有两条命令同时被执行。
 
 ## 全局命令
 
@@ -78,20 +78,20 @@ redis上各个数据之间数据是相互隔离的。但是由于redis是单线�
   # 1) "0"
   # 2) 1) "ab1d"
   #    2) "abd3d"
-  # 第二次查询返回的游标为0，正面已经查询完毕
+  # 第二次查询返回的游标为0，证明已经查询完毕
   ```
 
-  使用scan命令可以有效的避免redis可能产生的阻塞问题，但是如果在遍历过程中建发生了增删改，使用scan并不能保证结果的正确性。使用scan去遍历一些不会变化的数据
+  使用scan命令可以有效的避免redis可能产生的阻塞问题，但是如果在遍历过程中建发生了增删改，使用scan并不能保证结果的正确性。所有尽量使用scan去遍历一些不会变化的数据
 
 ### 键过期
 
 - expire key 秒数 : 设置key的n秒后过期
 
-- expireat key timestamp ：键再**秒级**时间戳timestamp后过期
+- expireat key timestamp ：键在**秒级**时间戳timestamp后过期
 
-- pexpire key 毫秒数 : 设置key的n毫秒后过期
+- pexpire key 毫秒数 : 设置key在n毫秒后过期
 
-- pexpireat key timestamp ：键再**毫秒级**时间戳timestamp后过期
+- pexpireat key timestamp ：键在**毫秒级**时间戳timestamp后过期
 
 - ttl key : 获取key剩余过期时间 单位为秒
 
@@ -237,16 +237,16 @@ hash类型的命令跟字符串类型的基本一致，只是hash类型的命令
 - hincrby key field n: 对field的值进行自增n，注意值必须是整型
 - hincrbyfloat key field n : 对field的值进行浮点数加
 
-hash类型的field无法单独设置过期时间，过期的作用域只能是key。hash类型的命令简单的操作复杂度都是O(1)级别的，批量操作和hkeys、hvals、hgetall 操作复杂度为 O(n)  n为field的总数，
+**hash类型的field无法单独设置过期时间，过期的作用域只能是key**。hash类型的命令简单的操作复杂度都是O(1)级别的，批量操作和hkeys、hvals、hgetall 操作复杂度为 O(n)  n为field的总数，
 
 #### 3.应用场景
 
 hash类型的值存的是一个对象，相比较字符串类型，hash类型可以减少key的数量，key多了也是会消耗内存的。
-如果对缓存值是一个对象，而且针对该值的操作更多的是针对对象中的字段进行操作时，建议使用hash类型来存储。
+如果缓存值是一个对象，并且针对该值的操作更多的是针对对象中的字段单独进行操作时，建议使用hash类型来存储。
 
 ### 列表list
 
-列表类型是redis提供一个有序的字符串集合，列表中可以含有重复的元素，一个列表最多存储 2的32次方-1个元素
+列表类型是有序的字符串集合，列表中可以含有重复的元素，一个列表最多存储 2的32次方-1个元素
 
 #### 1.内部编码
 
@@ -255,12 +255,12 @@ hash类型的值存的是一个对象，相比较字符串类型，hash类型可
 
 #### 2.命令
 
-列表类型是一个双向的数组，对于列表的操作命令跟操作java中的list类似，所有的命令前都会加 `l`或者`r`
+列表类型是一个**双向**的数组，对于列表的操作命令跟操作java中的list类似，所有的命令前都会加 `l`或者`r`
 
 - lrange key start end : 查询列表中元素，需要指定start和end
 
   ```shell
-  #索引下标有连个特点 lrange key 0 -1 查询所有的元素
+  #索引下标有两个特点 lrange key 0 -1 查询所有的元素
   # 索引下标从左到右 分别是 0 到 n-1，从右往左分别是 -1 到 -n。
   # lrange 查询出来的结果是包含首尾的
   ```
@@ -312,7 +312,7 @@ hash类型的值存的是一个对象，相比较字符串类型，hash类型可
 
 ### 集合Set
 
-set类型跟list类型一样都是一个数组，set是无序的并且不允许有重复元素，无法通过下标获取元素。set支持多个集合之间的交集、并集、差集的命令运算。
+set类型跟list类型一样都是一个数组，set是无序并且不允许有重复元素，无法通过下标获取元素。set支持多个集合之间的交集、并集、差集的命令运算。
 
 #### 1.内部编码
 
@@ -337,9 +337,13 @@ set类型跟list类型一样都是一个数组，set是无序的并且不允许�
 
 #### 3.应用场景
 
+set类型的数据结构应用场景更多是对多个集合之间做并、交、差集进行操作。当业务场景需要用到多个key集合之间做这些用算的时候，使用set会很方便。
+
+例如求不同用户之间相同的兴趣爱好，可以使用set类型，userId做key，然后将兴趣爱好存到set中，使用set的sinter方法求多个用户兴趣爱好的交集。
+
 ### 有序集合sortedSet
 
-有序集合在集合的基础上对每个元素设置了一个分数，根据分数可以对集合中的元素进行排序。有序集合中的元素同集合一样不能重复。
+有序集合在集合set的基础上对每个元素设置了一个分数，根据分数可以对集合中的元素进行排序。有序集合中的元素同集合set一样不能重复，但是分数可以一样。
 
 #### 1.内部编码
 
@@ -348,7 +352,64 @@ set类型跟list类型一样都是一个数组，set是无序的并且不允许�
 
 #### 2.命令
 
-- 
+- zrange key start end [withscores] : 从低到高区间返回，withscores是带分数返回
+
+- zrange key start end [withscores] : 从高到低区间返回，withscores是带分数返回
+
+  ```shell
+  #索引下标有两个特点 zrange key 0 -1 查询所有的元素
+  # 索引下标从左到右 分别是 0 到 n-1，从右往左分别是 -1 到 -n。
+  # zrange 查询出来的结果是包含首尾的
+  ```
+
+- zrangebyscore key min max [withscores] \[limit offset count]:按照分数从低到高，limit可以限制输出的起始位置和个数
+
+- zrevrangebyscore key max min [withscores] \[limit offset count]:按照分数从高到底
+
+  ```shell
+  # min 和 max支持开区间(小括号)，-inf和+inf分辨代表无穷小和无穷大
+  # zrangebyscore zkey (2 +inf withsocres
+  # zrangebyscore zkey (2 (5 withsocres
+  ```
+
+- zadd key score member [score member ...] :向sortedSet中添加元素，并指定分数，时间复杂度 O(log(n))
+
+  ```shell
+  # nx : member必须不存在，才可以设置成功，用于添加
+  # xx : member必须存在，才可以设置成，用于更新
+  # ch : 返回此次操作后，有序集合元素和分数发生变化的个数
+  # incr : 当member存在的时候，是更新分数累加，当member不存在的时候，是对分数进行赋值
+  ```
+
+- zcard key : 计算成员个数 O(1)
+
+- zcount key min max : 返回指定分数范围成员个数
+
+- zscore key member : 获取某个元素的分数，成员不存在返回nil
+
+- zrank key member : 按分数从低到高返回member的排名,从0开始
+
+- zrevrank key member : 按分数从高到低返回member的排名，从0开始
+
+- zrem key member [member ...] : 删除成员元素
+
+- zremrangebyrank key start end : 删除指定排名内的升序元素
+
+- zremrangebyscore key min max : 删除指定分数范围的元素，返回成功删除的个数
+
+- zincrby key increment member : 增加成员的分数，increment是分数的点数
+
+- zinterstore destination numkeys key [key1 ...] \[weights weight \[weight ...]] \[aggregate sum|min|max] : 交集
+
+- zunionstore destination numkeys key [key1 ...] \[weights weight \[weight ...]] \[aggregate sum|min|max] : 并集
+
+  ```shell
+  # destnation:需指定，计算结果保存到的那个键
+  # numkeys : 需指定，需要做集合运算的key的个数
+  # key [key...] : 需指定，做集合运算的sortedset类型的键
+  # weights weight [weight ...] :每个键占的权重，做集合运算时，每个键中的元素的分数乘于自己对应的权重
+  # aggregate sum|min|max: 聚合策略，集合运算后，对相同的元素做聚合处理的策略
+  ```
 
 #### 3.应用场景
 

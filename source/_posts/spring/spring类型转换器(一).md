@@ -18,6 +18,29 @@ categories:
 @Data
 public class TestBean {
     private Date birthday;
+    private Dog dog;
+    private ESex sex;
+}
+
+@Data
+public class Dog {
+    private String name;
+    private Map<String,String> props;
+    public Dog(){
+        log.info("创建新的dog对象");
+    }
+    public Dog(String name){
+        log.info("创建新的dog对象");
+        this.name = name;
+    }
+}
+
+@AllArgsConstructor
+@Getter
+public static enum ESex{
+    MAlE(1),
+    FAMALE(2);
+    private int code;
 }
 ```
 
@@ -47,8 +70,21 @@ BeanWrapperImpl beanWrapper = new BeanWrapperImpl(testBean);
 //注册 当遇到对象属性类型为Date的时候，使用DatePropertyEditor对属性值进行处理
 beanWrapper.registerCustomEditor(Date.class,new DatePropertyEditor());
 beanWrapper.setPropertyValue("birthday","2018-11-29 12:12:12");//设置值
+beanWrapper.setAutoGrowNestedPaths(true);//设置嵌套属性自动创建
+beanWrapper.setPropertyValue("sex","MAlE");//将值根据枚举名字转换为枚举
+beanWrapper.setPropertyValue("dog","小黑子");//将值直接作为 Dog构造函数的参数反射创建对象
+beanWrapper.setPropertyValue("dog.props[color]","白色");//嵌套属性设置值
 System.out.println(testBean.getBirthday());//Thu Nov 29 12:12:12 CST 2018
 ```
+
+BeanWrapper支持嵌套属性的赋值，当存在嵌套属性的时候需要设置 setAutoGrowNestedPaths=true。
+
+| 表达式    | 含义                                                         |
+| --------- | ------------------------------------------------------------ |
+| name      | 给属性name赋值，如果name是对象，将值作为该对象构造器的参数创建对象 |
+| bean.name | 属性bean是一个对象，给对象bean中的name赋值,需设置            |
+| name[1]   | 属性类型为array、list，给第n个下标赋值                       |
+| name{key} | 属性为一个Map，指定key赋值，默认会创建LinkedHashMap          |
 
 接下来我们就来研究一下BeanWrapperImpl的实现过程
 
@@ -478,16 +514,88 @@ public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean
 @Override
 public void setPropertyValue(String propertyName, Object value) throws BeansException {
    AbstractNestablePropertyAccessor nestedPa;
-   //用于解决 map[my.key] 类型的属性注入
+   //用于解决 name.map[key] 类型的属性注入
    nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 	
    PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
-   nestedPa.setPropertyValue(tokens, new PropertyValue(propertyName, value));
+   //为属性赋值
+    nestedPa.setPropertyValue(tokens, new PropertyValue(propertyName, value));
 }
+```
 
+由于存在嵌套属性赋值的情况,该情况下创建每一层属性的对象值，使用BeanWrapper包装该对象，那么又是一个BeanWrapperImpl的赋值流程。在这里spring使用了递归解决这个问题。这里spring的处理方式是只处理最底层的属性赋值，在递归中一层层的处理嵌套属性的创建与被注入，然后返回最底下那层的属性对象，完成用户自定义的值的赋值。
+
+```java
+/**
+* 例如 处理 beanWrapper.setPropertyValue("dog.props[color]","白色");
+*/
+protected AbstractNestablePropertyAccessor getPropertyAccessorForPropertyPath(String propertyPath) {
+   int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
+  //递归发生在这里
+   if (pos > -1) {
+       //解析出最上层的属性名。
+      String nestedProperty = propertyPath.substring(0, pos);
+      String nestedPath = propertyPath.substring(pos + 1);//剩下的属性路径
+       //针对最上层的属性 创建AbstractNestablePropertyAccessor 包装该对象并赋值
+      AbstractNestablePropertyAccessor nestedPa = getNestedPropertyAccessor(nestedProperty);
+      //递归调用 直到完成 testBean注入了dog 返回对dog的包装，后续对dog的props属性处理
+       return nestedPa.getPropertyAccessorForPropertyPath(nestedPath);
+   }
+   else {//不存在嵌套属性，直接返回自己，只需要对自己本身依赖的属性赋值
+      return this;
+   }
+}
+```
+完成对外层属性的初始化和将该值赋值到所依赖的对象中。然后使用BeanWrapper封装属性对象，后续走属性对象的赋值流程
+```java
+private AbstractNestablePropertyAccessor getNestedPropertyAccessor(String nestedProperty) {
+   if (this.nestedPropertyAccessors == null) {
+      this.nestedPropertyAccessors = new HashMap<String, AbstractNestablePropertyAccessor>();
+   }
+   // Get value of bean property.
+   PropertyTokenHolder tokens = getPropertyNameTokens(nestedProperty);
+   String canonicalName = tokens.canonicalName;
+   Object value = getPropertyValue(tokens);//获取对象中该属性的值
+   if (value == null || (value.getClass() == javaUtilOptionalClass && OptionalUnwrapper.isEmpty(value))) {
+      if (isAutoGrowNestedPaths()) {//设置允许自动创建嵌套属性
+          //值为空，嵌套的都是对象，这里就是反射创建属性对象，并将该对象set到宿主对象中
+         value = setDefaultValue(tokens);
+      } else {//不允许的情况下 抛出异常 结束
+         throw new NullValueInNestedPathException(getRootClass(), this.nestedPath + canonicalName);
+      }
+   }
+   // Lookup cached sub-PropertyAccessor, create new one if not found.
+   AbstractNestablePropertyAccessor nestedPa = this.nestedPropertyAccessors.get(canonicalName);
+   if (nestedPa == null || nestedPa.getWrappedInstance() !=
+         (value.getClass() == javaUtilOptionalClass ? OptionalUnwrapper.unwrap(value) : value)) {
+   	//再次使用BeanWrapper包装 该属性对象，接下来就是对属性对象的递归赋值
+      nestedPa = newNestedPropertyAccessor(value, this.nestedPath + canonicalName + NESTED_PROPERTY_SEPARATOR);
+      // 继承外层对象的类型转换器
+      copyDefaultEditorsTo(nestedPa);
+      copyCustomEditorsTo(nestedPa, canonicalName);
+      this.nestedPropertyAccessors.put(canonicalName, nestedPa);
+   }
+   return nestedPa;
+}
+```
+
+创建属性对象，并将该对象set到宿主对象。因为对象是指针引用的，所以在这步已经完成对宿主对象的属性赋值，接下来的流程只要对属性对象中的依赖属性进行赋值。
+
+```java
+private Object setDefaultValue(PropertyTokenHolder tokens) {
+   PropertyValue pv = createDefaultPropertyValue(tokens);//创建对应类型的默认值
+   setPropertyValue(tokens, pv);
+    //这里先set 然后再get 为了应用宿主对象中的类型转换器对值进行转换
+   return getPropertyValue(tokens);
+}
+```
+
+使用递归解决了嵌套赋值的问题，那么接下来就是针对最底层BeanWrapperImpl的属性赋值流程
+
+```java
 protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
-    if (tokens.keys != null) {
-        processKeyedProperty(tokens, pv);
+    if (tokens.keys != null) {//解决集合 map类型的赋值
+        processKeyedProperty(tokens, pv);//解决 map[key]的情况
     } else {
         processLocalProperty(tokens, pv);//赋值
     }
@@ -561,3 +669,25 @@ private class BeanPropertyHandler extends PropertyHandler {
    }
 }
 ```
+
+AbstractNestablePropertyAccessor的另一个实现类DirectFieldAccessor，专门用于给字段赋值，不依赖setter和getter，那么这个是怎么实现的，看源码发现是DirectFieldAccessor中提供了一个PropertyHandler的实现类，通过Field的反射实现了setValue和getValue
+
+```java
+private class FieldPropertyHandler extends PropertyHandler {
+   private final Field field;
+
+   public FieldPropertyHandler(Field field) {
+      super(field.getType(), true, true);
+      this.field = field;
+   }
+   @Override
+   public Object getValue() throws Exception {
+       return this.field.get(getWrappedInstance());
+   }
+   @Override
+   public void setValue(Object object, Object value) throws Exception {
+            this.field.set(object, value);
+   }
+}
+```
+
