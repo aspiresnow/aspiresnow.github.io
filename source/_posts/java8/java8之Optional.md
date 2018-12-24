@@ -19,14 +19,9 @@ Optional是一个值容器。在Optional对象中维护了一个泛型类型的�
 
 ```java
 public final class Optional<T> {
-    /**
-     * Common instance for {@code empty()}.
-     */
+    //封装null值
     private static final Optional<?> EMPTY = new Optional<>();
-
-    /**
-     * If non-null, the value; if null, indicates no value is present
-     */
+    //被包装的值
     private final T value;
 
     private Optional() {

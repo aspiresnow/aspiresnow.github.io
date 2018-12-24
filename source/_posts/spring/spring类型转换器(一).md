@@ -10,7 +10,7 @@ categories:
 
 # spring类型转换器(一)
 
-在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring对属性值的转换主要是使用BeanWrapperImpl实现的。
+在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring实例化bean过程中对属性值的转换主要是使用BeanWrapperImpl实现的。
 
 首先来看下BeanWrapperImpl的使用
 
@@ -44,7 +44,7 @@ public static enum ESex{
 }
 ```
 
-首先需要定义一个类型转换器，用于将字符串转换为日期
+定义一个处理日期的转换器
 
 ```java
 public class DatePropertyEditor extends PropertyEditorSupport {
@@ -62,7 +62,7 @@ public class DatePropertyEditor extends PropertyEditorSupport {
 }
 ```
 
-创建一个BeanWrapperImpl用于包装目标bean(这里来模拟spring的内部实现)。然后注册Date类型，将值使用DatePropertyEditor转换为Date类型。当调用setPropertyValue的时候，给testBean的birthday字段设置一个字符串类型的 时间，在实际赋值的过程中会调用到类型转换器将字符串转换为日期类型。
+创建一个BeanWrapperImpl用于包装目标bean(这里来模拟spring的内部实现)。然后注册Date类型的转换器，将值使用DatePropertyEditor转换为Date类型。调用setPropertyValue的时候，给testBean的birthday字段设置一个字符串类型的时间，在实际赋值的过程中会调用到类型转换器将字符串转换为日期类型。
 
 ```java
 TestBean testBean = new TestBean();
@@ -75,6 +75,22 @@ beanWrapper.setPropertyValue("sex","MAlE");//将值根据枚举名字转换为�
 beanWrapper.setPropertyValue("dog","小黑子");//将值直接作为 Dog构造函数的参数反射创建对象
 beanWrapper.setPropertyValue("dog.props[color]","白色");//嵌套属性设置值
 System.out.println(testBean.getBirthday());//Thu Nov 29 12:12:12 CST 2018
+```
+
+同样可以实现一个String trim的转换器
+
+```java
+public class StringPropertyEditor extends PropertyEditorSupport {
+    @Override
+    public void setAsText(String text) throws IllegalArgumentException {
+        if(text != null){
+            text = text.trim();
+        }
+        super.setValue(text);
+    }
+}
+//指定目标类型为String时，使用该转换器
+beanWrapper.registerCustomEditor(String.class,new DatePropertyEditor());
 ```
 
 BeanWrapper支持嵌套属性的赋值，当存在嵌套属性的时候需要设置 setAutoGrowNestedPaths=true。
@@ -101,7 +117,7 @@ public interface PropertyEditor {
 }
 ```
 
-提供了PropertyEditor的默认实现,如果要自定义属性转换器，直接继承PropertyEditorSupport，然后覆写setAsText、getAsText、setValue、getValue方法。在类型转换的时候如果是值是字符串会调用setAsText来赋值value，其他情况下会调用setValue来赋值value，然后在调用getValue获取改变后的value值完成类型转换
+PropertyEditor有个默认实现类PropertyEditorSupport,如果要自定义属性转换器，直接继承该类，然后覆写setAsText、getAsText、setValue、getValue方法。在类型转换的时候如果值是字符串会调用setAsText来赋值value，其他情况下会调用setValue来赋值value，然后再调用getValue获取改变后的value值完成类型转换。相当于将PropertyEditor当做一个加工作坊，传进去一个值，返回想要类型的值
 
 ```java
 public class PropertyEditorSupport implements PropertyEditor {
@@ -126,6 +142,8 @@ public class PropertyEditorSupport implements PropertyEditor {
 }
 ```
 
+**注意**：PropertyEditor是线程不安全的，有状态的，因此每次使用时都需要创建一个，不可重用；
+
 ## BeanWrapper
 
 首先先看下BeanWrapperImpl的继承图。还有一个跟BeanWrapperImpl平级的实现类DirectFieldAccessor，用于处理getter和setter的字段访问
@@ -142,7 +160,7 @@ public class PropertyEditorSupport implements PropertyEditor {
 
 从继承图可以看到PropertyEditorRegistrySupport实现了PropertyEditorRegistry接口，该类默认实现了类型转换器的注册和查找功能
 
-在PropertyEditorRegistrySupport声明了多个存储结构用于存储不通的类型转换器来源。
+在PropertyEditorRegistrySupport声明了多个存储结构用于存储不同的类型转换器来源。这里需要注意的是PropertyEditor是存在在Map中的，目标类型作为key，所以对于一个类型只能注册一个PropertyEditor，后面注册的会覆盖前面注册的
 
 ```java
 private ConversionService conversionService;//ConversionService转换器
@@ -153,7 +171,7 @@ private Map<String, CustomEditorHolder> customEditorsForPath;//绑定字段名�
 private Map<Class<?>, PropertyEditor> customEditorCache;//用于存储对应父类的类型转换器
 ```
 
-spring提供了另一种类型转换接口Converter,通过conversionService调用对应的Converter进行类型转换，在PropertyEditorRegistrySupport同样可以注册进来conversionService，用于使用Converter进行类型转换
+同时还看到一个conversionService变量，spring提供了另一种类型转换接口Converter,通过conversionService调用对应的Converter进行类型转换，在PropertyEditorRegistrySupport同样可以注册进来conversionService，用于使用Converter进行类型转换。conversionService的详细使用会在下篇文章中讲到。
 
 ```java
 public void setConversionService(ConversionService conversionService) {
@@ -161,7 +179,7 @@ public void setConversionService(ConversionService conversionService) {
 }
 ```
 
-注册ProperEditor类型，用于类型转换，不仅支持匹配类型的转换器注册，**也可以针对属性名注册类型转换器**
+接下来来看PropertyEditor的注册过程。
 
 ```java
 public void registerCustomEditor(Class<?> requiredType, String propertyPath, PropertyEditor propertyEditor) {
@@ -172,23 +190,25 @@ public void registerCustomEditor(Class<?> requiredType, String propertyPath, Pro
    if (propertyPath != null) {
       if (this.customEditorsForPath == null) {
          this.customEditorsForPath = new LinkedHashMap<String, CustomEditorHolder>(16);
-      }
+      }//存储在customEditorsForPath
       this.customEditorsForPath.put(propertyPath, new CustomEditorHolder(propertyEditor, requiredType));
    } else { 注册自定义的类型转换器 添加到 customEditors
       if (this.customEditors == null) {
          this.customEditors = new LinkedHashMap<Class<?>, PropertyEditor>(16);
-      }
+      }//存储在customEditors
       this.customEditors.put(requiredType, propertyEditor);
       this.customEditorCache = null;
    }
 }
 ```
 
-根据属性名和类型查找类型转换器
+在上面提到过PropertyEditor存在在一个Map中，key是目标类型，那么这个参数propertyPath是干嘛的呢？这是为了给属性名指定专属的类型的转换器。因为一个目标类型只能有一个PropertyEditor的限制。但是有时候确实某个属性的类型转换比较特殊，这个时候就可以给这个属性名单独注册一个类型转换器，不会覆盖其他的哦。在类型转换的时候，会先根据属性名去customEditorsForPath中找可以用的PropertyEditor。
+
+来看PropertyEditor的查找流程
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E6%9F%A5%E6%89%BE%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%99%A8.png)
 
-首先根据属性名查找特定的类型转换器
+首先根据属性名从customEditorsForPath查找特定的类型转换器
 
 ```java
 public PropertyEditor findCustomEditor(Class<?> requiredType, String propertyPath) {
@@ -199,6 +219,7 @@ public PropertyEditor findCustomEditor(Class<?> requiredType, String propertyPat
          PropertyEditor editor = getCustomEditor(propertyPath, requiredType);
          if (editor == null) {
             List<String> strippedPaths = new LinkedList<String>();
+             //解析字段名， a.b[0]这种
             addStrippedPropertyPaths(strippedPaths, "", propertyPath);
             for (Iterator<String> it = strippedPaths.iterator(); it.hasNext() && editor == null;) {
                String strippedPath = it.next();
@@ -296,7 +317,7 @@ private <T> T doConvert(Object value, Class<T> requiredType, MethodParameter met
 }
 ```
 
-TypeConverterDelegate实现了类型转换的功能，创建typeConverterDelegate的时候需要一个propertyEditorRegistry对象，用于查找类型转换器，将值转换为目标类型
+TypeConverterDelegate实现了类型转换的功能，创建TypeConverterDelegate的时候需要一个propertyEditorRegistry对象，用于查找匹配的类型转换器
 
 ```java
 public TypeConverterDelegate(PropertyEditorRegistrySupport propertyEditorRegistry) {
@@ -311,21 +332,21 @@ public <T> T convertIfNecessary(String propertyName, Object oldValue, Object new
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
-首先通过propertyEditorRegistry查找自定义的类型转换器PropertyEditor和conversionService
+首先通过propertyEditorRegistry查找自定义的类型转换器PropertyEditor和ConversionService
 
 ```java
 PropertyEditor editor = this.propertyEditorRegistry.findCustomEditor(requiredType, propertyName);
 ConversionService conversionService = this.propertyEditorRegistry.getConversionService();
 ```
 
-然后判断当该类型没有注册自定义的PropertyEditor，并且存在conversionService的时候，使用conversionService进行类型转换。如果conversionService中没有配置对应的converter，那么继续尝试使用默认注册的PropertyEditor。
+当该类型没有注册自定义的PropertyEditor，并且存在conversionService的时候，使用conversionService进行类型转换。如果conversionService中没有配置对应的converter，那么继续尝试使用默认注册的PropertyEditor。
 
 ```java
 if (editor == null && conversionService != null && newValue != null && typeDescriptor != null) {
    TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);//获取value的类型
    //判断conversionService是否配置了指定类型的converter，没有直接跳过，继续向下执行
    if (conversionService.canConvert(sourceTypeDesc, typeDescriptor)) {//
-      try {//转换
+      try {//使用conversionService完成类型转换
          return (T) conversionService.convert(newValue, sourceTypeDesc, typeDescriptor);
       }
       catch (ConversionFailedException ex) {
@@ -336,7 +357,7 @@ if (editor == null && conversionService != null && newValue != null && typeDescr
 }
 ```
 
-如果注册该类型对应的自定义PropertyEditor 或者 目标类型和值类型不一样则需要进行类型转换，当没有找到ProperEditor的时候会尝试查找默认注册的PropertyEditor
+如果目标类型存在自定义PropertyEditor 或者 目标类型和值类型不一样则需要进行类型转换(当没有找到ProperEditor的时候会尝试查找默认注册的PropertyEditor)
 
 ```java
 if (editor != null || (requiredType != null && !ClassUtils.isAssignableValue(requiredType, convertedValue))) {
@@ -354,7 +375,7 @@ if (editor != null || (requiredType != null && !ClassUtils.isAssignableValue(req
    }//editor不存在，查找PropertyEditorRegistrySupport中默认注册的类型转换器
    if (editor == null) {
       editor = findDefaultEditor(requiredType);
-   }//类型转换
+   }//使用 PropertyEditor进行类型转换
    convertedValue = doConvertValue(oldValue, convertedValue, requiredType, editor);
 }
 ```
@@ -375,12 +396,12 @@ private Object doConvertValue(Object oldValue, Object newValue, Class<?> require
                 editor = null;
             }
         } catch (Exception ex) {
-            //....
+            //throw....
         }
     }
 
     Object returnValue = convertedValue;
-    //当值为字符串数组，但是目标类型不是数组的时候，将值用 , 连接为字符串
+    //当值为字符串数组，但是目标类型不是数组的时候，将值用,连接为字符串
     if (requiredType != null && !requiredType.isArray() && convertedValue instanceof String[])     {
         convertedValue = StringUtils.arrayToCommaDelimitedString((String[]) convertedValue);
     }
@@ -390,8 +411,7 @@ private Object doConvertValue(Object oldValue, Object newValue, Class<?> require
             // Use PropertyEditor's setAsText in case of a String value.
             String newTextValue = (String) convertedValue;
             return doConvertTextValue(oldValue, newTextValue, editor);
-        }
-        else if (String.class == requiredType) {
+        } else if (String.class == requiredType) {
             returnValue = convertedValue;
         }
     }
@@ -416,21 +436,18 @@ if (requiredType != null) {
     if (convertedValue != null) {
         if (Object.class == requiredType) {
             return (T) convertedValue;
-        }
-        else if (requiredType.isArray()) {
+        } else if (requiredType.isArray()) {
             // Array required -> apply appropriate conversion of elements.
             if (convertedValue instanceof String && Enum.class.isAssignableFrom(requiredType.getComponentType())) {
                 convertedValue = StringUtils.commaDelimitedListToStringArray((String) convertedValue);
             }
             return (T) convertToTypedArray(convertedValue, propertyName, requiredType.getComponentType());
-        }
-        else if (convertedValue instanceof Collection) {
+        } else if (convertedValue instanceof Collection) {
             // Convert elements to target type, if determined.
             convertedValue = convertToTypedCollection(
                 (Collection<?>) convertedValue, propertyName, requiredType, typeDescriptor);
             standardConversion = true;
-        }//值是map的时候，转换为 目标类型的map
-        else if (convertedValue instanceof Map) {
+        }else if (convertedValue instanceof Map) {//值是map的时候，转换为 目标类型的map 
             convertedValue = convertToTypedMap(
                 (Map<?, ?>) convertedValue, propertyName, requiredType, typeDescriptor);
             standardConversion = true;
@@ -442,8 +459,7 @@ if (requiredType != null) {
         if (String.class == requiredType && ClassUtils.isPrimitiveOrWrapper(convertedValue.getClass())) {
             // We can stringify any primitive value...
             return (T) convertedValue.toString();
-        }
-        else if (convertedValue instanceof String && !requiredType.isInstance(convertedValue)) {
+        } else if (convertedValue instanceof String && !requiredType.isInstance(convertedValue)) {
             if (conversionAttemptEx == null && !requiredType.isInterface() && !requiredType.isEnum()) {
                 	//直接把值当做类型的构造函数的参数 反射创建目标类型对象
                     Constructor<T> strCtor = requiredType.getConstructor(String.class);
@@ -455,8 +471,7 @@ if (requiredType != null) {
             }//根据枚举名字 转换为枚举对象
             convertedValue = attemptToConvertStringToEnum(requiredType, trimmedValue, convertedValue);
             standardConversion = true;
-        }//转换number类型
-        else if (convertedValue instanceof Number && Number.class.isAssignableFrom(requiredType)) {
+        } else if (convertedValue instanceof Number && Number.class.isAssignableFrom(requiredType)) {//转换number类型
             convertedValue = NumberUtils.convertNumberToTargetClass(
                 (Number) convertedValue, (Class<Number>) requiredType);
             standardConversion = true;
@@ -508,7 +523,7 @@ public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean
 }
 ```
 
-在AbstractNestablePropertyAccessor抽象类中具体实现了setPropertyValue和getPropertyValue功能。
+在AbstractNestablePropertyAccessor类中实现了setPropertyValue和getPropertyValue功能。
 
 ```java
 @Override
@@ -516,14 +531,13 @@ public void setPropertyValue(String propertyName, Object value) throws BeansExce
    AbstractNestablePropertyAccessor nestedPa;
    //用于解决 name.map[key] 类型的属性注入
    nestedPa = getPropertyAccessorForPropertyPath(propertyName);
-	
    PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
    //为属性赋值
     nestedPa.setPropertyValue(tokens, new PropertyValue(propertyName, value));
 }
 ```
 
-由于存在嵌套属性赋值的情况,该情况下创建每一层属性的对象值，使用BeanWrapper包装该对象，那么又是一个BeanWrapperImpl的赋值流程。在这里spring使用了递归解决这个问题。这里spring的处理方式是只处理最底层的属性赋值，在递归中一层层的处理嵌套属性的创建与被注入，然后返回最底下那层的属性对象，完成用户自定义的值的赋值。
+由于存在嵌套属性赋值的情况,对于嵌套的处理，其实只需要对嵌套的最底层进行类型转换，上层每一层就创建默认的值然后set到再上层对象的属性中。在这里spring使用了递归解决这个问题，创建每一层属性的对象值，使用BeanWrapper包装该对象，那么又是一个BeanWrapperImpl的赋值流程。
 
 ```java
 /**
@@ -534,19 +548,18 @@ protected AbstractNestablePropertyAccessor getPropertyAccessorForPropertyPath(St
   //递归发生在这里
    if (pos > -1) {
        //解析出最上层的属性名。
-      String nestedProperty = propertyPath.substring(0, pos);
-      String nestedPath = propertyPath.substring(pos + 1);//剩下的属性路径
+      String nestedProperty = propertyPath.substring(0, pos);//dog
+      String nestedPath = propertyPath.substring(pos + 1);//剩下的属性路径 props[color]
        //针对最上层的属性 创建AbstractNestablePropertyAccessor 包装该对象并赋值
       AbstractNestablePropertyAccessor nestedPa = getNestedPropertyAccessor(nestedProperty);
       //递归调用 直到完成 testBean注入了dog 返回对dog的包装，后续对dog的props属性处理
-       return nestedPa.getPropertyAccessorForPropertyPath(nestedPath);
-   }
-   else {//不存在嵌套属性，直接返回自己，只需要对自己本身依赖的属性赋值
+       return nestedPa.getPropertyAccessorForPropertyPath(nestedPath); //处理props属性注入
+   } else {//不存在嵌套属性，直接返回自己，只需要对自己本身依赖的属性赋值
       return this;
    }
 }
 ```
-完成对外层属性的初始化和将该值赋值到所依赖的对象中。然后使用BeanWrapper封装属性对象，后续走属性对象的赋值流程
+来看这个递归的内部实现，在getNestedPropertyAccessor完成对外层属性的初始化和将该值赋值到所依赖的对象中。然后使用BeanWrapper封装属性对象，后续走属性对象的赋值流程
 ```java
 private AbstractNestablePropertyAccessor getNestedPropertyAccessor(String nestedProperty) {
    if (this.nestedPropertyAccessors == null) {

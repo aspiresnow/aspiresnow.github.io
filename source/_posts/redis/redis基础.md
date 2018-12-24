@@ -10,6 +10,8 @@ categories:
 
 # redis基础
 
+redis是一个高效的内存数据库，性能极高，读的速度能达到100000次/s,写的速度达到80000次/s 
+
 ## 为什么快
 
 - 首先也是最重要的redis所有的数据都存放在内存中
@@ -41,6 +43,24 @@ redis上各个数据之间数据是相互隔离的。但是由于redis是单线�
 每次客户端调用都会经历 **发送命令**、**执行命令**、**返回结果** 三个过程。redis是单线程处理的，所以一条命令从客户端到服务端不会立刻被执行，所有的命令都会进入一个队列中，然后逐条执行。由于网络传输无法保证顺序，所以redis无法保证从多个客户端发送的多条命令的执行顺序，但是可以保证不会有两条命令同时被执行。
 
 ## 全局命令
+
+###客户端命令
+
+#### 启动
+
+- redis-server : 使用默认配置启动redis，使用默认端口6379
+- redis-server --configKey1 configValue1 --configKey2 configValue2 :指定配置启动redis
+- redis-server /xx/xx/redis.conf : 指定配置文件启动redis
+- redis-server --port 8888 : 指定端口启动redis
+
+#### 连接
+
+- redis-cli -h ip -p port [Command]: 指定ip和端口连接服务端redis,如果指定了Command 则连接并执行命令
+  - redis-cli -h 192.168.2.321 -p 6379 
+  - redis-cli -h 192.168.2.321 -p 6379  get hello 
+  - redis-cli 连接本地的6379端口的redis
+- redis-cli shutdown : 停止redis服务,关闭前会生成持久化文件，是一种优雅的关闭
+- Redis-cli nosave : 关闭，不生成持久化问题
 
 ### 查询
 
