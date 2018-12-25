@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          hbase调优 - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/09/09/hbase/hbase参数调优/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                            
+                        </div>
+                        <h1>hbase调优</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2017-09-09
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="hbase调优">Hbase调优</span></h1>
+<p>[<a href="http://www.cnblogs.com/skyl/p/4814347.html" target="_blank" rel="noopener">HBase优化相关</a>]</p>
+<p>zookeeper.session.timeout<br>
+默认值：3分钟(180000ms)<br>
+说明：RegionServer与Zookeeper间的连接超时时间。当超时时间到后，ReigonServer会被Zookeeper从RS集群清单中移除，HMaster收到移除通知后，会对这台server负责的regions重新balance，让其他存活的RegionServer接管.<br>
+调优：这个timeout决定了RegionServer是否能够及时的failover。设置成1分钟或更低，可以减少因等待超时而被延长的failover时间。<br>
+不过需要注意的是，对于一些Online应用，RegionServer从宕机到恢复时间本身就很短的(网络闪断，crash等故障，运维可快速介入)，如果调低timeout时间，反而会得不偿失。因为当ReigonServer被正式从RS集群中移除时，HMaster就开始做balance了 (让其他RS根据故障机器记录的WAL日志进行恢复)。当故障的RS在人工介入恢复后，这个balance动作是毫无意义的，反而会使负载不均匀，给RS 带来更多负担。特别是那些固定分配regions的场景。</p>
+<p>hbase.regionserver.handler.count<br>
+默认值：10<br>
+说明：RegionServer的请求处理IO线程数。<br>
+调优：这个参数的调优与内存息息相关。<br>
+较少的IO线程，适用于处理单次请求内存消耗较高的Big PUT场景(大容量单次PUT或设置了较大cache的scan，均属于Big PUT)或ReigonServer的内存比较紧张的场景。<br>
+较多的IO线程，适用于单次请求内存消耗低，TPS要求非常高的场景。设置该值的时候，以监控内存为主要参考。<br>
+这里需要注意的是如果server的region数量很少，大量的请求都落在一个region上，因快速充满memstore触发flush导致的读写锁会影响全局TPS，不是IO线程数越高越好。<br>
+压测时，开启Enabling RPC-level logging，可以同时监控每次请求的内存消耗和GC的状况，最后通过多次压测结果来合理调节IO线程数。</p>
+<p>hbase.hregion.max.filesize<br>
+默认值：256M<br>
+说明：在当前ReigonServer上单个Reigon的最大存储空间，单个Region超过该值时，这个Region会被自动split成更小的region。<br>
+调优：小region对split和compaction友好，因为拆分region或compact小region里的storefile速度很快，内存占用低。缺点是split和compaction会很频繁。特别是数量较多的小region不停地split, compaction，会导致集群响应时间波动很大，region数量太多不仅给管理上带来麻烦，甚至会引发一些Hbase的bug。一般512以下的都算小region。<br>
+大region，则不太适合经常split和compaction，因为做一次compact和split会产生较长时间的停顿，对应用的读写性能冲击非常大。此外，大region意味着较大的storefile，compaction时对内存也是一个挑战。<br>
+当然，大region也有其用武之地。如果你的应用场景中，某个时间点的访问量较低，那么在此时做compact和split，既能顺利完成split和compaction，又能保证绝大多数时间平稳的读写性能。<br>
+内存方面，小region在设置memstore的大小值上比较灵活，大region则过大过小都不行，过大会导致flush时app的IO wait增高，过小则因store file过多影响读性能。</p>
+<p>既然split和compaction如此影响性能，有没有办法去掉?<br>
+compaction是无法避免的，split倒是可以从自动调整为手动。<br>
+只要通过将这个参数值调大到某个很难达到的值，比如100G，就可以间接禁用自动split(RegionServer不会对未到达100G的region做split)。<br>
+再配合RegionSplitter这个工具，在需要split时，手动split。<br>
+手动split在灵活性和稳定性上比起自动split要高很多，相反，管理成本增加不多，比较推荐online实时系统使用。</p>
+<p>hbase.regionserver.global.memstore.upperLimit/lowerLimit<br>
+默认值：0.4/0.35<br>
+upperlimit说明：hbase.hregion.memstore.flush.size 这个参数的作用是:当单个memstore达到指定值时，flush该memstore。但是，一台ReigonServer可能有成百上千个memstore，每个memstore也许未达到flush.size，jvm的heap就不够用了。该参数就是为了限制memstores占用的总内存。<br>
+当ReigonServer内所有的memstore所占用的内存总和达到heap的40%时，HBase会强制block所有的更新并flush这些memstore以释放所有memstore占用的内存。<br>
+lowerLimit说明：同upperLimit，只不过当全局memstore的内存达到35%时，它不会flush所有的memstore，它会找一些内存占用较大的memstore，做个别flush，当然更新还是会被block。lowerLimit算是一个在全局flush导致性能暴跌前的补救措施。为什么说是性能暴跌?可以想象一下，如果memstore需要在一段较长的时间内做全量flush，且这段时间内无法接受任何读写请求，对HBase集群的性能影响是很大的。<br>
+调优：这是一个Heap内存保护参数，默认值已经能适用大多数场景。它的调整一般是为了配合某些专属优化，比如读密集型应用，将读缓存开大，降低该值，腾出更多内存给其他模块使用。</p>
+<p>这个参数会给使用者带来什么影响?<br>
+比如，10G内存，100个region，每个memstore 64M，假设每个region只有一个memstore，那么当100个memstore平均占用到50%左右时，就会达到lowerLimit的限制。假设此时，其他memstore同样有很多的写请求进来。在那些大的region未flush完，就可能又超过了upperlimit，则所有 region都会被block，开始触发全局flush。<br>
+不过，除了你的内存非常小或你的应用场景里大多数都是读，我觉得不需要去调这个参数。</p>
+<p>hfile.block.cache.size<br>
+默认值：0.2<br>
+说明：storefile的读缓存占用Heap的大小百分比，0.2表示20%。该值直接影响数据读的性能。<br>
+调优：当然是越大越好，如果读比写多，开到0.4-0.5也没问题。如果读写较均衡，0.3左右。如果读比写少，果断默认吧。设置这个值的时候，你同时要参考 hbase.regionserver.global.memstore.upperLimit ，该值是memstore占heap的最大百分比，两个参数一个影响读，一个影响写。如果两值加起来超过80-90%，会有OOM的风险，谨慎设置。</p>
+<p>hbase.hstore.blockingStoreFiles<br>
+默认值：7<br>
+说明：在compaction时，如果一个Store(Coulmn Family)内有超过7个storefile需要合并，则阻塞block所有的写请求，进行flush，限制storefile数量增长过快。<br>
+调优：block写请求会影响当前region的性能，将值设为单个region可以支撑的最大store file数量会是个不错的选择，即允许comapction时，memstore继续生成storefile。最大storefile数量可通过 region size/memstore size来计算。如果你将region size设为无限大，那么你需要预估一个region可能产生的最大storefile数。</p>
+<p>hbase.hregion.memstore.block.multiplier<br>
+默认值：2<br>
+说明：当一个region里的memstore超过单个memstore.size两倍的大小时，block该region的所有请求，进行 flush，释放内存。虽然我们设置了memstore的总大小，比如64M，但想象一下，在最后63.9M的时候，我Put了一个100M的数据，此时 memstore的大小会瞬间暴涨到超过预期的memstore.size。这个参数的作用是当memstore的大小增至超过 memstore.size时，block所有请求，遏制风险进一步扩大。<br>
+调优：这个参数的默认值还是比较靠谱的。如果你预估你的正常应用场景(不包括异常)不会出现突发写或写的量可控，那么保持默认值即可。如果正常情况下，你的写请求量就会经常暴长到正常的几倍，那么你应该调大这个倍数并调整其他参数值，比如hfile.block.cache.size和 hbase.regionserver.global.memstore.upperLimit/lowerLimit，以预留更多内存，防止HBase server OOM。</p>
+<p>启用LZO压缩<br>
+LZO对比Hbase默认的GZip，前者性能较高，后者压缩比较高，具体参见 Using LZO Compression 。对于想提高HBase读写性能的开发者，采用LZO是比较好的选择。对于非常在乎存储空间的开发者，则建议保持默认。</p>
+<p>不要定义太多的Column Family<br>
+Hbase目前不能良好的处理超过包含2-3个CF的表。因为某个CF在flush发生时，它邻近的CF也会因关联效应被触发flush，最终导致系统产生更多IO。</p>
+<p>批量导入<br>
+在批量导入数据到Hbase前，你可以通过预先创建regions，来平衡数据的负载。详见 Table Creation: Pre-Creating Regions</p>
+<p>避免CMS concurrent mode failure<br>
+HBase使用CMS GC。默认触发GC的时机是当年老代内存达到90%的时候，这个百分比由 -XX:CMSInitiatingOccupancyFraction=N 这个参数来设置。concurrent mode failed发生在这样一个场景：<br>
+当年老代内存达到90%的时候，CMS开始进行并发垃圾收集，于此同时，新生代还在迅速不断地晋升对象到年老代。当年老代CMS还未完成并发标记时，年老代满了，悲剧就发生了。CMS因为没内存可用不得不暂停mark，并触发一次全jvm的stop the world(挂起所有线程)，然后采用单线程拷贝方式清理所有垃圾对象。这个过程会非常漫长。为了避免出现concurrent mode failed，我们应该让GC在未到90%时，就触发。<br>
+通过设置 -XX:CMSInitiatingOccupancyFraction=N<br>
+这个百分比， 可以简单的这么计算。如果你的 hfile.block.cache.size 和 hbase.regionserver.global.memstore.upperLimit 加起来有60%(默认)，那么你可以设置 70-80，一般高10%左右差不多。</p>
+<p>Hbase客户端优化<br>
+AutoFlush(默认是true)<br>
+将HTable的setAutoFlush设为false，可以支持客户端批量更新。即当Put填满客户端flush缓存时，才发送到服务端。</p>
+<p>Scan Caching<br>
+scanner一次缓存多少数据来scan(从服务端一次抓多少数据回来scan)。<br>
+默认值是 1，一次只取一条。</p>
+<p>Scan Attribute Selection<br>
+scan时建议指定需要的Column Family，减少通信量，否则scan操作默认会返回整个row的所有数据(所有Coulmn Family)。</p>
+<p>Close ResultScanners<br>
+通过scan取完数据后，记得要关闭ResultScanner，否则RegionServer可能会出现问题(对应的Server资源无法释放)。</p>
+<p>Optimal Loading of Row Keys<br>
+当你scan一张表的时候，返回结果只需要row key(不需要CF, qualifier,values,timestaps)时，你可以在scan实例中添加一个filterList，并设置 MUST_PASS_ALL 操作，filterList中add FirstKeyOnlyFilter或KeyOnlyFilter。这样可以减少网络通信量。</p>
+<p>Turn off WAL on Puts<br>
+当Put某些非重要数据时，你可以设置writeToWAL(false)，来进一步提高写性能。writeToWAL(false)会在Put时放弃写WAL log。风险是:当RegionServer宕机时，可能你刚才Put的那些数据会丢失，且无法恢复。</p>
+<p>启用Bloom Filter<br>
+Bloom Filter通过空间换时间，提高读操作性能。</p>
+<p><a href="http://3.In" target="_blank" rel="noopener">3.In</a> Memory</p>
+<p>创建表的时候，可以通过HColumnDescriptor.setInMemory(true)将表放到RegionServer的缓存中，保证在读取的时候被cache命中。</p>
+<p>4.Max Version</p>
+<p>创建表的时候，可以通过HColumnDescriptor.setMaxVersions(intmaxVersions)设置表中数据的最大版本，如果只需要保存最新版本的数据，那么可以设置setMaxVersions(1)。</p>
+<p>5.Time to Live(设置数据存储的生命周期)</p>
+<p>创建表的时候，可以通过HColumnDescriptor.setTimeToLive(inttimeToLive)设置表中数据的存储生命期，过期数据将自动被删除，例如如果只需要存储最近两天的数据，那么可以设置setTimeToLive(2 * 24 * 60 * 60)。</p>
+<p>6.Compact &amp; Split</p>
+<p>HBase的Compact分为两类：一类叫Minor Compact(部分文件合并), 一类叫Major Compact(全部文件合并).</p>
+<p>两者区别在于：Minor Compact是在Store内StoreFile数量达到阈值(hbase.hstore.blockingStoreFiles, 默认是7)时触发，将Store内的多个小StoreFile合并成一个大的StoreFile.</p>
+<p>Major Compact除了将给定Region中一个列族的所有StoreFile合并成一个大的StoreFile外，还会将其中的Delete标记项进行删除。Major Compact是HBase清理被删除记录的唯一机会，因为我们不能保证被删除的记录和墓碑标记记录在同一个Store内。----一个Region只保存一个Table的数据，一张Table的所有数据分布在多个Region上。一个Region包含多个Store。一个Store只保存一个Column Family的数据，一个Column Family的所有数据分布在多个Store内。</p>
+<p>由于Major Compact非常消耗资源，实际应用中，可以考虑必要时手动进行。当Region内StoreFile的大小达到一定阈值后，等分Split为两个StoreFile。</p>
+<p>7.Pre-Creating Regions</p>
+<p>默认情况下，在创建HBase表的时候会自动创建一个Region分区，当导入数据的时候，所有的HBase客户端都向这一个Region写数据，直到这个Region足够大了才进行切分。一种可以加快批量写入速度的方法是通过预先创建一些空的Regions，这样当数据写入HBase时，会按照Region分区情况，在集群内做数据的负载均衡</p>
+<p>8.HBase模式设计之ID顺序增长（rowkey顺序增长）<br>
+在设计RowKey的时候，常常有应用的RowKey必须包含ID部分，这样才可以支持查询访问。但ID自增长，会导致写入数据的时候压力集中在某一个或少数几个Region上，这是HBase设计的大忌。<br>
+经过多个应用的实践，使用ID的二进制反转的方式来避免。<br>
+简单说明: 比如ID是Byte型(一般为int或者long，此处为方便解释)，RowKey=ID+timestamp，1,2,3,4……这样增长，对应二进制为0000 0001，0000 0010，0000 0011,0000 0100……，因为前面的bit是不会变化的，所以以ID为RowKey（或者ID打头）的数据写入的时候会集中在一个region上，然后又集中在下一个region上。为此将变化的部分放到RowKey的前面，来分散写入的压力。前面的增长在RowKey的ID上就变成1000 0000， 0100 0000， 1100 0000，0010 0000……我们预分区，假如需要16-1个分区，就可以分为[,0x01)，[0x01,0x02),[0x02,0x03)……[0xFE,0xFF), [0xFF,)，注意算一下，这样，1,2,3,4……就会写到不同的区间上，从而分散到不同的region了。（提醒：为什么只拿ID说事，不考虑timestamp呢，因为HBase的RowKey时字节码比较的，先从高位开始，高位分出胜负，后面就不care了~）</p>
+<p>优点：转顺序为分散，均衡集群压力；可以做到预分区；不用hash，不用考虑ID的hash碰撞，从而节约存储空间；<br>
+限制：scan只能在同一ID打头的rowkey内进行，连续ID的scan不能直接支持，需要程序逻辑处理。</p>
+<h2><span id="根据业务访问特点优化">根据业务访问特点优化</span></h2>
+<p>根据业务访问特点，将Hbase的工作负载大致分为以下四类：</p>
+<p>(1)随机读密集型</p>
+<p>对于随机读密集型工作负载，高效利用<strong>缓存</strong>和更好地<strong>索引</strong>会给HBase系统带来更高的性能。</p>
+<p>(2)顺序读密集型</p>
+<p>对于顺序读密集型工作负载，读缓存不会带来太多好处；除非顺序读的规模很小并且限定在一个特定的行键范围内，否则很可能使用缓存会比不使用缓存需要更频繁地访问硬盘。</p>
+<p>(3)写密集型</p>
+<p>写密集型工作负载的优化方法需要有别于读密集型负载。缓存不再起到重要作用。写操作总是进入MemStore，然后被刷写生成新的Hfile，以后再被合并。获得更好写性能的办法是<strong>不要太频繁刷写、合并或者拆分</strong>，因为在这段时间里IO压力上升，系统会变慢。</p>
+<p>(4)混合型</p>
+<p>对于完全混合型工作负载，优化方法会变得复杂些。优化时，需要混合调整多个参数来得到一个最优的组合。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/09/10/hbase/hbase的表设计/" data-toggle="tooltip" data-placement="top" title="hbase的表设计">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/09/09/hbase/hbase过滤器/" data-toggle="tooltip" data-placement="top" title="hbase过滤器">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#hbase" title="hbase">hbase</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/09/09/hbase/hbase参数调优/";
+    var disqus_url = "http://yoursite-url/2017/09/09/hbase/hbase参数调优/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

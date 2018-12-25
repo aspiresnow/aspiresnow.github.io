@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          vim编辑器 - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2018/09/10/linux/vim编辑器/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#linux" title="linux">linux</a>
+                            
+                        </div>
+                        <h1>vim编辑器</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2018-09-10
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="vim编辑器">vim编辑器</span></h1>
+<p>定制vim的工作特性： 配置文件：永久有效  全局：/etc/vimrc  个人：~/.vimrc</p>
+<h2><span id="屏幕翻滚类命令">屏幕翻滚类命令</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Ctrl+u  #向文件首翻半屏</span><br><span class="line">Ctrl+d  #向文件尾翻半屏</span><br><span class="line">Ctrl+f #向文件尾翻一屏</span><br><span class="line">Ctrl＋b #向文件首翻一屏</span><br><span class="line">nz  #将第n行滚至屏幕顶部，不指定n时将当前行滚至屏幕顶部</span><br></pre></td></tr></table></figure>
+<h2><span id="进入vim的命令">进入vim的命令</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim filename #打开或新建文件，并将光标置于第一行首</span><br><span class="line">vim +n filename #打开文件，并将光标置于第n行首</span><br><span class="line">vim + filename #打开文件，并将光标置于最后一行首</span><br><span class="line">vim +/pattern filename #打开文件，并将光标置于第一个与pattern匹配的串处</span><br><span class="line">vim -r filename #在上次正用vi编辑时发生系统崩溃，恢复filename</span><br><span class="line">vim -o/O filename1 filename2 ... #打开多个文件，依次进行编辑</span><br></pre></td></tr></table></figure>
+<h2><span id="vi-m关闭文件">vi m关闭文件</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">:w       #保存</span><br><span class="line">:w file.txt：在末尾将文件内容另存到 file.txt中   (将当前文件中部分内容另存为另一个文件)</span><br><span class="line">:r file.txt：将file中的内容复制到当前文件的光标处  (将另一个文件的内容填充在当前文件中) </span><br><span class="line">:q        #退出</span><br><span class="line">:q!       #强制退出</span><br><span class="line">:wq       #保存退出编辑器</span><br><span class="line">:set nu   #显示行号，:set nonu：隐藏行号</span><br><span class="line">:set mouse=a #就能够使用鼠标点击光标的位置</span><br><span class="line">:set ic   #忽略大小写</span><br><span class="line">:set autoindent #设置自动缩进  :set noai：取消自动缩进</span><br><span class="line">:syntax on #语法着色，:syntax off：关闭语法着色</span><br><span class="line">可以修改 /etc/vimrc文件修改vim的默认配置，如果只作用于某个用户，在该用户家目录下闯将.vimrc文件，并复制进去内容进行修改</span><br></pre></td></tr></table></figure>
+<h2><span id="插入文本类命令">插入文本类命令</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">i           #在光标前</span><br><span class="line">I           #在当前行首</span><br><span class="line">a           #光标后</span><br><span class="line">A           #在当前行尾</span><br><span class="line">o           #在当前行之下新开一行</span><br><span class="line">O           #在当前行之上新开一行</span><br><span class="line">r           #替换当前字符</span><br><span class="line">R           #替换当前字符及其后的字符，直至按ESC键</span><br><span class="line">s           #从当前光标位置处开始，以输入的文本替代指定数目的字符</span><br><span class="line">S           #删除指定数目的行，并以所输入文本代替之</span><br><span class="line">ncw或nCW    #修改指定数目的字</span><br><span class="line">nCC        #修改指定数目的行</span><br><span class="line">C          #删除光标位置到行尾的内容并进入插入模式 (相当于c$) </span><br><span class="line">c&lt;范围&gt;     #删除光标所在位置周围某个范围的文本并进入插入模式。关于范围请看第5点，常用的组合有：caw - 删除一个单词包括它后面的空格并开始插入； ciw - 删除一个单词并开始插入； ci" - 删除一个字符串内部文本并开始插入； c$ - 从光标位置删除到行尾并开始插入； ct字符 - 从光标位置删除本行某个字符之前（保留该字符）并开始插入。等等。</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">常用的范围指令有： </span><br><span class="line">空格 #光标所在位置字符。（例如 gU空格 - 将光标位置字符转为大写） </span><br><span class="line">重复某些动作命令 - 光标所在行。 （例如dd删除一行，yy复制一行，cc删除一行文本并开始插入，&gt;&gt; 当前行缩进一格，==自动缩进当前行） </span><br><span class="line"><span class="meta">$</span><span class="bash"> - 从光标位置到行尾 </span></span><br><span class="line">^ - 从光标位置到行首，不包含缩进空白 </span><br><span class="line">0 - 从光标位置到行首，包含缩进空白 </span><br><span class="line">gg - 从光标位置到文件开头 </span><br><span class="line">ngg - 跳到第n行，如 2gg跳到第2行</span><br><span class="line">G - 从光标位置到文件结尾 </span><br><span class="line"><span class="meta">%</span><span class="bash"> - 从光标位置到另一边匹配的括号 </span></span><br><span class="line">f&lt;字符&gt; - 从光标位置到光标右边某个字符首次出现的位置，包括该字符 </span><br><span class="line">F&lt;字符&gt; - 从光标位置到光标左边某个字符首次出现的位置，包括该字符 </span><br><span class="line">t&lt;字符&gt; - 从光标位置到光标右边某个字符首次出现的位置，包括该字符 </span><br><span class="line">F&lt;字符&gt; - 从光标位置到光标左边某个字符首次出现的位置，包括该字符 </span><br><span class="line">/正则表达式 - 从光标位置到下一个匹配正则表达式的位置（跨行） </span><br><span class="line">?正则表达式 - 从光标位置到上一个匹配正则表达式的位置（跨行） </span><br><span class="line">aw - 一个单词加一个空格 （a可理解为“一个”，下同） </span><br><span class="line">iw - 一个单词 （i可理解为in，下同） </span><br><span class="line">a" - 一个字符串包括双引号 </span><br><span class="line">i" - 一个字符串内部文本 </span><br><span class="line">a&lt; - 一组&lt; &gt;包含的文本，包括&lt; &gt;号本身 </span><br><span class="line">同理类推： i&lt;, a[, i[, a(, i( </span><br><span class="line">注意：真正vim中的it范围（一对xml标签内部）在ideaVim中不生效。</span><br></pre></td></tr></table></figure>
+<h2><span id="复制-粘贴">复制、粘贴</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ggvG    #全选</span><br><span class="line">yy    #将当前行复制到缓存区</span><br><span class="line">nyy   #将当前行向下n行复制到缓冲区</span><br><span class="line">yw    #复制从光标开始到词尾的字符。</span><br><span class="line">nyw   #复制从光标开始的n个单词。</span><br><span class="line">y^    #复制从光标到行首的内容。  </span><br><span class="line"><span class="meta">y$</span><span class="bash">    <span class="comment">#复制从光标到行尾的内容。</span></span></span><br><span class="line">p     #粘贴剪切板里的内容在光标后</span><br><span class="line">P     #粘贴剪切板里的内容在光标前</span><br></pre></td></tr></table></figure>
+<h2><span id="文本替换">文本替换</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">:s/old/new           #用new替换行中首次出现的old</span><br><span class="line">:s/old/new/g         #用new替换行中所有的old</span><br><span class="line">:s/old/new/gc         #用new替换行中所有的old，每次都需要询问确认</span><br><span class="line">:n,m s/old/new/g     #用new替换从n到m行里所有的old</span><br><span class="line">:%s/old/new/g        #用new替换当前文件里所有的old ,简单替换表达式  :%s/four/4/g , “%” 范围前缀表示在所有行中执行替换，最后的 “g” 标记表示替换行中的所有匹配点，如果仅仅对当前行进行操作，那么只要去掉%即可</span><br><span class="line">如果你有一个像 “thirtyfour” 这样的单词，上面的命令会出错。这种情况下，这个单词会被替换成”thirty4″。要解决这个问题，用 “&lt;”来指定匹配单词开头： :%s/&lt;four/4/g , 显然，这样在处理 “fourty” 的时候还是会出错。用 “&gt;” 来解决这个问题： :%s/&lt;four&gt;/4/g</span><br></pre></td></tr></table></figure>
+<h2><span id="删除命令">删除命令</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ndw或ndW     #删除光标处开始及其后的n-1个字 ,并复制被删除的</span><br><span class="line">do     #删至行首,并复制被删除的</span><br><span class="line"><span class="meta">d$</span><span class="bash">     <span class="comment">#删至行尾,并复制被删除的</span></span></span><br><span class="line">ndd    #删除当前行及其后n-1行,并复制被删除的</span><br><span class="line">x或X   #删除一个字符，x删除光标后的，而X删除光标前的</span><br><span class="line">Ctrl+u #删除输入方式下所输入的文本</span><br><span class="line">x      #删除当前字符,并复制被删除的</span><br><span class="line">nx     #删除从光标开始的n个字符,并复制被删除的</span><br><span class="line">dd     #删除当前行,并复制被删除的</span><br><span class="line">ndd    #向下删除当前行在内的n行,并复制被删除的</span><br><span class="line">u      #撤销上一步操作</span><br><span class="line">U      #撤销对当前行的所有操作</span><br></pre></td></tr></table></figure>
+<h2><span id="搜索及替换命令">搜索及替换命令</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/pattern     #从光标开始处向文件尾搜索pattern </span><br><span class="line">?pattern     #从光标开始处向文件首搜索pattern</span><br><span class="line">n            #在同一方向重复上一次搜索命令</span><br><span class="line">N            #在反方向上重复上一次搜索命令</span><br><span class="line">：s/p1/p2/g  #将当前行中所有p1均用p2替代</span><br><span class="line">：n1,n2s/p1/p2/g   #将第n1至n2行中所有p1均用p2替代</span><br><span class="line">：g/p1/s//p2/g     #将文件中所有p1均用p2替换</span><br></pre></td></tr></table></figure>
+<h2><span id="打开多个文件vim-1txt-2txt">打开多个文件：vim 1.txt 2.txt</span></h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">vim -o 1.txt 2.txt          #水平分割显示</span><br><span class="line">vim -O 1.txt 2.txt          #垂直分割显示</span><br><span class="line">ctrl+w 放开后按 s            #水平拆分窗口</span><br><span class="line">ctrl+w 放开后按 v            #垂直拆分窗口</span><br><span class="line">ctrl+w 放开后按 w   		 #放开后按上下箭头：在各个窗口中切换光标</span><br><span class="line">:next                       #切换到下一个文件</span><br><span class="line">:prev                       #切换到上一个文件</span><br><span class="line">:last                       #切换到最后一个文件</span><br><span class="line">:first                      #切换至第一个文件</span><br><span class="line">:qa                         #退出全部</span><br></pre></td></tr></table></figure>
+<p>vim编辑器</p>
+<p>​	<br>
+​	使用<br>
+​		vim：模式化的编辑<br>
+​	<br>
+			基本模式：<br>
+				编辑模式，命令模式<br>
+				输入模式<br>
+				末行模式：<br>
+					内置的命令行接口</p>
+<pre><code>		打开文件：
+			# vim [OPTION]... FILE...
+				+#: 打开文件后，直接让光标处于第#行的行首；
+				+/PATTERN：打开文件后，直接让光标处于第一个被PATTERN匹配到的行的行首；
+
+		模式转换：
+			编辑模式 --&gt; 输入模式
+				i: insert, 在光标所在处输入；
+				a: append, 在光标所在处后面输入；
+				o: 在当前光标所在行的下方打开一个新行；
+				I：在当前光标所在行的行首输入；
+				A：在当前光标所在行的行尾输入；
+				O：在当前光标所在行的上方打开一个新行；
+				c
+				C
+
+			输入模式 --&gt; 编辑模式
+				ESC
+
+			编辑模式 --&gt; 末行模式
+				:
+
+			末行模式 --&gt; 编辑模式
+				ESC
+
+		关闭文件：
+			:q 退出
+			:q! 强制退出，丢弃做出的修改；
+			:wq 保存退出
+			:x 保存退出
+			:w /PATH/TO/SOMEWHERE
+
+			ZZ: 保存退出；
+
+	光标跳转：
+		
+		字符间跳转：
+			h, j, k, l
+				h: 左
+				l: 右
+				j: 下
+				k: 上
+
+			#COMMAND：跳转由#指定的个数的字符；
+
+		单词间跳转：
+			w：下一个单词的词首
+			e：当前或下一单词的词尾
+			b：当前或前一个单词的词首
+
+			#COMMAND：由#指定一次跳转的单词数
+
+		行首行尾跳转：
+			^: 跳转至行首的第一个非空白字符；
+			0: 跳转至行首；
+			$: 跳转至行尾；
+
+		行间移动：
+			#G：跳转至由#指定行；
+			G：最后一行；
+			1G, gg: 第一行；
+
+		句间移动：
+			)
+			(
+
+		段落间移动：
+			}
+			{
+
+vim的编辑命令：
+
+	字符编辑：
+		x: 删除光标处的字符；
+		#x: 删除光标处起始的#个字符；
+
+		xp: 交换光标所在处的字符及其后面字符的位置；
+
+	替换命令(r, replace)
+		r: 替换光标所在处的字符
+
+	删除命令：
+		d: 删除命令，可结合光标跳转字符，实现范围删除；
+			d$: 
+			d^:
+			d0:
+
+			dw
+			de
+			db
+
+				#COMMAND
+
+			dd: 删除光标所在的行；
+				#dd：多行删除；
+
+	粘贴命令(p, put, paste)：
+		p：缓冲区存的如果为整行，则粘贴当前光标所在行的下方；否则，则粘贴至当前光标所在处的后面；
+		P：缓冲区存的如果为整行，则粘贴当前光标所在行的上方；否则，则粘贴至当前光标所在处的前面；
+
+	复制命令(y, yank)：
+		y: 复制，工作行为相似于d命令；
+			y$
+			y0
+			y^
+
+			ye
+			yw
+			yb
+
+				#COMMAND
+
+			yy：复制行
+				#yy: 复制多行；
+
+	改变命令(c, change)
+		c: 修改
+			编辑模式 --&gt; 输入模式
+
+			c$
+			c^
+			c0
+
+			cb
+			ce
+			cw
+				#COMMAND
+
+			cc：删除并输入新内容
+			#cc: 
+
+	其它编辑操作
+
+		可视化模式：
+			v: 按字符选定
+			V：按行行定
+
+			Note：经常结合编辑命令；
+				d, c, y
+
+		撤消此前的编辑：
+			u(undo)：撤消此前的操作；
+				#u: 撤消指定次数的操作；
+
+		撤消此前的撤消：
+			Ctrl+r
+
+		重复前一个编辑操作：
+			.
+</code></pre>
+<p>​	<br>
+​	vim中的末行模式：<br>
+​		内建的命令行接口<br>
+​	<br>
+		(1) 地址定界<br>
+			:start_pos,end_pos<br>
+				#: 具体第#行，例如2表示第2行；<br>
+				#,#: 从左侧#表示行起始，到右侧#表示行结尾；<br>
+				#,+#: 从左侧#表示的行起始，加上右侧#表示的行数；<br>
+				.: 当前行<br>
+				$: 最后一行<br>
+					.,$-1<br>
+				%：全文, 相当于1,$</p>
+<pre><code>			/pat1/,/pat2/：
+				从第一次被pat1模式匹配到的行开始，一直到第一次被pat2匹配到的行结束；
+				#,/pat/
+				/pat/,$
+
+		使用方式：
+			后跟一个编辑命令
+				d
+				y
+				w /PATH/TO/SOMEWHERE: 将范围内的行另存至指定文件中；
+				r /PATH/FROM/SOMEFILE：在指定位置插入指定文件中的所有内容；
+
+	(2) 查找
+		/PATTERN：从当前光标所在处向文件尾部查找；
+		?PATTERN：从当前光标所在处向文件首部查找；
+			n：与命令同方向；
+			N：与命令反方向；
+
+	(3) 查找并替换
+		s: 在末行模式下完成查找替换操作
+			s/要查找的内容/替换为的内容/修饰符
+				要查找的内容：可使用模式
+				替换为的内容：不能使用模式，但可以使用\1, \2, ...等后向引用符号；还可以使用“&amp;”引用前面查找时查找到的整个内容；
+				修饰符：
+					i: 忽略大小写
+					g: 全局替换；默认情况下，每一行只替换第一次出现；
+
+			查找替换中的分隔符/可替换为其它字符，例如
+				s@@@
+				s###
+
+		练习：
+			1、复制/etc/grub2.cfg至/tmp/目录，用查找替换命令删除/tmp/grub2.cfg文件中的行首的空白字符；
+				%s/^[[:space:]]\+//g
+
+			2、复制/etc/rc.d/init.d/functions文件至/tmp目录，用查找替换命令为/tmp/functions的每行开头为空白字符的行的行首添加一个#号；
+				:%s/^[[:space:]]/#&amp;/
+</code></pre>
+<p>​	<br>
+​	<br>
+​	<br>
+​</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/09/12/codePies/" data-toggle="tooltip" data-placement="top" title="Code-Pieces">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/08/04/docker初识/" data-toggle="tooltip" data-placement="top" title="docker初识">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#linux" title="linux">linux</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2018/09/10/linux/vim编辑器/";
+    var disqus_url = "http://yoursite-url/2018/09/10/linux/vim编辑器/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

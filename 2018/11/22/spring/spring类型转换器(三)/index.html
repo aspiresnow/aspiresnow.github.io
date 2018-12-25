@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          spring类型转换器(三) - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2018/11/22/spring/spring类型转换器(三)/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#spring" title="spring">spring</a>
+                            
+                        </div>
+                        <h1>spring类型转换器(三)</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2018-11-22
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="spring类型转换器三">spring类型转换器(三)</span></h1>
+<h2><span id="格式化formatter">格式化Formatter</span></h2>
+<p>Converter用来将源数据类型转换目标数据类型，不过有时候一个数据类型会对应不同格式的字符串，如日期类型在不同国家显示的字符是不一样的，需要根据Locale进行转换，或者需要将日期类型转换为不同格式化的字符串，spring针对这种情况提供了Formatter接口来针对格式化进行处理。</p>
+<p>格式化Formatter其实也是一种Converter，只是两个互转类型之间，<strong>有一个固定是String类型</strong>，Formatter实现了不同格式的String类型与其他类型的类型互转</p>
+<p>Formatter主要针对的是Number类型和日期类型。Spring对这两种类型的子类和字符串之间的转换提供了格式化实现，下面以日期类型的转换为例说明。</p>
+<h3><span id="例子">例子</span></h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchFieldException </span>&#123;</span><br><span class="line">        String today = <span class="string">"2018-12-04 12:21:32"</span>;</span><br><span class="line">        DefaultFormattingConversionService conversionService = <span class="keyword">new</span> DefaultFormattingConversionService();</span><br><span class="line">        Field longDateField = Person.class.getDeclaredField(<span class="string">"longDate"</span>);</span><br><span class="line">        Date longDate = (Date) conversionService.convert(today, <span class="keyword">new</span> TypeDescriptor(longDateField));</span><br><span class="line">        Field shortDateField = Person.class.getDeclaredField(<span class="string">"shortDate"</span>);</span><br><span class="line">        Date shortDate = (Date) conversionService.convert(today, <span class="keyword">new</span> TypeDescriptor(shortDateField));</span><br><span class="line">        Field localDateTimeField = Person.class.getDeclaredField(<span class="string">"localDateTime"</span>);</span><br><span class="line">        LocalDateTime localDateTime = (LocalDateTime) conversionService.convert(today, <span class="keyword">new</span> TypeDescriptor(localDateTimeField));</span><br><span class="line">        Field dateFormatField = Person.class.getDeclaredField(<span class="string">"dateFormat"</span>);</span><br><span class="line">        <span class="comment">//日期到字符串的格式化转换，注意@DateTimeFormat注解一定要加在日期类型上，加在字符串类型上没有用</span></span><br><span class="line">        String dateFormat = (String) conversionService.convert(LocalDateTime.now(), <span class="keyword">new</span> TypeDescriptor(localDateTimeField), <span class="keyword">new</span> TypeDescriptor(dateFormatField));</span><br><span class="line">        System.out.println(dateFormat);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Data</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">        <span class="meta">@DateTimeFormat</span>(pattern = <span class="string">"yyyy-MM-dd HH:mm:ss"</span>)</span><br><span class="line">        <span class="keyword">private</span> Date longDate;</span><br><span class="line">        <span class="meta">@DateTimeFormat</span>(pattern = <span class="string">"yyyy-MM-dd"</span>)</span><br><span class="line">        <span class="keyword">private</span> Date shortDate;</span><br><span class="line">        <span class="meta">@DateTimeFormat</span>(pattern = <span class="string">"yyyy-MM-dd HH:mm:ss"</span>)</span><br><span class="line">        <span class="keyword">private</span> LocalDateTime localDateTime;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> String dateFormat;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="原理分析">原理分析</span></h2>
+<ol>
+<li>首先需要明确的一点，格式化是完成指定类型和字符串类型的互转,那么就可以定性为使用Converter来完成，需要注册两个Converter，String到Class<?>和 Class<?>到String的转换，这样就可以借用Converter调用的壳子，内部的转换及格式化再具体实现</li>
+<li>格式化功能的实现是通过两个接口来实现，通过Printer接口<code>print()</code>方法实现指定类型到字符串的转换，通过Parser接口<code>parse()</code>方法完成字符串到指定类型的转换。Formater接口继承了这两个接口</li>
+<li>格式化可以转换为不同格式的字符串，并且可以用户自定义，那么就需要一个入口来让用户配置，所以提供了两个注解用于指定字段的格式类型
+<ul>
+<li><code>DateTimeFormat</code> 指定日期格式的注解，通过指定pattern或者style实现指定不同的格式字符串</li>
+<li><code>NumberFormat</code> 指定数字格式的注解，通过指定pattern或者style实现指定不同的格式字符串。</li>
+</ul>
+</li>
+<li>那么通过什么来提供注解接入的入口呢，那就是AnnotationFormatterFactory<a extends="" annotation="">接口，这个接口集成了注解和Formater接口，将两者关联起来，然后注册到Converter中。同时这个接口的<code>getFieldTypes()</code>方法返回一个Set&lt;Class&lt;?&gt;&gt;，可以同时集成多个类型到字符串之间的转换。</a></li>
+</ol>
+<h2><span id="源码">源码</span></h2>
+<p>Formatter接口继承了Printer和Parser接口，一个用于将对象格式化为本地化的字符串，一个将字符串转换为对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Formatter</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Printer</span>&lt;<span class="title">T</span>&gt;, <span class="title">Parser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Printer</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="function">String <span class="title">print</span><span class="params">(T object, Locale locale)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Parser</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="function">T <span class="title">parse</span><span class="params">(String text, Locale locale)</span> <span class="keyword">throws</span> ParseException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AnnotationFormatterFactory集成了注解和Formatter。可以创建带有Annotation性质的Printer和Parser对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">AnnotationFormatterFactory</span>&lt;<span class="title">A</span> <span class="keyword">extends</span> <span class="title">Annotation</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//支持多个类型到字符串之间的转换</span></span><br><span class="line">    Set&lt;Class&lt;?&gt;&gt; getFieldTypes();</span><br><span class="line">    <span class="comment">//格式化</span></span><br><span class="line">    Printer&lt;?&gt; getPrinter(A annotation, Class&lt;?&gt; fieldType);</span><br><span class="line">    <span class="comment">//反格式化</span></span><br><span class="line">    Parser&lt;?&gt; getParser(A annotation, Class&lt;?&gt; fieldType);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上章节的继承图中可以看到FormattingConversionService继承了GenericConversionService。同时实现了FormatterRegistry和ConverterRegistry接口</p>
+<p>FormatterRegistry扩展了ConverterRegistry接口，额外提供了注册Formatter、AnnotationFormatterFactory的功能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FormatterRegistry</span> <span class="keyword">extends</span> <span class="title">ConverterRegistry</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">addFormatter</span><span class="params">(Formatter&lt;?&gt; formatter)</span></span>;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">addFormatterForFieldType</span><span class="params">(Class&lt;?&gt; fieldType, Formatter&lt;?&gt; formatter)</span></span>;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">addFormatterForFieldType</span><span class="params">(Class&lt;?&gt; fieldType, Printer&lt;?&gt; printer, Parser&lt;?&gt; parser)</span></span>;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">addFormatterForFieldAnnotation</span><span class="params">(AnnotationFormatterFactory&lt;? extends Annotation&gt; annotationFormatterFactory)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>FormatterRegistrar接口用于批量注册Formatter的接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FormatterRegistrar</span> </span>&#123;</span><br><span class="line">  <span class="comment">//批量注册</span></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">registerFormatters</span><span class="params">(FormatterRegistry registry)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>spring提供了FormattingConversionService的默认实现DefaultFormattingConversionService，使用的时候一般都是直接使用这个类。</p>
+<p>首先来看DefaultFormattingConversionService，在BeanFactory中只接收一个ConversionService变量，所以只能给spring容易配置一个ConversionService。那么到底应该用DefaultFormattingConversionService还是用DefaultConversionService？让我们来看DefaultFormattingConversionService中的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">DefaultFormattingConversionService</span><span class="params">(StringValueResolver embeddedValueResolver, <span class="keyword">boolean</span> registerDefaultFormatters)</span> </span>&#123;</span><br><span class="line">   setEmbeddedValueResolver(embeddedValueResolver);</span><br><span class="line">    <span class="comment">//注册DefaultConversionService中的默认转换器</span></span><br><span class="line">   DefaultConversionService.addDefaultConverters(<span class="keyword">this</span>);</span><br><span class="line">   <span class="keyword">if</span> (registerDefaultFormatters) &#123;</span><br><span class="line">      addDefaultFormatters(<span class="keyword">this</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>从源码可以看出，DefaultFormattingConversionService完全是对DefaultConversionService的扩展，在构造函数中调用了DefaultConversionService的addDefaultConverters完全拥有了DefaultConversionService所有的功能，所以只需要使用DefaultFormattingConversionService就可以</strong></p>
+<p>DefaultFormattingConversionService创建完成之后除了添加Converters，还注册了一些Formatters，这些Formaters主要是spring提供的用于针对<strong>日期类型</strong>、<strong>Number类型</strong>、<strong>货币金额</strong>进行格式化转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">addDefaultFormatters</span><span class="params">(FormatterRegistry formatterRegistry)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//支持数字类型的字符串格式化转换</span></span><br><span class="line">   formatterRegistry.addFormatterForFieldAnnotation(<span class="keyword">new</span> NumberFormatAnnotationFormatterFactory());</span><br><span class="line">  	<span class="comment">//支持对 货币金额 格式转换</span></span><br><span class="line">   <span class="keyword">if</span> (jsr354Present) &#123;</span><br><span class="line">      formatterRegistry.addFormatter(<span class="keyword">new</span> CurrencyUnitFormatter());</span><br><span class="line">      formatterRegistry.addFormatter(<span class="keyword">new</span> MonetaryAmountFormatter());</span><br><span class="line">      formatterRegistry.addFormatterForFieldAnnotation(<span class="keyword">new</span> Jsr354NumberFormatAnnotationFormatterFactory());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (jsr310Present) &#123;</span><br><span class="line">      <span class="comment">//对java8的日期类型 字符串格式化转换   LocalDateTime</span></span><br><span class="line">      <span class="keyword">new</span> DateTimeFormatterRegistrar().registerFormatters(formatterRegistry);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span> (jodaTimePresent) &#123;</span><br><span class="line">      <span class="comment">//对joda格式的日期 字符串格式化转换</span></span><br><span class="line">      <span class="keyword">new</span> JodaTimeFormatterRegistrar().registerFormatters(formatterRegistry);</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">//对普通的Date 、Calendar、时间戳 字符串格式化转换</span></span><br><span class="line">      <span class="keyword">new</span> DateFormatterRegistrar().registerFormatters(formatterRegistry);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3><span id="formater的注册和转换">Formater的注册和转换</span></h3>
+<h4><span id="注册formatter">注册Formatter</span></h4>
+<p>接下来分析下Formater的注册功能。通过上述分析我们可以知道，Formater实质上是Class&lt;?&gt;和String之间的互转，所以在注册的时候，只需要提供Class&lt;?&gt;、Printer和Parser。来看FormattingConversionService类中的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//没有指定Class&lt;?&gt; 直接使用 Formater上的泛型作为和String互转的类型</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFormatter</span><span class="params">(Formatter&lt;?&gt; formatter)</span> </span>&#123;</span><br><span class="line">   addFormatterForFieldType(getFieldType(formatter), formatter);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//formatter同时继承了 Printer和Parser接口</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFormatterForFieldType</span><span class="params">(Class&lt;?&gt; fieldType, Formatter&lt;?&gt; formatter)</span> </span>&#123;</span><br><span class="line">   addConverter(<span class="keyword">new</span> PrinterConverter(fieldType, formatter, <span class="keyword">this</span>));</span><br><span class="line">   addConverter(<span class="keyword">new</span> ParserConverter(fieldType, formatter, <span class="keyword">this</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//注册Converter</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFormatterForFieldType</span><span class="params">(Class&lt;?&gt; fieldType, Printer&lt;?&gt; printer, Parser&lt;?&gt; parser)</span> </span>&#123;</span><br><span class="line">   addConverter(<span class="keyword">new</span> PrinterConverter(fieldType, printer, <span class="keyword">this</span>));</span><br><span class="line">   addConverter(<span class="keyword">new</span> ParserConverter(fieldType, parser, <span class="keyword">this</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到的是注册Formater的过程，就是注册了一对Converter。注册Converter的过程已经在前文分析过，在这里我们来一起看下PrinterConverter和ParserConverter类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PrinterConverter</span> <span class="keyword">implements</span> <span class="title">GenericConverter</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; fieldType;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> TypeDescriptor printerObjectType;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Printer printer;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> ConversionService conversionService;<span class="comment">//this</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">PrinterConverter</span><span class="params">(Class&lt;?&gt; fieldType, Printer&lt;?&gt; printer, ConversionService conversionService)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.fieldType = fieldType;</span><br><span class="line">       <span class="comment">//获取Printer上设置的泛型 即Class&lt;?&gt;</span></span><br><span class="line">      <span class="keyword">this</span>.printerObjectType = TypeDescriptor.valueOf(resolvePrinterObjectType(printer));</span><br><span class="line">      <span class="keyword">this</span>.printer = printer;</span><br><span class="line">      <span class="keyword">this</span>.conversionService = conversionService;<span class="comment">//this</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span> <span class="comment">//fieldType -&gt; String 转换</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Set&lt;ConvertiblePair&gt; <span class="title">getConvertibleTypes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> Collections.singleton(<span class="keyword">new</span> ConvertiblePair(<span class="keyword">this</span>.fieldType, String.class));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">convert</span><span class="params">(Object source, TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (source == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">      &#125;<span class="comment">//如果源数据类型和Printer支持的不一致，首先需要进行 源数据类型 -&gt; Printer支持类型的转换</span></span><br><span class="line">      <span class="keyword">if</span> (!sourceType.isAssignableTo(<span class="keyword">this</span>.printerObjectType)) &#123;</span><br><span class="line">         source = <span class="keyword">this</span>.conversionService.convert(source, sourceType, <span class="keyword">this</span>.printerObjectType);</span><br><span class="line">      &#125; <span class="comment">//委托Printer 完成到 String类型的转换</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.printer.print(source, LocaleContextHolder.getLocale());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> Class&lt;?&gt; resolvePrinterObjectType(Printer&lt;?&gt; printer) &#123;</span><br><span class="line">      <span class="keyword">return</span> GenericTypeResolver.resolveTypeArgument(printer.getClass(), Printer.class);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出PrinterConverter类型实现GenericConverter，用于实现传入类型到字符串的转换，具体的转换功能委托给参数Printer实现类对象实现。这里相当于是一个插件类保留。可以通过Printer实现任何类型到String类型的转换。</p>
+<p>再来看ParserConverter</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ParserConverter</span> <span class="keyword">implements</span> <span class="title">GenericConverter</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; fieldType;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Parser&lt;?&gt; parser;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> ConversionService conversionService;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">ParserConverter</span><span class="params">(Class&lt;?&gt; fieldType, Parser&lt;?&gt; parser, ConversionService conversionService)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.fieldType = fieldType;</span><br><span class="line">      <span class="keyword">this</span>.parser = parser;</span><br><span class="line">      <span class="keyword">this</span>.conversionService = conversionService;<span class="comment">//this</span></span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span> <span class="comment">//String -&gt; fieldType 转换</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Set&lt;ConvertiblePair&gt; <span class="title">getConvertibleTypes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> Collections.singleton(<span class="keyword">new</span> ConvertiblePair(String.class, <span class="keyword">this</span>.fieldType));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">convert</span><span class="params">(Object source, TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;</span><br><span class="line">      String text = (String) source;</span><br><span class="line">      <span class="keyword">if</span> (!StringUtils.hasText(text)) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      Object result;</span><br><span class="line">      <span class="keyword">try</span> &#123; <span class="comment">//调用parser 将String类型转换为 Parser中声明的泛型</span></span><br><span class="line">         result = <span class="keyword">this</span>.parser.parse(text, LocaleContextHolder.getLocale());</span><br><span class="line">      &#125;</span><br><span class="line">	  <span class="comment">//catch...</span></span><br><span class="line">      <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">//throw ...</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//如果通过Parser转换后的类型不是目标类型，调用相应的类型转换器继续转换</span></span><br><span class="line">      TypeDescriptor resultType = TypeDescriptor.valueOf(result.getClass());</span><br><span class="line">      <span class="keyword">if</span> (!resultType.isAssignableTo(targetType)) &#123;</span><br><span class="line">         result = <span class="keyword">this</span>.conversionService.convert(result, resultType, targetType);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> result;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ParserConverter跟PrinterConverter实现了一个反方向的转换，至此注册通过一个Formater接口实现类，就可以完成Formater实现类中泛型到String类型之间的互转。</p>
+<p>例如注册 LocalDateTime的转换器，实现LocalDateTime和String类型的互转</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">registry.addFormatterForFieldType(LocalDateTime.class, <span class="keyword">new</span> TemporalAccessorPrinter(</span><br><span class="line">    dtf == DateTimeFormatter.ISO_DATE_TIME ? DateTimeFormatter.ISO_LOCAL_DATE_TIME : dtf),</span><br><span class="line">      <span class="keyword">new</span> TemporalAccessorParser(LocalDateTime.class, dtf));</span><br></pre></td></tr></table></figure>
+<p>可以看到使用一个类TemporalAccessorPrinter和TemporalAccessorParser，并都传入了一个参数DateTimeFormatter，众所周知LocalDateTime和String格式化就是通过DateTimeFormatter来实现。那么我们猜测TemporalAccessorParser其实就是对DateTimeFormatter的封装调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TemporalAccessorPrinter</span> <span class="keyword">implements</span> <span class="title">Printer</span>&lt;<span class="title">TemporalAccessor</span>&gt; </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> DateTimeFormatter formatter;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">TemporalAccessorPrinter</span><span class="params">(DateTimeFormatter formatter)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.formatter = formatter;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> String <span class="title">print</span><span class="params">(TemporalAccessor partial, Locale locale)</span> </span>&#123;</span><br><span class="line">       <span class="comment">//调用formater的format转换为String</span></span><br><span class="line">      <span class="keyword">return</span> DateTimeContextHolder.getFormatter(<span class="keyword">this</span>.formatter, locale).format(partial);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到TemporalAccessorPrinter就是调用的DateTimeFormatter完成格式化的，不过这里使用到了ThreadLocal，可以先不管，TemporalAccessorParser中同理也会使用DateTimeFormatter完成String到日期的转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TemporalAccessorParser</span> <span class="keyword">implements</span> <span class="title">Parser</span>&lt;<span class="title">TemporalAccessor</span>&gt; </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> DateTimeFormatter formatter;</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> TemporalAccessor <span class="title">parse</span><span class="params">(String text, Locale locale)</span> <span class="keyword">throws</span> ParseException </span>&#123;</span><br><span class="line">      DateTimeFormatter formatterToUse = DateTimeContextHolder.getFormatter(<span class="keyword">this</span>.formatter, locale);</span><br><span class="line">      <span class="keyword">if</span> (LocalDate.class == <span class="keyword">this</span>.temporalAccessorType) &#123;</span><br><span class="line">         <span class="keyword">return</span> LocalDate.parse(text, formatterToUse);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (LocalTime.class == <span class="keyword">this</span>.temporalAccessorType) &#123;</span><br><span class="line">         <span class="keyword">return</span> LocalTime.parse(text, formatterToUse);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (LocalDateTime.class == <span class="keyword">this</span>.temporalAccessorType) &#123;</span><br><span class="line">         <span class="keyword">return</span> LocalDateTime.parse(text, formatterToUse);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//...</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="格式化转换">格式化转换</span></h4>
+<p>Formatter的注册最终是注册了一对Converter，所以格式化转换完全就是Converter逻辑的实现，在前文已经分析过了，这里就不再赘述。</p>
+<h3><span id="annotationformatterfactory的注册和转换">AnnotationFormatterFactory的注册和转换</span></h3>
+<h3><span id="注册">注册</span></h3>
+<p>分析完了Formatter的注册和转换过程，一起来看下FormatConversionService提供了另外一种注册。前文提到了可以通过在对象字段上声明一个注解，在注解中指定格式化后字符串格式。这个功能就是通过AnnotationFormatterFactory来实现的。来看FormatConversionService的<code>addFormatterForFieldAnnotation()</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFormatterForFieldAnnotation</span><span class="params">(AnnotationFormatterFactory&lt;? extends Annotation&gt; annotationFormatterFactory)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取注册AnnotationFormatterFactory上的注解</span></span><br><span class="line">   Class&lt;? extends Annotation&gt; annotationType =getAnnotationType(annotationFormatterFactory);</span><br><span class="line">   <span class="keyword">if</span> (<span class="keyword">this</span>.embeddedValueResolver != <span class="keyword">null</span> &amp;&amp; annotationFormatterFactory <span class="keyword">instanceof</span> EmbeddedValueResolverAware) &#123;</span><br><span class="line">      ((EmbeddedValueResolverAware) annotationFormatterFactory).setEmbeddedValueResolver(<span class="keyword">this</span>.embeddedValueResolver);</span><br><span class="line">   &#125;</span><br><span class="line">    <span class="comment">//AnnotationFormatterFactory中定义的支持转换的Class&lt;?&gt;集合</span></span><br><span class="line">   Set&lt;Class&lt;?&gt;&gt; fieldTypes = annotationFormatterFactory.getFieldTypes();</span><br><span class="line">    <span class="comment">//该集合中所有的类型都需要完成到String的互转，所以循环封装Converter并注册</span></span><br><span class="line">   <span class="keyword">for</span> (Class&lt;?&gt; fieldType : fieldTypes) &#123;</span><br><span class="line">       <span class="comment">//注册 fieldType --&gt; String 的类型转换器</span></span><br><span class="line">      addConverter(<span class="keyword">new</span> AnnotationPrinterConverter(annotationType, annotationFormatterFactory, fieldType));</span><br><span class="line">       <span class="comment">//注册 String --&gt; fieldType 的类型转换器</span></span><br><span class="line">      addConverter(<span class="keyword">new</span> AnnotationParserConverter(annotationType, annotationFormatterFactory, fieldType));</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AnnotationFormatterFactory的注册，首先需要获取的就是AnnotationFormatterFactory泛型中的注解类型。然后通过<code>getFieldTypes()</code>获取所有声明的可以进行转换类型集合，然后循环注册了两个类型转换器AnnotationPrinterConverter和AnnotationParserConverter。那么来看一下AnnotationPrinterConverter到底如何完成可配置的类型转换的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AnnotationPrinterConverter</span> <span class="keyword">implements</span> <span class="title">ConditionalGenericConverter</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;? extends Annotation&gt; annotationType; <span class="comment">//注解类型</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> AnnotationFormatterFactory annotationFormatterFactory;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; fieldType;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">AnnotationPrinterConverter</span><span class="params">(Class&lt;? extends Annotation&gt; annotationType,</span></span></span><br><span class="line"><span class="function"><span class="params">         AnnotationFormatterFactory&lt;?&gt; annotationFormatterFactory, Class&lt;?&gt; fieldType)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.annotationType = annotationType;</span><br><span class="line">      <span class="keyword">this</span>.annotationFormatterFactory = annotationFormatterFactory;</span><br><span class="line">      <span class="keyword">this</span>.fieldType = fieldType;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Set&lt;ConvertiblePair&gt; <span class="title">getConvertibleTypes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">//声明为 fieldType -&gt; String 之间的转换</span></span><br><span class="line">      <span class="keyword">return</span> Collections.singleton(<span class="keyword">new</span> ConvertiblePair(<span class="keyword">this</span>.fieldType, String.class));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;</span><br><span class="line">       <span class="comment">//转换器生效的条件时 源数据类型上有该注解</span></span><br><span class="line">      <span class="keyword">return</span> sourceType.hasAnnotation(<span class="keyword">this</span>.annotationType);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">convert</span><span class="params">(Object source, TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;		<span class="comment">//获取源数据类型上的注解</span></span><br><span class="line">      Annotation ann = sourceType.getAnnotation(<span class="keyword">this</span>.annotationType);</span><br><span class="line">      <span class="keyword">if</span> (ann == <span class="keyword">null</span>) &#123; <span class="comment">//使用该转换器的前提是添加了相同的注解</span></span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">""</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      AnnotationConverterKey converterKey = <span class="keyword">new</span> AnnotationConverterKey(ann, sourceType.getObjectType());</span><br><span class="line">      <span class="comment">//将创建PrinterConverter缓存起来，避免每次重复创建</span></span><br><span class="line">      GenericConverter converter = cachedPrinters.get(converterKey);</span><br><span class="line">      <span class="keyword">if</span> (converter == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="comment">//从annotationFormatterFactory中获取Printer</span></span><br><span class="line">         Printer&lt;?&gt; printer = <span class="keyword">this</span>.annotationFormatterFactory.getPrinter(</span><br><span class="line">               converterKey.getAnnotation(), converterKey.getFieldType());</span><br><span class="line">          <span class="comment">//在这个converter中又创建了PrinterConverter </span></span><br><span class="line">         converter = <span class="keyword">new</span> PrinterConverter(<span class="keyword">this</span>.fieldType, printer, FormattingConversionService.<span class="keyword">this</span>);</span><br><span class="line">         cachedPrinters.put(converterKey, converter);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//使用PrinterConverter 进行类型转换</span></span><br><span class="line">      <span class="keyword">return</span> converter.convert(source, sourceType, targetType);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到的是，AnnotationPrinterConverter实现了ConditionalGenericConverter接口，在<code>matches()</code>方法中声明了该转换器只会作用于Class&lt;?&gt;上有指定的注解的类型。在convert方法中最终创建了一个PrinterConverter对象，使用PrinterConverter完成格式化的功能，这个在上面已经分析过了。唯一的不同就是Printer的获取。使用annotationFormatterFactory获取printer，并将注解作为参数传递进去。所以可以我们可以实现AnnotationFormatterFactory的<code>getPrinter()</code>方法提供转换为字符串的功能即可，通过看以通过参数annotation获取用户配置的格式。实现格式的可配置。</p>
+<p>同样在AnnotationParserConverter中实现String到Class&lt;?&gt;的转换，调用AnnotationFormatterFactory获取Parser然后创建一个ParserConverter来实现类型转化。需要注意的是 <strong>注解只能添加在非String类型那一方上。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AnnotationParserConverter</span> <span class="keyword">implements</span> <span class="title">ConditionalGenericConverter</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;? extends Annotation&gt; annotationType;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> AnnotationFormatterFactory annotationFormatterFactory;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; fieldType;</span><br><span class="line">	<span class="comment">//此处省略...</span></span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span><span class="comment">//String 到fieldType的转换</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Set&lt;ConvertiblePair&gt; <span class="title">getConvertibleTypes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> Collections.singleton(<span class="keyword">new</span> ConvertiblePair(String.class, fieldType));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span> <span class="comment">//注意这里用的是targetType 还是要非String类上声明注解</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> targetType.hasAnnotation(<span class="keyword">this</span>.annotationType);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">convert</span><span class="params">(Object source, TypeDescriptor sourceType, TypeDescriptor targetType)</span> </span>&#123;</span><br><span class="line">      Annotation ann = targetType.getAnnotation(<span class="keyword">this</span>.annotationType);</span><br><span class="line">      <span class="keyword">if</span> (ann == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">//throw ...</span></span><br><span class="line">      &#125;</span><br><span class="line">      AnnotationConverterKey converterKey = <span class="keyword">new</span> AnnotationConverterKey(ann, targetType.getObjectType());</span><br><span class="line">      GenericConverter converter = cachedParsers.get(converterKey);</span><br><span class="line">      <span class="keyword">if</span> (converter == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="comment">//获取parser</span></span><br><span class="line">         Parser&lt;?&gt; parser = <span class="keyword">this</span>.annotationFormatterFactory.getParser(</span><br><span class="line">               converterKey.getAnnotation(), converterKey.getFieldType());</span><br><span class="line">          <span class="comment">//创建ParserConverter进行转换</span></span><br><span class="line">         converter = <span class="keyword">new</span> ParserConverter(<span class="keyword">this</span>.fieldType, parser, FormattingConversionService.<span class="keyword">this</span>);</span><br><span class="line">         cachedParsers.put(converterKey, converter);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> converter.convert(source, sourceType, targetType);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过封装封装注册AnnotationPrinterConverter和AnnotationParserConverter，用户需要做的就只有是实现AnnotationFormatterFactory，在泛型中指定注解，然后实现了<code>getPrinter()</code>和<code>getParser()</code>来实现Class&lt;?&gt;和String之间的转换，其他的调用直接走Converter流程。来看Date类型格式化的实现</p>
+<p>在DateFormatterRegistrar中，在注册Formatters之前，先注册了日期类型的一些converter，这里先不去管这个。最主要的是<code>addFormatterForFieldAnnotation</code>方法，通过这个方法完成对Formater的注册</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerFormatters</span><span class="params">(FormatterRegistry registry)</span> </span>&#123;</span><br><span class="line">   addDateConverters(registry);</span><br><span class="line">    <span class="comment">//注册Formater FormatterFactory</span></span><br><span class="line">   registry.addFormatterForFieldAnnotation(<span class="keyword">new</span> DateTimeFormatAnnotationFormatterFactory());</span><br><span class="line">   <span class="keyword">if</span> (<span class="keyword">this</span>.dateFormatter != <span class="keyword">null</span>) &#123;</span><br><span class="line">       <span class="comment">//添加对非注解 Date类型转换</span></span><br><span class="line">      registry.addFormatter(<span class="keyword">this</span>.dateFormatter);</span><br><span class="line">      registry.addFormatterForFieldType(Calendar.class, <span class="keyword">this</span>.dateFormatter);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>来看下DateTimeFormatAnnotationFormatterFactory实现了AnnotationFormatterFactory。并指定注解为DateTimeFormat。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateTimeFormatAnnotationFormatterFactory</span>  <span class="keyword">extends</span> <span class="title">EmbeddedValueResolutionSupport</span></span></span><br><span class="line"><span class="class">      <span class="keyword">implements</span> <span class="title">AnnotationFormatterFactory</span>&lt;<span class="title">DateTimeFormat</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Class&lt;?&gt;&gt; FIELD_TYPES;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">static</span> &#123;<span class="comment">//定义支持的 格式化的类型，支持格式化 Date、Calendar、Long类型</span></span><br><span class="line">      Set&lt;Class&lt;?&gt;&gt; fieldTypes = <span class="keyword">new</span> HashSet&lt;Class&lt;?&gt;&gt;(<span class="number">4</span>);</span><br><span class="line">      fieldTypes.add(Date.class);</span><br><span class="line">      fieldTypes.add(Calendar.class);</span><br><span class="line">      fieldTypes.add(Long.class);</span><br><span class="line">      FIELD_TYPES = Collections.unmodifiableSet(fieldTypes);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span> <span class="comment">//定义支持的 格式化的类型，支持格式化 Date、Calendar、Long类型</span></span><br><span class="line">   <span class="keyword">public</span> Set&lt;Class&lt;?&gt;&gt; getFieldTypes() &#123;</span><br><span class="line">      <span class="keyword">return</span> FIELD_TYPES;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> Printer&lt;?&gt; getPrinter(DateTimeFormat annotation, Class&lt;?&gt; fieldType) &#123;</span><br><span class="line">      <span class="keyword">return</span> getFormatter(annotation, fieldType);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> Parser&lt;?&gt; getParser(DateTimeFormat annotation, Class&lt;?&gt; fieldType) &#123;</span><br><span class="line">      <span class="keyword">return</span> getFormatter(annotation, fieldType);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="function"><span class="keyword">protected</span> Formatter&lt;Date&gt; <span class="title">getFormatter</span><span class="params">(DateTimeFormat annotation, Class&lt;?&gt; fieldType)</span> </span>&#123;</span><br><span class="line">      DateFormatter formatter = <span class="keyword">new</span> DateFormatter();</span><br><span class="line">      <span class="comment">//获取用户注解中写的格式</span></span><br><span class="line">      formatter.setStylePattern(resolveEmbeddedValue(annotation.style()));</span><br><span class="line">      formatter.setIso(annotation.iso()); <span class="comment">//获取用户注解中写的格式</span></span><br><span class="line">      formatter.setPattern(resolveEmbeddedValue(annotation.pattern())); <span class="comment">//获取用户注解中写的格式</span></span><br><span class="line">      <span class="keyword">return</span> formatter;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到的是在<code>getFieldType()</code>声明了支持转换的有Date、Calendar、Long。可以看到<code>getPrinter()</code>和<code>getFormatter()</code>方法返回了一个DateFormatter对象，并将用户配置的注解信息注入到这个DateFormatter对象中</p>
+<p>接下来就是最终的格式化实现就是这个DateFormatter对象了。大家想一下，一般针对Date类型的格式化都会用什么呢？想必大家都猜到了，没错就是SimpleDateFormat。在DateFormatter中就是创建了一个SimpleDateFormat来实现类型和字符串的转换的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateFormatter</span> <span class="keyword">implements</span> <span class="title">Formatter</span>&lt;<span class="title">Date</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//....此处省略</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">print</span><span class="params">(Date date, Locale locale)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> getDateFormat(locale).format(date);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Date <span class="title">parse</span><span class="params">(String text, Locale locale)</span> <span class="keyword">throws</span> ParseException </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> getDateFormat(locale).parse(text);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> DateFormat <span class="title">getDateFormat</span><span class="params">(Locale locale)</span> </span>&#123;</span><br><span class="line">       DateFormat dateFormat = createDateFormat(locale);</span><br><span class="line">       <span class="keyword">if</span> (<span class="keyword">this</span>.timeZone != <span class="keyword">null</span>) &#123;</span><br><span class="line">          dateFormat.setTimeZone(<span class="keyword">this</span>.timeZone);</span><br><span class="line">       &#125;</span><br><span class="line">       dateFormat.setLenient(<span class="keyword">this</span>.lenient);</span><br><span class="line">       <span class="keyword">return</span> dateFormat;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//创建一个SimpleDateFormat,并使用 annotation传入的pattern</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> DateFormat <span class="title">createDateFormat</span><span class="params">(Locale locale)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (StringUtils.hasLength(<span class="keyword">this</span>.pattern)) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="keyword">this</span>.pattern, locale);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (<span class="keyword">this</span>.iso != <span class="keyword">null</span> &amp;&amp; <span class="keyword">this</span>.iso != ISO.NONE) &#123;</span><br><span class="line">          String pattern = ISO_PATTERNS.get(<span class="keyword">this</span>.iso);</span><br><span class="line">          <span class="keyword">if</span> (pattern == <span class="keyword">null</span>) &#123;</span><br><span class="line">             <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Unsupported ISO format "</span> + <span class="keyword">this</span>.iso);</span><br><span class="line">          &#125;</span><br><span class="line">          SimpleDateFormat format = <span class="keyword">new</span> SimpleDateFormat(pattern);</span><br><span class="line">          format.setTimeZone(UTC);</span><br><span class="line">          <span class="keyword">return</span> format;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (StringUtils.hasLength(<span class="keyword">this</span>.stylePattern)) &#123;</span><br><span class="line">          <span class="keyword">int</span> dateStyle = getStylePatternForChar(<span class="number">0</span>);</span><br><span class="line">          <span class="keyword">int</span> timeStyle = getStylePatternForChar(<span class="number">1</span>);</span><br><span class="line">          <span class="keyword">if</span> (dateStyle != -<span class="number">1</span> &amp;&amp; timeStyle != -<span class="number">1</span>) &#123;</span><br><span class="line">             <span class="keyword">return</span> DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span> (dateStyle != -<span class="number">1</span>) &#123;</span><br><span class="line">             <span class="keyword">return</span> DateFormat.getDateInstance(dateStyle, locale);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span> (timeStyle != -<span class="number">1</span>) &#123;</span><br><span class="line">             <span class="keyword">return</span> DateFormat.getTimeInstance(timeStyle, locale);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Unsupported style pattern"</span>);</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> DateFormat.getDateInstance(<span class="keyword">this</span>.style, locale);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此就实现了Formatter的注册和使用。那么在spring中是如何使用的呢？</p>
+<h2><span id="spring中的使用">spring中的使用</span></h2>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"conversionService"</span>    <span class="attr">class</span>=<span class="string">"org.springframework.format.support.FormattingConversionServiceFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">converters</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"example.MyCustomConverter"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">converters</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">formatters</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"example.MyCustomFormatters"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">formatters</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">formatterRegistrars</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">formatterRegistrars</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>没错就注册一个id为conversionService的FormattingConversionServiceFactoryBean对象。使用这个就可以了，不需要再注册ConversionServiceFactoryBean了。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/11/22/spring/spring-Validation/" data-toggle="tooltip" data-placement="top" title="spring Validation">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/11/22/spring/spring类型转换器(二)/" data-toggle="tooltip" data-placement="top" title="spring类型转换器(二)">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#spring" title="spring">spring</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2018/11/22/spring/spring类型转换器(三)/";
+    var disqus_url = "http://yoursite-url/2018/11/22/spring/spring类型转换器(三)/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

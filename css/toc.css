@@ -1,0 +1,165 @@
+/*toc*/
+.toc-article {
+  position: absolute;
+  border-left: rgba(88,88,88,0.1) 1px solid;
+  padding: 1em 1em 0 1em;
+  margin-left: 1em;
+}
+.toc-title {
+  font-size: 120%;
+}
+.toc-title:before {
+  font-family: "FontAwesome";
+  content: "\f02e";
+  margin-right: 0.5em;
+}
+@media screen and (max-width: 1100px) {
+  #toc {
+    display: none;
+  }
+}
+#toc {
+  width: inherit;
+  line-height: 1em;
+  font-size: 0.9em;
+  float: left;
+  overflow: auto;
+}
+@media mq-mobile {
+  #toc {
+    display: none;
+  }
+}
+@media mq-tablet {
+  #toc {
+    display: none;
+  }
+}
+.toc-fixed {
+  position: fixed;
+  top: 60px;
+  margin-top: 0;
+  max-height: 81%;
+  overflow: hidden;
+  z-index: 1;
+}
+.toc-nav {
+  padding: 0;
+  margin: 1em;
+  line-height: 1.8em;
+}
+.toc-nav li {
+  list-style-type: none;
+}
+.toc-nav li a:hover {
+  background-color: transparent !important;
+}
+.toc-nav .active > a {
+  color: color-theme;
+}
+.toc-nav-link {
+  font-family: "futura-pt", Helvetica, Arial, "Hiragino Sans GB", "Hiragino Sans GB W3", Microsoft JhengHei, WenQuanYi Micro Hei, "Microsoft YaHei", sans-serif;
+  color: color-link;
+  padding: 1px !important;
+}
+.toc-nav-link:hover {
+  color: color-theme;
+}
+.toc-nav-child {
+  margin-left: 1em;
+}
+#sidebar {
+  display: inline;
+  float: left;
+  padding-left: 12px;
+}
+/*-----------------------toc------------------------------*/
+/*
+.bs-docs-sidebar {
+    margin-top: 60px;
+    padding-left: 20px
+}
+
+.bs-docs-sidebar.affix {
+    position: static
+}
+
+.bs-docs-sidebar h4 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+*/
+/*一级目录*/
+.bs-docs-sidebar .nav > li > a {
+  display: block;
+  padding: 4px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #999;
+}
+.bs-docs-sidebar .nav > li > a:hover,
+.bs-docs-sidebar .nav > li > a:focus {
+  padding-left: 19px;
+  color: #e6618c;
+  text-decoration: none;
+  background-color: transparent;
+  border-left: 1px solid #e6618c;
+}
+.bs-docs-sidebar .nav > .active > a,
+.bs-docs-sidebar .nav > .active:hover > a,
+.bs-docs-sidebar .nav > .active:focus > a {
+  padding-left: 18px;
+  font-weight: 700;
+  color: #e6618c;
+  background-color: transparent;
+  border-left: 2px solid #e6618c;
+}
+/*二级目录*/
+.bs-docs-sidebar .nav .nav {
+  display: none;
+  padding-bottom: 10px;
+}
+.bs-docs-sidebar .nav .nav > li > a {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 25px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.bs-docs-sidebar .nav .nav > li > a:hover,
+.bs-docs-sidebar .nav .nav > li > a:focus {
+  padding-left: 24px;
+}
+.bs-docs-sidebar .nav .nav > .active > a,
+.bs-docs-sidebar .nav .nav > .active:hover > a,
+.bs-docs-sidebar .nav .nav > .active:focus > a {
+  padding-left: 23px;
+  font-weight: 500;
+}
+@media (min-width: 992px) {
+  .bs-docs-sidebar .nav > .active > ul {
+    display: block;
+  }
+  .bs-docs-sidebar.affix,
+  .bs-docs-sidebar.affix-bottom {
+    width: 213px;
+  }
+  .bs-docs-sidebar.affix {
+    position: fixed;
+    top: 20px;
+  }
+  .bs-docs-sidebar.affix-bottom {
+    position: absolute;
+  }
+  .bs-docs-sidebar.affix-bottom .bs-docs-sidenav,
+  .bs-docs-sidebar.affix .bs-docs-sidenav {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+@media (min-width: 1200px) {
+  .bs-docs-sidebar.affix-bottom,
+  .bs-docs-sidebar.affix {
+    width: 263px;
+  }
+}

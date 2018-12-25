@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          java8之Collector - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2017/08/05/java8/java8之Collector/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                            
+                        </div>
+                        <h1>java8之Collector</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2017-08-05
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="java8之collector">java8之Collector</span></h1>
+<p>Stream流的终端操作常常需要聚合，Collector就是对Stream流进行聚合的实现。jdk提供了Collectors工具类封装了一些常用的聚合操作。</p>
+<a id="more"></a>
+<h2><span id="collector接口">Collector接口</span></h2>
+<p>Collector是一个接口，它是一个可变的汇聚操作，通过累加器将输入元素汇集到一个<strong>可伸展</strong>的结果容器中；如果是并行流会产生多个结果容器，还需将结果容器合并为一个，最后将累积的结果容器转换为一个最终想要的容器返回（这是一个可选操作）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Collector</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//用于提供一个可伸展结构的容器</span></span><br><span class="line">    <span class="function">Supplier&lt;A&gt; <span class="title">supplier</span><span class="params">()</span></span>;   <span class="comment">//容器</span></span><br><span class="line">  	<span class="comment">//用于将元素添加到提供的容器中</span></span><br><span class="line">    <span class="function">BiConsumer&lt;A, T&gt; <span class="title">accumulator</span><span class="params">()</span></span>;<span class="comment">//累加器</span></span><br><span class="line">  	<span class="comment">//把并行流产生的多个容易合并为一个</span></span><br><span class="line">    <span class="function">BinaryOperator&lt;A&gt; <span class="title">combiner</span><span class="params">()</span></span>; <span class="comment">//合并器</span></span><br><span class="line">	<span class="comment">//将combiner返回的结果类型转换为其他类型，当characteristics选择IDENTITY_FINISH时，不需要转换类型，	   所以该方法不会被调用，其他情况下会被调用</span></span><br><span class="line">    <span class="function">Function&lt;A, R&gt; <span class="title">finisher</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//Collector约束属性set,不可变Collections.unmodifiableSet</span></span><br><span class="line">    <span class="function">Set&lt;Characteristics&gt; <span class="title">characteristics</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Characteristics是Collector内的一个枚举类，用来约束Collector的属性。</p>
+<ul>
+<li>CONCURRENT：表示此收集器支持并发，意味着允许在多个线程中，累加器可以调用结果容器</li>
+<li>UNORDERED：表示收集器并不按照Stream中的元素输入顺序执行</li>
+<li>IDENTITY_FINISH：表示不需要转换结果类型，直接返回supplier创建的数据类型，finisher方法不执行。</li>
+</ul>
+<p>如下就是一个简单的Collector的实现，将结果聚合到一个list当中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List result = Stream.of(<span class="number">1</span>, <span class="number">2</span>,<span class="number">3</span>, <span class="number">4</span>,<span class="number">5</span>).collect(</span><br><span class="line">  () -&gt; <span class="keyword">new</span> ArrayList(), <span class="comment">//创建一个可变容器</span></span><br><span class="line">  (list, item) -&gt; list.add(item),<span class="comment">//将stream中元素添加到可变容器中</span></span><br><span class="line">  (list1, list2) -&gt; list1.addAll(list2)<span class="comment">//合并多个可变容器</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h2><span id="collectors工具类">Collectors工具类</span></h2>
+<p>Collectors本身提供了关于Collector的常见汇聚实现，Collectors的内部类CollectorImpl实现了Collector接口，Collectors本身就是一堆创建CollectorImpl对象的工具类。</p>
+<h3><span id="collectorimpl">CollectorImpl</span></h3>
+<p>CollectorImpl是Collectors工具类中的内部类，实现了Collector接口，提供了构造器，方便构造Collector的具体实现类，Collector接口中可以设置一个Characteristics的集合，Collectors针对可能出现的组合定义好了几个类型集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Collector.Characteristics&gt; CH_CONCURRENT_ID                                   </span><br><span class="line">        = Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.CONCURRENT,         </span><br><span class="line">                                                 Collector.Characteristics.UNORDERED,          </span><br><span class="line">                                                 Collector.Characteristics.IDENTITY_FINISH));  </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Collector.Characteristics&gt; CH_CONCURRENT_NOID                                 </span><br><span class="line">        = Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.CONCURRENT,         </span><br><span class="line">                                                 Collector.Characteristics.UNORDERED));        </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Collector.Characteristics&gt; CH_ID                                              </span><br><span class="line">        = Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.IDENTITY_FINISH));  </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Collector.Characteristics&gt; CH_UNORDERED_ID                                    </span><br><span class="line">        = Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.UNORDERED,          </span><br><span class="line">                                                 Collector.Characteristics.IDENTITY_FINISH));  </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Set&lt;Collector.Characteristics&gt; CH_NOID = Collections.emptySet();    </span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectorImpl</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; <span class="keyword">implements</span> <span class="title">Collector</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; </span>&#123; </span><br><span class="line">     <span class="comment">//构造函数，创建Collector的实现类对象</span></span><br><span class="line">     CollectorImpl(Supplier&lt;A&gt; supplier,                             </span><br><span class="line">                   BiConsumer&lt;A, T&gt; accumulator,                     </span><br><span class="line">                   BinaryOperator&lt;A&gt; combiner,                       </span><br><span class="line">                   Function&lt;A,R&gt; finisher,                           </span><br><span class="line">                   Set&lt;Characteristics&gt; characteristics) &#123;           </span><br><span class="line">         <span class="keyword">this</span>.supplier = supplier;                                   </span><br><span class="line">         <span class="keyword">this</span>.accumulator = accumulator;                             </span><br><span class="line">         <span class="keyword">this</span>.combiner = combiner;                                   </span><br><span class="line">         <span class="keyword">this</span>.finisher = finisher;                                   </span><br><span class="line">         <span class="keyword">this</span>.characteristics = characteristics;                     </span><br><span class="line">     &#125;                  </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h3><span id="collectors工具类型">Collectors工具类型</span></h3>
+<h4><span id="链接">链接</span></h4>
+<p>mapping是在将元素添加到容器前进行一次映射处理、collectingAndThen是处理Collector的最终返回值问题，是额外给Collector添加一个Finisher方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, U, A, R&gt;                                                                </span><br><span class="line">Collector&lt;T, ?, R&gt; mapping(Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; mapper,                       </span><br><span class="line">                           Collector&lt;? <span class="keyword">super</span> U, A, R&gt; downstream) &#123;                       </span><br><span class="line">    BiConsumer&lt;A, ? <span class="keyword">super</span> U&gt; downstreamAccumulator = downstream.accumulator();            </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(downstream.supplier(),                                     </span><br><span class="line">                               (r, t) -&gt; downstreamAccumulator.accept(r, mapper.apply(t)),</span><br><span class="line">                               downstream.combiner(), downstream.finisher(),              </span><br><span class="line">                               downstream.characteristics());                             </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T,A,R,RR&gt; Collector&lt;T,A,RR&gt; <span class="title">collectingAndThen</span><span class="params">(Collector&lt;T,A,R&gt; downstream,  </span></span></span><br><span class="line"><span class="function"><span class="params">                                                            Function&lt;R,RR&gt; finisher)</span> </span>&#123;    </span><br><span class="line">    Set&lt;Collector.Characteristics&gt; characteristics = downstream.characteristics();        </span><br><span class="line">    <span class="keyword">if</span> (characteristics.contains(Collector.Characteristics.IDENTITY_FINISH)) &#123;            </span><br><span class="line">        <span class="keyword">if</span> (characteristics.size() == <span class="number">1</span>)                                                  </span><br><span class="line">            characteristics = Collectors.CH_NOID;                                         </span><br><span class="line">        <span class="keyword">else</span> &#123;                                                                            </span><br><span class="line">            characteristics = EnumSet.copyOf(characteristics);                            </span><br><span class="line">            characteristics.remove(Collector.Characteristics.IDENTITY_FINISH);            </span><br><span class="line">            characteristics = Collections.unmodifiableSet(characteristics);               </span><br><span class="line">        &#125;                                                                                 </span><br><span class="line">    &#125;                                                                                     </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(downstream.supplier(),                                     </span><br><span class="line">                               downstream.accumulator(),                                  </span><br><span class="line">                               downstream.combiner(),                                     </span><br><span class="line">                               downstream.finisher().andThen(finisher),                   </span><br><span class="line">                               characteristics);                                          </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="构建集合类">构建集合类</span></h4>
+<p>toCollection、toList、toSet：创建集合–&gt;将元素添加到集合–&gt;合并集合—&gt;返回集合类型。构建set的时候需要注意设置characteristics类型为无序的，不需要按照Stream顺序添加到集合中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Set&lt;T&gt;&gt; toSet() &#123;                                                    </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;((Supplier&lt;Set&lt;T&gt;&gt;) HashSet::<span class="keyword">new</span>, Set::add,            </span><br><span class="line">                               (left, right) -&gt; &#123; left.addAll(right); <span class="keyword">return</span> left; &#125;,</span><br><span class="line">                               CH_UNORDERED_ID);                                     </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="聚合为字符串">聚合为字符串</span></h4>
+<p>提供了一个可变的字符存储容器StringJoiner，然后就是将Stream中的元素添加到StringJoiner，合并多个StringJoiner，最后toString返回字符串。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Collector&lt;CharSequence, ?, String&gt; joining(CharSequence delimiter, </span><br><span class="line">                                                         CharSequence prefix,    </span><br><span class="line">                                                         CharSequence suffix) &#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(                                                  </span><br><span class="line">            () -&gt; <span class="keyword">new</span> StringJoiner(delimiter, prefix, suffix),                   </span><br><span class="line">            StringJoiner::add, StringJoiner::merge,                              </span><br><span class="line">            StringJoiner::toString, CH_NOID);                                    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="聚合reduce">聚合reduce</span></h4>
+<ul>
+<li>接受一个默认值和一个BinaryOperator参数，通过BinaryOperator将元素集合合并为一个元素</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, T&gt;                             </span><br><span class="line">reducing(T identity, BinaryOperator&lt;T&gt; op) &#123;                     </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(                                  </span><br><span class="line">            boxSupplier(identity),                               </span><br><span class="line">            (a, t) -&gt; &#123; a[<span class="number">0</span>] = op.apply(a[<span class="number">0</span>], t); &#125;,             </span><br><span class="line">            (a, b) -&gt; &#123; a[<span class="number">0</span>] = op.apply(a[<span class="number">0</span>], b[<span class="number">0</span>]); <span class="keyword">return</span> a; &#125;,</span><br><span class="line">            a -&gt; a[<span class="number">0</span>],                                           </span><br><span class="line">            CH_NOID);                                            </span><br><span class="line">&#125;  </span><br><span class="line"><span class="comment">//为了实现容器，使用数组来当存储对象的容器</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> &lt;T&gt; Supplier&lt;T[]&gt; boxSupplier(T identity) &#123;</span><br><span class="line">	<span class="keyword">return</span> () -&gt; (T[]) <span class="keyword">new</span> Object[] &#123; identity &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>同上一样，只是多个一个mapper参数用于处理向容器添加前的映射处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, U&gt;  Collector&lt;T, ?, U&gt; reducing(U identity,</span><br><span class="line">                            Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; mapper,</span><br><span class="line">                            BinaryOperator&lt;U&gt; op) &#123;                 </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(   </span><br><span class="line">      		<span class="comment">// boxSupplier == return () -&gt; (T[]) new Object[] &#123; identity &#125;; </span></span><br><span class="line">            boxSupplier(identity), <span class="comment">//转换为可伸缩数据结构，存储数据                            </span></span><br><span class="line">            (a, t) -&gt; &#123; a[<span class="number">0</span>] = op.apply(a[<span class="number">0</span>], mapper.apply(t)); &#125;,  </span><br><span class="line">            (a, b) -&gt; &#123; a[<span class="number">0</span>] = op.apply(a[<span class="number">0</span>], b[<span class="number">0</span>]); <span class="keyword">return</span> a; &#125;,   </span><br><span class="line">            a -&gt; a[<span class="number">0</span>], CH_NOID);                                    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>接受一个BinaryOperator参数，通过BinaryOperator将元素集合合并为一个元素</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Optional&lt;T&gt;&gt;                        </span><br><span class="line">reducing(BinaryOperator&lt;T&gt; op) &#123;         </span><br><span class="line">	<span class="comment">//匿名内部类提供一个容器</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">OptionalBox</span> <span class="keyword">implements</span> <span class="title">Consumer</span>&lt;<span class="title">T</span>&gt; </span>&#123;                        </span><br><span class="line">        T value = <span class="keyword">null</span>;                                               </span><br><span class="line">        <span class="keyword">boolean</span> present = <span class="keyword">false</span>;                                      </span><br><span class="line">                                                                      </span><br><span class="line">        <span class="meta">@Override</span>                                                     </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">accept</span><span class="params">(T t)</span> </span>&#123;<span class="comment">//容器添加元素，这里其实就是通过参数 BinaryOperator来决定是否用新的元素替代原有的元素                                 </span></span><br><span class="line">            <span class="keyword">if</span> (present) &#123;                                            </span><br><span class="line">                value = op.apply(value, t);                           </span><br><span class="line">            &#125;                                                         </span><br><span class="line">            <span class="keyword">else</span> &#123;                                                    </span><br><span class="line">                value = t;                                            </span><br><span class="line">                present = <span class="keyword">true</span>;                                       </span><br><span class="line">            &#125;                                                         </span><br><span class="line">        &#125;                                                             </span><br><span class="line">    &#125;                                                                 </span><br><span class="line">                                                                      </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;T, OptionalBox, Optional&lt;T&gt;&gt;(            </span><br><span class="line">            OptionalBox::<span class="keyword">new</span>, OptionalBox::accept,                    </span><br><span class="line">            (a, b) -&gt; &#123; <span class="keyword">if</span> (b.present) a.accept(b.value); <span class="keyword">return</span> a; &#125;,</span><br><span class="line">            a -&gt; Optional.ofNullable(a.value), CH_NOID);              </span><br><span class="line">&#125;   </span><br><span class="line"></span><br><span class="line"><span class="comment">//给出每个城市最高的人</span></span><br><span class="line">Comparator&lt;Person&gt; byHeight = Comparator.comparing(Person::getHeight);</span><br><span class="line">Map&lt;City, Person&gt; tallestByCity = people.stream().collect(groupingBy(Person::getCity,reducing(BinaryOperator.maxBy(byHeight))));</span><br></pre></td></tr></table></figure>
+<h4><span id="聚合为值reduce">聚合为值(reduce)</span></h4>
+<p>counting、minBy、maxBy：通过reduce将数据聚合为一个值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Long&gt; counting() &#123;                                       </span><br><span class="line">    <span class="keyword">return</span> reducing(<span class="number">0L</span>, e -&gt; <span class="number">1L</span>, Long::sum);   <span class="comment">//一个元素代表1，通过Long::sum 累加    </span></span><br><span class="line">&#125;                 </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Optional&lt;T&gt;&gt;        </span><br><span class="line">minBy(Comparator&lt;? <span class="keyword">super</span> T&gt; comparator) &#123;             </span><br><span class="line">    <span class="keyword">return</span> reducing(BinaryOperator.minBy(comparator));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="累积求值">累积求值</span></h4>
+<p>summingInt、averagingInt、summarizingInt等:返回总值、平均值、统计数据(和、平均值、最大值、最小值),注意到在针对基本数据类型创建可伸展数据结构的时候都选择了基本数据类型的数组类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Integer&gt; summingInt(ToIntFunction&lt;? <span class="keyword">super</span> T&gt; mapper) &#123;           </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(                         </span><br><span class="line">            () -&gt; <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">1</span>],                           </span><br><span class="line">            (a, t) -&gt; &#123; a[<span class="number">0</span>] += mapper.applyAsInt(t); &#125;,</span><br><span class="line">            (a, b) -&gt; &#123; a[<span class="number">0</span>] += b[<span class="number">0</span>]; <span class="keyword">return</span> a; &#125;,      </span><br><span class="line">            a -&gt; a[<span class="number">0</span>], CH_NOID);                        </span><br><span class="line">&#125;      </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Collector&lt;T, ?, Double&gt; averagingInt(ToIntFunction&lt;? <span class="keyword">super</span> T&gt; mapper) &#123;                      </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(                                      </span><br><span class="line">            () -&gt; <span class="keyword">new</span> <span class="keyword">long</span>[<span class="number">2</span>],  <span class="comment">//一个存储总值，一个存储总数                                    </span></span><br><span class="line">            (a, t) -&gt; &#123; a[<span class="number">0</span>] += mapper.applyAsInt(t); a[<span class="number">1</span>]++; &#125;,     </span><br><span class="line">            (a, b) -&gt; &#123; a[<span class="number">0</span>] += b[<span class="number">0</span>]; a[<span class="number">1</span>] += b[<span class="number">1</span>]; <span class="keyword">return</span> a; &#125;,     </span><br><span class="line">            a -&gt; (a[<span class="number">1</span>] == <span class="number">0</span>) ? <span class="number">0.0</span>d : (<span class="keyword">double</span>) a[<span class="number">0</span>] / a[<span class="number">1</span>], CH_NOID);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="转换为map">转换为Map</span></h4>
+<p>toMap、toConcurrentMap：将Stream流转换为map或者concurrentMap</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, K, U&gt;                                                      </span><br><span class="line">Collector&lt;T, ?, Map&lt;K,U&gt;&gt; toMap(Function&lt;? <span class="keyword">super</span> T, ? extends K&gt; keyMapper,  </span><br><span class="line">                                Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; valueMapper,</span><br><span class="line">                                BinaryOperator&lt;U&gt; mergeFunction) &#123;           </span><br><span class="line">    <span class="keyword">return</span> toMap(keyMapper, valueMapper, mergeFunction, HashMap::<span class="keyword">new</span>);       </span><br><span class="line">&#125;                                                                            </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, K, U, M extends Map&lt;K, U&gt;&gt;                                                </span><br><span class="line">Collector&lt;T, ?, M&gt; toMap(Function&lt;? <span class="keyword">super</span> T, ? extends K&gt; keyMapper,                        </span><br><span class="line">                            Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; valueMapper,                   </span><br><span class="line">                            BinaryOperator&lt;U&gt; mergeFunction,                                </span><br><span class="line">                            Supplier&lt;M&gt; mapSupplier) &#123; </span><br><span class="line">    <span class="comment">//map提供的merge方法，用于合并两个map</span></span><br><span class="line">    BiConsumer&lt;M, T&gt; accumulator                                                            </span><br><span class="line">            = (map, element) -&gt; map.merge(keyMapper.apply(element),                         </span><br><span class="line">                                          valueMapper.apply(element), mergeFunction);       </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(mapSupplier, accumulator, mapMerger(mergeFunction), CH_ID);  </span><br><span class="line">&#125;        </span><br><span class="line"><span class="comment">//用法 </span></span><br><span class="line">Map&lt;String, Student&gt; studentIdToStudent = students.stream().collect(toMap(Student::getId,Function.identity());</span><br></pre></td></tr></table></figure>
+<h4><span id="分组聚合">分组聚合</span></h4>
+<p>groupingBy、partitioningBy：默认会将value聚合为list，可以传递一个Collector对value进行聚合</p>
+<ul>
+<li>partitioningBy</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, D, A&gt;                                                                              </span><br><span class="line">Collector&lt;T, ?, Map&lt;Boolean, D&gt;&gt; partitioningBy(Predicate&lt;? <span class="keyword">super</span> T&gt; predicate,                      </span><br><span class="line">                                                Collector&lt;? <span class="keyword">super</span> T, A, D&gt; downstream) &#123;             </span><br><span class="line">    BiConsumer&lt;A, ? <span class="keyword">super</span> T&gt; downstreamAccumulator = downstream.accumulator();</span><br><span class="line">    <span class="comment">//将元素根据true和false分别添加到包装后的Partition容器中</span></span><br><span class="line">    BiConsumer&lt;Partition&lt;A&gt;, T&gt; accumulator = (result, t) -&gt;                                         </span><br><span class="line">            downstreamAccumulator.accept(predicate.test(t) ? result.forTrue : result.forFalse, t);   </span><br><span class="line">    BinaryOperator&lt;A&gt; op = downstream.combiner();                                                    </span><br><span class="line">    BinaryOperator&lt;Partition&lt;A&gt;&gt; merger = (left, right) -&gt;                                           </span><br><span class="line">            <span class="keyword">new</span> Partition&lt;&gt;(op.apply(left.forTrue, right.forTrue),                                   </span><br><span class="line">                            op.apply(left.forFalse, right.forFalse));  </span><br><span class="line">    <span class="comment">//元素容器，使用Partition，包装原有的Collector的容器</span></span><br><span class="line">    Supplier&lt;Partition&lt;A&gt;&gt; supplier = () -&gt;                                                          </span><br><span class="line">            <span class="keyword">new</span> Partition&lt;&gt;(downstream.supplier().get(),                                             </span><br><span class="line">                            downstream.supplier().get());                                            </span><br><span class="line">    <span class="keyword">if</span> (downstream.characteristics().contains(Collector.Characteristics.IDENTITY_FINISH)) &#123;          </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(supplier, accumulator, merger, CH_ID);                            </span><br><span class="line">    &#125;                                                                                                </span><br><span class="line">    <span class="keyword">else</span> &#123;                                                                                           </span><br><span class="line">        Function&lt;Partition&lt;A&gt;, Map&lt;Boolean, D&gt;&gt; finisher = par -&gt;                                    </span><br><span class="line">                <span class="keyword">new</span> Partition&lt;&gt;(downstream.finisher().apply(par.forTrue),                            </span><br><span class="line">                                downstream.finisher().apply(par.forFalse));                          </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(supplier, accumulator, merger, finisher, CH_NOID);                </span><br><span class="line">    &#125;                                                                                                </span><br><span class="line">&#125;    </span><br><span class="line"></span><br><span class="line"><span class="comment">//私有类提供容器</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Partition</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractMap</span>&lt;<span class="title">Boolean</span>, <span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>&lt;<span class="title">Boolean</span>, <span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> T forTrue;</span><br><span class="line">    <span class="keyword">final</span> T forFalse;</span><br><span class="line">	<span class="comment">//包装两个被包装容器 一个用于存储true的情况，一种存储false的情况</span></span><br><span class="line">    Partition(T forTrue, T forFalse) &#123;<span class="comment">//使用被包装的Collector的容器类型</span></span><br><span class="line">        <span class="keyword">this</span>.forTrue = forTrue;</span><br><span class="line">        <span class="keyword">this</span>.forFalse = forFalse;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Set&lt;Map.Entry&lt;Boolean, T&gt;&gt; entrySet() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AbstractSet&lt;Map.Entry&lt;Boolean, T&gt;&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> Iterator&lt;Map.Entry&lt;Boolean, T&gt;&gt; iterator() &#123;</span><br><span class="line">                Map.Entry&lt;Boolean, T&gt; falseEntry = <span class="keyword">new</span> SimpleImmutableEntry&lt;&gt;(<span class="keyword">false</span>, forFalse);</span><br><span class="line">                Map.Entry&lt;Boolean, T&gt; trueEntry = <span class="keyword">new</span> SimpleImmutableEntry&lt;&gt;(<span class="keyword">true</span>, forTrue);</span><br><span class="line">                <span class="keyword">return</span> Arrays.asList(falseEntry, trueEntry).iterator();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>groupingBy  要求容器是一个Map的实现类型。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//classifier   mapFactory </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, K, D, A, M extends Map&lt;K, D&gt;&gt;                                                            </span><br><span class="line">Collector&lt;T, ?, M&gt; groupingBy(Function&lt;? <span class="keyword">super</span> T, ? extends K&gt; classifier, <span class="comment">//提供map的key值函数                                    </span></span><br><span class="line">                              Supplier&lt;M&gt; mapFactory,<span class="comment">//提供容器                                                          </span></span><br><span class="line">                              Collector&lt;? <span class="keyword">super</span> T, A, D&gt; downstream) &#123;                                         </span><br><span class="line">    Supplier&lt;A&gt; downstreamSupplier = downstream.supplier();                                                    </span><br><span class="line">    BiConsumer&lt;A, ? <span class="keyword">super</span> T&gt; downstreamAccumulator = downstream.accumulator();                                 </span><br><span class="line">    BiConsumer&lt;Map&lt;K, A&gt;, T&gt; accumulator = (m, t) -&gt; &#123; <span class="comment">//m为容器，即Map</span></span><br><span class="line">    	<span class="comment">//获取key值</span></span><br><span class="line">        K key = Objects.requireNonNull(classifier.apply(t), <span class="string">"element cannot be mapped to a null key"</span>);</span><br><span class="line">        <span class="comment">//以Collectors.toList为例，这里将被包装Collector的容器放入map中，并返回被包装Collector的容器</span></span><br><span class="line">        A container = m.computeIfAbsent(key, k -&gt; downstreamSupplier.get());   </span><br><span class="line">        <span class="comment">//再使用被包装Collector的类加器向被包装Collector的容器中添加元素</span></span><br><span class="line">        downstreamAccumulator.accept(container, t);                                                            </span><br><span class="line">    &#125;;                                                                                                         </span><br><span class="line">    BinaryOperator&lt;Map&lt;K, A&gt;&gt; merger = Collectors.&lt;K, A, Map&lt;K, A&gt;&gt;mapMerger(downstream.combiner());     </span><br><span class="line">    <span class="comment">//容器 ，一般使用 HashMap</span></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)                                                                             </span><br><span class="line">    Supplier&lt;Map&lt;K, A&gt;&gt; mangledFactory = (Supplier&lt;Map&lt;K, A&gt;&gt;) mapFactory;                                     </span><br><span class="line">                                                                                                               </span><br><span class="line">    <span class="keyword">if</span> (downstream.characteristics().contains(Collector.Characteristics.IDENTITY_FINISH)) &#123;                    </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(mangledFactory, accumulator, merger, CH_ID);                                </span><br><span class="line">    &#125;                                                                                                          </span><br><span class="line">    <span class="keyword">else</span> &#123;                                                                                                     </span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)                                                                         </span><br><span class="line">        Function&lt;A, A&gt; downstreamFinisher = (Function&lt;A, A&gt;) downstream.finisher();                            </span><br><span class="line">        Function&lt;Map&lt;K, A&gt;, M&gt; finisher = intermediate -&gt; &#123;                                                    </span><br><span class="line">            intermediate.replaceAll((k, v) -&gt; downstreamFinisher.apply(v));                                    </span><br><span class="line">            <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)                                                                     </span><br><span class="line">            M castResult = (M) intermediate;                                                                   </span><br><span class="line">            <span class="keyword">return</span> castResult;                                                                                 </span><br><span class="line">        &#125;;                                                                                                     </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CollectorImpl&lt;&gt;(mangledFactory, accumulator, merger, finisher, CH_NOID);                    </span><br><span class="line">    &#125;                                                                                                          </span><br><span class="line">&#125;                                                                                                              </span><br><span class="line"></span><br><span class="line">groupingBy(classifier, HashMap::<span class="keyword">new</span>, toList());</span><br></pre></td></tr></table></figure>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2017/08/05/java8/java8之日期实现/" data-toggle="tooltip" data-placement="top" title="java8之日期实现">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2017/08/05/java8/java8之CompletableFuture/" data-toggle="tooltip" data-placement="top" title="java8之CompletableFuture">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#java8" title="java8">java8</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2017/08/05/java8/java8之Collector/";
+    var disqus_url = "http://yoursite-url/2017/08/05/java8/java8之Collector/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

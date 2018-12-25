@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          spring类型转换器(一) - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2018/11/22/spring/spring类型转换器(一)/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#spring" title="spring">spring</a>
+                            
+                        </div>
+                        <h1>spring类型转换器(一)</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2018-11-22
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="spring类型转换器一">spring类型转换器(一)</span></h1>
+<p>在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring实例化bean过程中对属性值的转换主要是使用BeanWrapperImpl实现的。</p>
+<p>首先来看下BeanWrapperImpl的使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Date birthday;</span><br><span class="line">    <span class="keyword">private</span> Dog dog;</span><br><span class="line">    <span class="keyword">private</span> ESex sex;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String,String&gt; props;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dog</span><span class="params">()</span></span>&#123;</span><br><span class="line">        log.info(<span class="string">"创建新的dog对象"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dog</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        log.info(<span class="string">"创建新的dog对象"</span>);</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="meta">@Getter</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">enum</span> ESex&#123;</span><br><span class="line">    MAlE(<span class="number">1</span>),</span><br><span class="line">    FAMALE(<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> code;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义一个处理日期的转换器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DatePropertyEditor</span> <span class="keyword">extends</span> <span class="title">PropertyEditorSupport</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAsText</span><span class="params">(String text)</span> <span class="keyword">throws</span> IllegalArgumentException </span>&#123;</span><br><span class="line">        SimpleDateFormat sf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Date date = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span>(text != <span class="keyword">null</span>) &#123;</span><br><span class="line">                date = sf.parse(String.valueOf(text));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">super</span>.setValue(date);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ParseException e) &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个BeanWrapperImpl用于包装目标bean(这里来模拟spring的内部实现)。然后注册Date类型的转换器，将值使用DatePropertyEditor转换为Date类型。调用setPropertyValue的时候，给testBean的birthday字段设置一个字符串类型的时间，在实际赋值的过程中会调用到类型转换器将字符串转换为日期类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TestBean testBean = <span class="keyword">new</span> TestBean();</span><br><span class="line">BeanWrapperImpl beanWrapper = <span class="keyword">new</span> BeanWrapperImpl(testBean);</span><br><span class="line"><span class="comment">//注册 当遇到对象属性类型为Date的时候，使用DatePropertyEditor对属性值进行处理</span></span><br><span class="line">beanWrapper.registerCustomEditor(Date.class,<span class="keyword">new</span> DatePropertyEditor());</span><br><span class="line">beanWrapper.setPropertyValue(<span class="string">"birthday"</span>,<span class="string">"2018-11-29 12:12:12"</span>);<span class="comment">//设置值</span></span><br><span class="line">beanWrapper.setAutoGrowNestedPaths(<span class="keyword">true</span>);<span class="comment">//设置嵌套属性自动创建</span></span><br><span class="line">beanWrapper.setPropertyValue(<span class="string">"sex"</span>,<span class="string">"MAlE"</span>);<span class="comment">//将值根据枚举名字转换为枚举</span></span><br><span class="line">beanWrapper.setPropertyValue(<span class="string">"dog"</span>,<span class="string">"小黑子"</span>);<span class="comment">//将值直接作为 Dog构造函数的参数反射创建对象</span></span><br><span class="line">beanWrapper.setPropertyValue(<span class="string">"dog.props[color]"</span>,<span class="string">"白色"</span>);<span class="comment">//嵌套属性设置值</span></span><br><span class="line">System.out.println(testBean.getBirthday());<span class="comment">//Thu Nov 29 12:12:12 CST 2018</span></span><br></pre></td></tr></table></figure>
+<p>同样可以实现一个String trim的转换器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringPropertyEditor</span> <span class="keyword">extends</span> <span class="title">PropertyEditorSupport</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAsText</span><span class="params">(String text)</span> <span class="keyword">throws</span> IllegalArgumentException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(text != <span class="keyword">null</span>)&#123;</span><br><span class="line">            text = text.trim();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">super</span>.setValue(text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//指定目标类型为String时，使用该转换器</span></span><br><span class="line">beanWrapper.registerCustomEditor(String.class,<span class="keyword">new</span> DatePropertyEditor());</span><br></pre></td></tr></table></figure>
+<p>BeanWrapper支持嵌套属性的赋值，当存在嵌套属性的时候需要设置 setAutoGrowNestedPaths=true。</p>
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>给属性name赋值，如果name是对象，将值作为该对象构造器的参数创建对象</td>
+</tr>
+<tr>
+<td><a href="http://bean.name" target="_blank" rel="noopener">bean.name</a></td>
+<td>属性bean是一个对象，给对象bean中的name赋值,需设置</td>
+</tr>
+<tr>
+<td>name[1]</td>
+<td>属性类型为array、list，给第n个下标赋值</td>
+</tr>
+<tr>
+<td>name{key}</td>
+<td>属性为一个Map，指定key赋值，默认会创建LinkedHashMap</td>
+</tr>
+</tbody>
+</table>
+<p>接下来我们就来研究一下BeanWrapperImpl的实现过程</p>
+<h2><span id="属性编辑propertyeditor">属性编辑PropertyEditor</span></h2>
+<p>java.beans包中声明了一个PropertyEditor接口，用于提供对属性的访问和赋值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">PropertyEditor</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object value)</span></span>;<span class="comment">//设置值</span></span><br><span class="line">    <span class="function">Object <span class="title">getValue</span><span class="params">()</span></span>;<span class="comment">//获取属性编辑器的值</span></span><br><span class="line">    <span class="function">String <span class="title">getAsText</span><span class="params">()</span></span>;<span class="comment">//获取转换为String类型的值</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setAsText</span><span class="params">(String text)</span> <span class="keyword">throws</span> java.lang.IllegalArgumentException</span>;<span class="comment">//用于转换String类型</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PropertyEditor有个默认实现类PropertyEditorSupport,如果要自定义属性转换器，直接继承该类，然后覆写setAsText、getAsText、setValue、getValue方法。在类型转换的时候如果值是字符串会调用setAsText来赋值value，其他情况下会调用setValue来赋值value，然后再调用getValue获取改变后的value值完成类型转换。相当于将PropertyEditor当做一个加工作坊，传进去一个值，返回想要类型的值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PropertyEditorSupport</span> <span class="keyword">implements</span> <span class="title">PropertyEditor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">        firePropertyChange();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAsText</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">this</span>.value != <span class="keyword">null</span>) ? <span class="keyword">this</span>.value.toString() : <span class="keyword">null</span>;</span><br><span class="line">    &#125;<span class="comment">//覆盖实现</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAsText</span><span class="params">(String text)</span> <span class="keyword">throws</span> java.lang.IllegalArgumentException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (value <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">            setValue(text);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> java.lang.IllegalArgumentException(text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>：PropertyEditor是线程不安全的，有状态的，因此每次使用时都需要创建一个，不可重用；</p>
+<h2><span id="beanwrapper">BeanWrapper</span></h2>
+<p>首先先看下BeanWrapperImpl的继承图。还有一个跟BeanWrapperImpl平级的实现类DirectFieldAccessor，用于处理getter和setter的字段访问</p>
+<p><img src="https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/BeanWrapper%E7%BB%A7%E6%89%BF.png" alt="image"></p>
+<p>从图可以看出，BeanWrapperImpl实现了3个顶级接口，提供了对象属性访问、类型转换器的注册和查找、类型转换功能</p>
+<ul>
+<li>PropertyAccessor : 声明属性的访问功能的接口</li>
+<li>PropertyEditorRegistry: 声明类型转换器的注入和查找功能的接口</li>
+<li>TypeConverter : 声明类型转换功能的接口</li>
+</ul>
+<h3><span id="注册查找类型转换器">注册\查找类型转换器</span></h3>
+<p>从继承图可以看到PropertyEditorRegistrySupport实现了PropertyEditorRegistry接口，该类默认实现了类型转换器的注册和查找功能</p>
+<p>在PropertyEditorRegistrySupport声明了多个存储结构用于存储不同的类型转换器来源。这里需要注意的是PropertyEditor是存在在Map中的，目标类型作为key，所以对于一个类型只能注册一个PropertyEditor，后面注册的会覆盖前面注册的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ConversionService conversionService;<span class="comment">//ConversionService转换器</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;Class&lt;?&gt;, PropertyEditor&gt; defaultEditors;<span class="comment">//自身默认创建的类型转换器</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;Class&lt;?&gt;, PropertyEditor&gt; overriddenDefaultEditors;<span class="comment">//</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;Class&lt;?&gt;, PropertyEditor&gt; customEditors;<span class="comment">//外界自定义添加的类型转换器</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;String, CustomEditorHolder&gt; customEditorsForPath;<span class="comment">//绑定字段名称的类型转换器</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;Class&lt;?&gt;, PropertyEditor&gt; customEditorCache;<span class="comment">//用于存储对应父类的类型转换器</span></span><br></pre></td></tr></table></figure>
+<p>同时还看到一个conversionService变量，spring提供了另一种类型转换接口Converter,通过conversionService调用对应的Converter进行类型转换，在PropertyEditorRegistrySupport同样可以注册进来conversionService，用于使用Converter进行类型转换。conversionService的详细使用会在下篇文章中讲到。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setConversionService</span><span class="params">(ConversionService conversionService)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>.conversionService = conversionService;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来来看PropertyEditor的注册过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerCustomEditor</span><span class="params">(Class&lt;?&gt; requiredType, String propertyPath, PropertyEditor propertyEditor)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (requiredType == <span class="keyword">null</span> &amp;&amp; propertyPath == <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Either requiredType or propertyPath is required"</span>);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//给属性名注册特定的类型转换器，添加到 customEditorsForPath</span></span><br><span class="line">   <span class="keyword">if</span> (propertyPath != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.customEditorsForPath == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">this</span>.customEditorsForPath = <span class="keyword">new</span> LinkedHashMap&lt;String, CustomEditorHolder&gt;(<span class="number">16</span>);</span><br><span class="line">      &#125;<span class="comment">//存储在customEditorsForPath</span></span><br><span class="line">      <span class="keyword">this</span>.customEditorsForPath.put(propertyPath, <span class="keyword">new</span> CustomEditorHolder(propertyEditor, requiredType));</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123; 注册自定义的类型转换器 添加到 customEditors</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.customEditors == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">this</span>.customEditors = <span class="keyword">new</span> LinkedHashMap&lt;Class&lt;?&gt;, PropertyEditor&gt;(<span class="number">16</span>);</span><br><span class="line">      &#125;<span class="comment">//存储在customEditors</span></span><br><span class="line">      <span class="keyword">this</span>.customEditors.put(requiredType, propertyEditor);</span><br><span class="line">      <span class="keyword">this</span>.customEditorCache = <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面提到过PropertyEditor存在在一个Map中，key是目标类型，那么这个参数propertyPath是干嘛的呢？这是为了给属性名指定专属的类型的转换器。因为一个目标类型只能有一个PropertyEditor的限制。但是有时候确实某个属性的类型转换比较特殊，这个时候就可以给这个属性名单独注册一个类型转换器，不会覆盖其他的哦。在类型转换的时候，会先根据属性名去customEditorsForPath中找可以用的PropertyEditor。</p>
+<p>来看PropertyEditor的查找流程</p>
+<p><img src="https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E6%9F%A5%E6%89%BE%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%99%A8.png" alt="image"></p>
+<p>首先根据属性名从customEditorsForPath查找特定的类型转换器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PropertyEditor <span class="title">findCustomEditor</span><span class="params">(Class&lt;?&gt; requiredType, String propertyPath)</span> </span>&#123;</span><br><span class="line">   Class&lt;?&gt; requiredTypeToUse = requiredType;</span><br><span class="line">   <span class="keyword">if</span> (propertyPath != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.customEditorsForPath != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">// Check property-specific editor first. 首先根据属性名称查找类型转换器</span></span><br><span class="line">         PropertyEditor editor = getCustomEditor(propertyPath, requiredType);</span><br><span class="line">         <span class="keyword">if</span> (editor == <span class="keyword">null</span>) &#123;</span><br><span class="line">            List&lt;String&gt; strippedPaths = <span class="keyword">new</span> LinkedList&lt;String&gt;();</span><br><span class="line">             <span class="comment">//解析字段名， a.b[0]这种</span></span><br><span class="line">            addStrippedPropertyPaths(strippedPaths, <span class="string">""</span>, propertyPath);</span><br><span class="line">            <span class="keyword">for</span> (Iterator&lt;String&gt; it = strippedPaths.iterator(); it.hasNext() &amp;&amp; editor == <span class="keyword">null</span>;) &#123;</span><br><span class="line">               String strippedPath = it.next();</span><br><span class="line">               editor = getCustomEditor(strippedPath, requiredType);</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">if</span> (editor != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> editor;</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (requiredType == <span class="keyword">null</span>) &#123;<span class="comment">//获取属性对应的类型 ，由子类实现</span></span><br><span class="line">         requiredTypeToUse = getPropertyType(propertyPath);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// No property-specific editor -&gt; check type-specific editor.</span></span><br><span class="line">   <span class="keyword">return</span> getCustomEditor(requiredTypeToUse);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据类型查找定义的类型转换器，如果没有对应的，则查找父类对应的类型转换器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> PropertyEditor <span class="title">getCustomEditor</span><span class="params">(Class&lt;?&gt; requiredType)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (requiredType == <span class="keyword">null</span> || <span class="keyword">this</span>.customEditors == <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// Check directly registered editor for type.</span></span><br><span class="line">   PropertyEditor editor = <span class="keyword">this</span>.customEditors.get(requiredType);</span><br><span class="line">   <span class="keyword">if</span> (editor == <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="comment">// Check cached editor for type, registered for superclass or interface.</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.customEditorCache != <span class="keyword">null</span>) &#123;</span><br><span class="line">         editor = <span class="keyword">this</span>.customEditorCache.get(requiredType);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (editor == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">//遍历已有的类型转换器，如果类型是requiredType的父类则使用该类型转换器</span></span><br><span class="line">         <span class="keyword">for</span> (Iterator&lt;Class&lt;?&gt;&gt; it = <span class="keyword">this</span>.customEditors.keySet().iterator(); it.hasNext() &amp;&amp; editor == <span class="keyword">null</span>;) &#123;</span><br><span class="line">            Class&lt;?&gt; key = it.next();</span><br><span class="line">            <span class="keyword">if</span> (key.isAssignableFrom(requiredType)) &#123;</span><br><span class="line">               editor = <span class="keyword">this</span>.customEditors.get(key);</span><br><span class="line">               <span class="keyword">if</span> (<span class="keyword">this</span>.customEditorCache == <span class="keyword">null</span>) &#123;<span class="comment">//缓存起来</span></span><br><span class="line">                  <span class="keyword">this</span>.customEditorCache = <span class="keyword">new</span> HashMap&lt;Class&lt;?&gt;, PropertyEditor&gt;();</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="keyword">this</span>.customEditorCache.put(requiredType, editor);</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> editor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PropertyEditorRegistrySupport 中默认添加了一些转换器，当调用 getDefaultEditor(requiredType)的时候会进行注册</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> PropertyEditor <span class="title">getDefaultEditor</span><span class="params">(Class&lt;?&gt; requiredType)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (!<span class="keyword">this</span>.defaultEditorsActive) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span> (<span class="keyword">this</span>.defaultEditors == <span class="keyword">null</span>) &#123;</span><br><span class="line">      createDefaultEditors(); <span class="comment">//先注册默认的转换器</span></span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">this</span>.defaultEditors.get(requiredType);<span class="comment">//获取默认注册的类型转换器</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createDefaultEditors</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors = <span class="keyword">new</span> HashMap&lt;Class&lt;?&gt;, PropertyEditor&gt;(<span class="number">64</span>);</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(Collection.class, <span class="keyword">new</span> CustomCollectionEditor(Collection.class));</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(Set.class, <span class="keyword">new</span> CustomCollectionEditor(Set.class));</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(SortedSet.class, <span class="keyword">new</span> CustomCollectionEditor(SortedSet.class));</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(List.class, <span class="keyword">new</span> CustomCollectionEditor(List.class));</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(SortedMap.class, <span class="keyword">new</span> CustomMapEditor(SortedMap.class));</span><br><span class="line">    <span class="keyword">this</span>.defaultEditors.put(BigDecimal.class, <span class="keyword">new</span> CustomNumberEditor(BigDecimal.class, <span class="keyword">true</span>));</span><br><span class="line">    <span class="comment">//.....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3><span id="类型转换">类型转换</span></h3>
+<p>TypeConverter接口定义了将一个值转换为目标类型的值的功能。在继承图中可以看出TypeConverterSupport对类型转换提供了默认实现。</p>
+<p>TypeConverterSupport将类型转换功能委托给typeConverterDelegate实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">convertIfNecessary</span><span class="params">(Object value, Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> TypeMismatchException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> doConvert(value, requiredType, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">T <span class="title">doConvert</span><span class="params">(Object value, Class&lt;T&gt; requiredType, MethodParameter methodParam, Field field)</span> <span class="keyword">throws</span> TypeMismatchException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (field != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.typeConverterDelegate.convertIfNecessary(value, requiredType, field);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.typeConverterDelegate.convertIfNecessary(value, requiredType, methodParam);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TypeConverterDelegate实现了类型转换的功能，创建TypeConverterDelegate的时候需要一个propertyEditorRegistry对象，用于查找匹配的类型转换器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">TypeConverterDelegate</span><span class="params">(PropertyEditorRegistrySupport propertyEditorRegistry)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>(propertyEditorRegistry, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//转换功能</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">convertIfNecessary</span><span class="params">(String propertyName, Object oldValue, Object newValue,</span></span></span><br><span class="line"><span class="function"><span class="params">			Class&lt;T&gt; requiredType, TypeDescriptor typeDescriptor)</span> <span class="keyword">throws</span> IllegalArgumentException </span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="image"></p>
+<p>首先通过propertyEditorRegistry查找自定义的类型转换器PropertyEditor和ConversionService</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PropertyEditor editor = <span class="keyword">this</span>.propertyEditorRegistry.findCustomEditor(requiredType, propertyName);</span><br><span class="line">ConversionService conversionService = <span class="keyword">this</span>.propertyEditorRegistry.getConversionService();</span><br></pre></td></tr></table></figure>
+<p>当该类型没有注册自定义的PropertyEditor，并且存在conversionService的时候，使用conversionService进行类型转换。如果conversionService中没有配置对应的converter，那么继续尝试使用默认注册的PropertyEditor。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (editor == <span class="keyword">null</span> &amp;&amp; conversionService != <span class="keyword">null</span> &amp;&amp; newValue != <span class="keyword">null</span> &amp;&amp; typeDescriptor != <span class="keyword">null</span>) &#123;</span><br><span class="line">   TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);<span class="comment">//获取value的类型</span></span><br><span class="line">   <span class="comment">//判断conversionService是否配置了指定类型的converter，没有直接跳过，继续向下执行</span></span><br><span class="line">   <span class="keyword">if</span> (conversionService.canConvert(sourceTypeDesc, typeDescriptor)) &#123;<span class="comment">//</span></span><br><span class="line">      <span class="keyword">try</span> &#123;<span class="comment">//使用conversionService完成类型转换</span></span><br><span class="line">         <span class="keyword">return</span> (T) conversionService.convert(newValue, sourceTypeDesc, typeDescriptor);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">catch</span> (ConversionFailedException ex) &#123;</span><br><span class="line">         <span class="comment">// fallback to default conversion logic below</span></span><br><span class="line">         conversionAttemptEx = ex;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果目标类型存在自定义PropertyEditor 或者 目标类型和值类型不一样则需要进行类型转换(当没有找到ProperEditor的时候会尝试查找默认注册的PropertyEditor)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (editor != <span class="keyword">null</span> || (requiredType != <span class="keyword">null</span> &amp;&amp; !ClassUtils.isAssignableValue(requiredType, convertedValue))) &#123;</span><br><span class="line">    <span class="comment">//目标类型是Collection子类的时候，将String类型的值先根据 , 分割为字符串数组</span></span><br><span class="line">   <span class="keyword">if</span> (typeDescriptor != <span class="keyword">null</span> &amp;&amp; requiredType != <span class="keyword">null</span> &amp;&amp; Collection.class.isAssignableFrom(requiredType) &amp;&amp;</span><br><span class="line">         convertedValue <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">      TypeDescriptor elementTypeDesc = typeDescriptor.getElementTypeDescriptor();</span><br><span class="line">      <span class="keyword">if</span> (elementTypeDesc != <span class="keyword">null</span>) &#123;</span><br><span class="line">         Class&lt;?&gt; elementType = elementTypeDesc.getType();</span><br><span class="line">          <span class="comment">//将值转换为String数组</span></span><br><span class="line">         <span class="keyword">if</span> (Class.class == elementType || Enum.class.isAssignableFrom(elementType)) &#123;</span><br><span class="line">            convertedValue = StringUtils.commaDelimitedListToStringArray((String) convertedValue);</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;<span class="comment">//editor不存在，查找PropertyEditorRegistrySupport中默认注册的类型转换器</span></span><br><span class="line">   <span class="keyword">if</span> (editor == <span class="keyword">null</span>) &#123;</span><br><span class="line">      editor = findDefaultEditor(requiredType);</span><br><span class="line">   &#125;<span class="comment">//使用 PropertyEditor进行类型转换</span></span><br><span class="line">   convertedValue = doConvertValue(oldValue, convertedValue, requiredType, editor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类型转换，主要分三种情况处理，值类型不是字符串，值类型是字符串数组，值类型是字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">doConvertValue</span><span class="params">(Object oldValue, Object newValue, Class&lt;?&gt; requiredType, PropertyEditor editor)</span> </span>&#123;</span><br><span class="line">    Object convertedValue = newValue;</span><br><span class="line">    <span class="comment">//当值不是String类型的时候，使用PropertyEditor的 setValue 和 getValue进行转换</span></span><br><span class="line">    <span class="keyword">if</span> (editor != <span class="keyword">null</span> &amp;&amp; !(convertedValue <span class="keyword">instanceof</span> String)) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            editor.setValue(convertedValue);</span><br><span class="line">            Object newConvertedValue = editor.getValue();</span><br><span class="line">            <span class="keyword">if</span> (newConvertedValue != convertedValue) &#123;</span><br><span class="line">                convertedValue = newConvertedValue;</span><br><span class="line">                <span class="comment">//已完成类型转换，置为空，防止最后一步进行类型转换</span></span><br><span class="line">                editor = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            <span class="comment">//throw....</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Object returnValue = convertedValue;</span><br><span class="line">    <span class="comment">//当值为字符串数组，但是目标类型不是数组的时候，将值用,连接为字符串</span></span><br><span class="line">    <span class="keyword">if</span> (requiredType != <span class="keyword">null</span> &amp;&amp; !requiredType.isArray() &amp;&amp; convertedValue <span class="keyword">instanceof</span> String[])     &#123;</span><br><span class="line">        convertedValue = StringUtils.arrayToCommaDelimitedString((String[]) convertedValue);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//值为String类型，调用PropertyEditor的 setAsText进行转换</span></span><br><span class="line">    <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">        <span class="keyword">if</span> (editor != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Use PropertyEditor's setAsText in case of a String value.</span></span><br><span class="line">            String newTextValue = (String) convertedValue;</span><br><span class="line">            <span class="keyword">return</span> doConvertTextValue(oldValue, newTextValue, editor);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (String.class == requiredType) &#123;</span><br><span class="line">            returnValue = convertedValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> returnValue;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//转换String类型的值，这里使用了oldValue触发属性改变事件并将原值传递给监听器。然后再设置新值</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">doConvertTextValue</span><span class="params">(Object oldValue, String newTextValue, PropertyEditor editor)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        editor.setValue(oldValue); <span class="comment">//这里使用oldValue，用于触发属性改变事件</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">        <span class="comment">// Swallow and proceed.</span></span><br><span class="line">    &#125;<span class="comment">//使用 setAsText 处理字符串类型的属性转换</span></span><br><span class="line">    editor.setAsText(newTextValue);</span><br><span class="line">    <span class="keyword">return</span> editor.getValue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，需要对转换后的值和目标类型进行判断，是否符合要求，如果不符合继续处理。这里主要处理了集合类型还有Number类型、基本类型转String、枚举类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (requiredType != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (convertedValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (Object.class == requiredType) &#123;</span><br><span class="line">            <span class="keyword">return</span> (T) convertedValue;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (requiredType.isArray()) &#123;</span><br><span class="line">            <span class="comment">// Array required -&gt; apply appropriate conversion of elements.</span></span><br><span class="line">            <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> String &amp;&amp; Enum.class.isAssignableFrom(requiredType.getComponentType())) &#123;</span><br><span class="line">                convertedValue = StringUtils.commaDelimitedListToStringArray((String) convertedValue);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> (T) convertToTypedArray(convertedValue, propertyName, requiredType.getComponentType());</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> Collection) &#123;</span><br><span class="line">            <span class="comment">// Convert elements to target type, if determined.</span></span><br><span class="line">            convertedValue = convertToTypedCollection(</span><br><span class="line">                (Collection&lt;?&gt;) convertedValue, propertyName, requiredType, typeDescriptor);</span><br><span class="line">            standardConversion = <span class="keyword">true</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> Map) &#123;<span class="comment">//值是map的时候，转换为 目标类型的map </span></span><br><span class="line">            convertedValue = convertToTypedMap(</span><br><span class="line">                (Map&lt;?, ?&gt;) convertedValue, propertyName, requiredType, typeDescriptor);</span><br><span class="line">            standardConversion = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (convertedValue.getClass().isArray() &amp;&amp; Array.getLength(convertedValue) == <span class="number">1</span>) &#123;</span><br><span class="line">            convertedValue = Array.get(convertedValue, <span class="number">0</span>);</span><br><span class="line">            standardConversion = <span class="keyword">true</span>;</span><br><span class="line">        &#125;<span class="comment">//将基本类型 直接转换为String</span></span><br><span class="line">        <span class="keyword">if</span> (String.class == requiredType &amp;&amp; ClassUtils.isPrimitiveOrWrapper(convertedValue.getClass())) &#123;</span><br><span class="line">            <span class="comment">// We can stringify any primitive value...</span></span><br><span class="line">            <span class="keyword">return</span> (T) convertedValue.toString();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> String &amp;&amp; !requiredType.isInstance(convertedValue)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (conversionAttemptEx == <span class="keyword">null</span> &amp;&amp; !requiredType.isInterface() &amp;&amp; !requiredType.isEnum()) &#123;</span><br><span class="line">                	<span class="comment">//直接把值当做类型的构造函数的参数 反射创建目标类型对象</span></span><br><span class="line">                    Constructor&lt;T&gt; strCtor = requiredType.getConstructor(String.class);</span><br><span class="line">            &#125;</span><br><span class="line">            String trimmedValue = ((String) convertedValue).trim();</span><br><span class="line">            <span class="keyword">if</span> (requiredType.isEnum() &amp;&amp; <span class="string">""</span>.equals(trimmedValue)) &#123;</span><br><span class="line">                <span class="comment">// It's an empty enum identifier: reset the enum value to null.</span></span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;<span class="comment">//根据枚举名字 转换为枚举对象</span></span><br><span class="line">            convertedValue = attemptToConvertStringToEnum(requiredType, trimmedValue, convertedValue);</span><br><span class="line">            standardConversion = <span class="keyword">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (convertedValue <span class="keyword">instanceof</span> Number &amp;&amp; Number.class.isAssignableFrom(requiredType)) &#123;<span class="comment">//转换number类型</span></span><br><span class="line">            convertedValue = NumberUtils.convertNumberToTargetClass(</span><br><span class="line">                (Number) convertedValue, (Class&lt;Number&gt;) requiredType);</span><br><span class="line">            standardConversion = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//如果使用editor转换失败，再次尝试使用conversionService进行转换</span></span><br><span class="line">    <span class="keyword">if</span> (!ClassUtils.isAssignableValue(requiredType, convertedValue)) &#123;</span><br><span class="line">        TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);</span><br><span class="line">            <span class="keyword">if</span> (conversionService.canConvert(sourceTypeDesc, typeDescriptor)) &#123;</span><br><span class="line">                <span class="keyword">return</span> (T) conversionService.convert(newValue, sourceTypeDesc, typeDescriptor);</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在attemptToConvertStringToEnum方法中自动根据枚举的名称转换为枚举的对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Field enumField = requiredType.getField(trimmedValue);</span><br><span class="line">ReflectionUtils.makeAccessible(enumField);</span><br><span class="line">convertedValue = enumField.get(<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<h3><span id="属性访问">属性访问</span></h3>
+<p>PropertyAccessor接口定义了属性访问的功能。通过实现setPropertyValue 和 getPropertyValue方法实现对象属性的赋值和访问。</p>
+<p>AbstractPropertyAccessor实现了PropertyAccessor接口，不过没有对setPropertyValue和getPropertyValue进行实现，而是单独提供了一个 setPropertyValues的方法， 用于批量设置属性值，同时可以通过 ignoreUnknown和ignoreInvalid参数忽略未知的属性</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPropertyValues</span><span class="params">(PropertyValues pvs, <span class="keyword">boolean</span> ignoreUnknown, <span class="keyword">boolean</span> ignoreInvalid)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    List&lt;PropertyAccessException&gt; propertyAccessExceptions = <span class="keyword">null</span>;</span><br><span class="line">    List&lt;PropertyValue&gt; propertyValues = pvs <span class="keyword">instanceof</span> MutablePropertyValues ? ((MutablePropertyValues)pvs).getPropertyValueList() : Arrays.asList(pvs.getPropertyValues());</span><br><span class="line">    Iterator var6 = propertyValues.iterator();</span><br><span class="line">    <span class="keyword">while</span>(var6.hasNext()) &#123;</span><br><span class="line">        PropertyValue pv = (PropertyValue)var6.next();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.setPropertyValue(pv);<span class="comment">//调用子类实现的setPropertyValue方法</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (NotWritablePropertyException var9) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ignoreUnknown) &#123;</span><br><span class="line">                <span class="keyword">throw</span> var9;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NullValueInNestedPathException var10) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ignoreInvalid) &#123;</span><br><span class="line">                <span class="keyword">throw</span> var10;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在AbstractNestablePropertyAccessor类中实现了setPropertyValue和getPropertyValue功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPropertyValue</span><span class="params">(String propertyName, Object value)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">   AbstractNestablePropertyAccessor nestedPa;</span><br><span class="line">   <span class="comment">//用于解决 name.map[key] 类型的属性注入</span></span><br><span class="line">   nestedPa = getPropertyAccessorForPropertyPath(propertyName);</span><br><span class="line">   PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));</span><br><span class="line">   <span class="comment">//为属性赋值</span></span><br><span class="line">    nestedPa.setPropertyValue(tokens, <span class="keyword">new</span> PropertyValue(propertyName, value));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于存在嵌套属性赋值的情况,对于嵌套的处理，其实只需要对嵌套的最底层进行类型转换，上层每一层就创建默认的值然后set到再上层对象的属性中。在这里spring使用了递归解决这个问题，创建每一层属性的对象值，使用BeanWrapper包装该对象，那么又是一个BeanWrapperImpl的赋值流程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 例如 处理 beanWrapper.setPropertyValue("dog.props[color]","白色");</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AbstractNestablePropertyAccessor <span class="title">getPropertyAccessorForPropertyPath</span><span class="params">(String propertyPath)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">int</span> pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);</span><br><span class="line">  <span class="comment">//递归发生在这里</span></span><br><span class="line">   <span class="keyword">if</span> (pos &gt; -<span class="number">1</span>) &#123;</span><br><span class="line">       <span class="comment">//解析出最上层的属性名。</span></span><br><span class="line">      String nestedProperty = propertyPath.substring(<span class="number">0</span>, pos);<span class="comment">//dog</span></span><br><span class="line">      String nestedPath = propertyPath.substring(pos + <span class="number">1</span>);<span class="comment">//剩下的属性路径 props[color]</span></span><br><span class="line">       <span class="comment">//针对最上层的属性 创建AbstractNestablePropertyAccessor 包装该对象并赋值</span></span><br><span class="line">      AbstractNestablePropertyAccessor nestedPa = getNestedPropertyAccessor(nestedProperty);</span><br><span class="line">      <span class="comment">//递归调用 直到完成 testBean注入了dog 返回对dog的包装，后续对dog的props属性处理</span></span><br><span class="line">       <span class="keyword">return</span> nestedPa.getPropertyAccessorForPropertyPath(nestedPath); <span class="comment">//处理props属性注入</span></span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;<span class="comment">//不存在嵌套属性，直接返回自己，只需要对自己本身依赖的属性赋值</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>来看这个递归的内部实现，在getNestedPropertyAccessor完成对外层属性的初始化和将该值赋值到所依赖的对象中。然后使用BeanWrapper封装属性对象，后续走属性对象的赋值流程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> AbstractNestablePropertyAccessor <span class="title">getNestedPropertyAccessor</span><span class="params">(String nestedProperty)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (<span class="keyword">this</span>.nestedPropertyAccessors == <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.nestedPropertyAccessors = <span class="keyword">new</span> HashMap&lt;String, AbstractNestablePropertyAccessor&gt;();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// Get value of bean property.</span></span><br><span class="line">   PropertyTokenHolder tokens = getPropertyNameTokens(nestedProperty);</span><br><span class="line">   String canonicalName = tokens.canonicalName;</span><br><span class="line">   Object value = getPropertyValue(tokens);<span class="comment">//获取对象中该属性的值</span></span><br><span class="line">   <span class="keyword">if</span> (value == <span class="keyword">null</span> || (value.getClass() == javaUtilOptionalClass &amp;&amp; OptionalUnwrapper.isEmpty(value))) &#123;</span><br><span class="line">      <span class="keyword">if</span> (isAutoGrowNestedPaths()) &#123;<span class="comment">//设置允许自动创建嵌套属性</span></span><br><span class="line">          <span class="comment">//值为空，嵌套的都是对象，这里就是反射创建属性对象，并将该对象set到宿主对象中</span></span><br><span class="line">         value = setDefaultValue(tokens);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;<span class="comment">//不允许的情况下 抛出异常 结束</span></span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> NullValueInNestedPathException(getRootClass(), <span class="keyword">this</span>.nestedPath + canonicalName);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// Lookup cached sub-PropertyAccessor, create new one if not found.</span></span><br><span class="line">   AbstractNestablePropertyAccessor nestedPa = <span class="keyword">this</span>.nestedPropertyAccessors.get(canonicalName);</span><br><span class="line">   <span class="keyword">if</span> (nestedPa == <span class="keyword">null</span> || nestedPa.getWrappedInstance() !=</span><br><span class="line">         (value.getClass() == javaUtilOptionalClass ? OptionalUnwrapper.unwrap(value) : value)) &#123;</span><br><span class="line">   	<span class="comment">//再次使用BeanWrapper包装 该属性对象，接下来就是对属性对象的递归赋值</span></span><br><span class="line">      nestedPa = newNestedPropertyAccessor(value, <span class="keyword">this</span>.nestedPath + canonicalName + NESTED_PROPERTY_SEPARATOR);</span><br><span class="line">      <span class="comment">// 继承外层对象的类型转换器</span></span><br><span class="line">      copyDefaultEditorsTo(nestedPa);</span><br><span class="line">      copyCustomEditorsTo(nestedPa, canonicalName);</span><br><span class="line">      <span class="keyword">this</span>.nestedPropertyAccessors.put(canonicalName, nestedPa);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> nestedPa;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建属性对象，并将该对象set到宿主对象。因为对象是指针引用的，所以在这步已经完成对宿主对象的属性赋值，接下来的流程只要对属性对象中的依赖属性进行赋值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">setDefaultValue</span><span class="params">(PropertyTokenHolder tokens)</span> </span>&#123;</span><br><span class="line">   PropertyValue pv = createDefaultPropertyValue(tokens);<span class="comment">//创建对应类型的默认值</span></span><br><span class="line">   setPropertyValue(tokens, pv);</span><br><span class="line">    <span class="comment">//这里先set 然后再get 为了应用宿主对象中的类型转换器对值进行转换</span></span><br><span class="line">   <span class="keyword">return</span> getPropertyValue(tokens);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用递归解决了嵌套赋值的问题，那么接下来就是针对最底层BeanWrapperImpl的属性赋值流程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setPropertyValue</span><span class="params">(PropertyTokenHolder tokens, PropertyValue pv)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tokens.keys != <span class="keyword">null</span>) &#123;<span class="comment">//解决集合 map类型的赋值</span></span><br><span class="line">        processKeyedProperty(tokens, pv);<span class="comment">//解决 map[key]的情况</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        processLocalProperty(tokens, pv);<span class="comment">//赋值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在processLocalProperty方法中，首先通过子类获取属性处理器，通过PropertyHandler对属性赋值。在赋值之前再次判断属性是否已经进行了类型转换，如果没有再次调用类型转换器进行转换，如果已经完成类型转换，使用ConvertedValue</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);<span class="comment">//子类提供的钩子方法</span></span><br><span class="line">Object originalValue = pv.getValue();</span><br><span class="line">Object valueToApply = originalValue;</span><br><span class="line"><span class="keyword">if</span> (!Boolean.FALSE.equals(pv.conversionNecessary)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (pv.isConverted()) &#123;<span class="comment">//如果已经完成类型转换，取类型转换后的值</span></span><br><span class="line">        valueToApply = pv.getConvertedValue();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;<span class="comment">//未完成类型转换的，再次调用类型转换器进行转换</span></span><br><span class="line">        valueToApply = convertForProperty(</span><br><span class="line">            tokens.canonicalName, oldValue, originalValue, ph.toTypeDescriptor());</span><br><span class="line">    &#125;</span><br><span class="line">    pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);</span><br><span class="line">&#125;</span><br><span class="line">ph.setValue(<span class="keyword">this</span>.wrappedObject, valueToApply);</span><br></pre></td></tr></table></figure>
+<p>对属性的访问和设置spring进行了更小粒度的封装。提供了 PropertyHandler抽象类。为什么在这里进行抽象，看PropertyHandler的两个实现，可以看到一个是BeanPropertyHandler，一个是FieldPropertyHandler，不难想象，属性一种是由getter和setter方法进行访问，一种是没有getter和setter直接反射字段进行的。</p>
+<p>如果要对map进行控制，我们可以再提供一个专门处理map的实现了类handler</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义在父类中的内部抽象类</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PropertyHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; propertyType;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> readable;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> writable;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Object <span class="title">getValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object object, Object value)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>BeanWrapperImpl提供了BeanPropertyHandler，将setter和getter传入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> BeanPropertyHandler <span class="title">getLocalPropertyHandler</span><span class="params">(String propertyName)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//反射获取</span></span><br><span class="line">   PropertyDescriptor pd = getCachedIntrospectionResults().getPropertyDescriptor(propertyName);</span><br><span class="line">   <span class="keyword">return</span> (pd != <span class="keyword">null</span> ? <span class="keyword">new</span> BeanPropertyHandler(pd) : <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>BeanPropertyHandler提供对setter和getter的访问</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanPropertyHandler</span> <span class="keyword">extends</span> <span class="title">PropertyHandler</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> PropertyDescriptor pd;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> ResolvableType <span class="title">getResolvableType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> ResolvableType.forMethodReturnType(<span class="keyword">this</span>.pd.getReadMethod());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">      <span class="keyword">final</span> Method readMethod = <span class="keyword">this</span>.pd.getReadMethod();</span><br><span class="line">      <span class="keyword">return</span> readMethod.invoke(getWrappedInstance(), (Object[]) <span class="keyword">null</span>);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(<span class="keyword">final</span> Object object, Object valueToApply)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">       <span class="keyword">final</span> Method writeMethod = (<span class="keyword">this</span>.pd <span class="keyword">instanceof</span> GenericTypeAwarePropertyDescriptor ?</span><br><span class="line">                                   ((GenericTypeAwarePropertyDescriptor) <span class="keyword">this</span>.pd).getWriteMethodForActualAccess() :</span><br><span class="line">                                   <span class="keyword">this</span>.pd.getWriteMethod());</span><br><span class="line"></span><br><span class="line">       writeMethod.invoke(getWrappedInstance(), value);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractNestablePropertyAccessor的另一个实现类DirectFieldAccessor，专门用于给字段赋值，不依赖setter和getter，那么这个是怎么实现的，看源码发现是DirectFieldAccessor中提供了一个PropertyHandler的实现类，通过Field的反射实现了setValue和getValue</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">FieldPropertyHandler</span> <span class="keyword">extends</span> <span class="title">PropertyHandler</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> Field field;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">FieldPropertyHandler</span><span class="params">(Field field)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">super</span>(field.getType(), <span class="keyword">true</span>, <span class="keyword">true</span>);</span><br><span class="line">      <span class="keyword">this</span>.field = field;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">this</span>.field.get(getWrappedInstance());</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object object, Object value)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.field.set(object, value);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/11/22/spring/spring类型转换器(二)/" data-toggle="tooltip" data-placement="top" title="spring类型转换器(二)">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/11/19/spring/spring国际化支持/" data-toggle="tooltip" data-placement="top" title="spring国际化支持">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#spring" title="spring">spring</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2018/11/22/spring/spring类型转换器(一)/";
+    var disqus_url = "http://yoursite-url/2018/11/22/spring/spring类型转换器(一)/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
