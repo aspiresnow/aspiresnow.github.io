@@ -237,6 +237,7 @@
 <li>Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可能产生的竞争和cpu切换问题</li>
 </ul>
 <p>单线程有个问题，如果某个命令执行过长，会造成其他命令的阻塞，所以redis比较适合高速、高频的访问，避免一个命令返回过多数据，导致执行过慢阻塞。</p>
+<p><strong>如果设置了最大使用的内存，则数据已有记录数达到内存限值后不能继续插入新值。</strong></p>
 <h2><span id="丰富功能">丰富功能</span></h2>
 <p>redi可以作为键值对数据库，主要提供了5种数据结构:<strong>字符串</strong>、<strong>哈希</strong>、<strong>列表</strong>、<strong>集合</strong>、<strong>有序集合</strong>，同时在字符串基础上演变出了<strong>位图(Bitmaps)<strong>和</strong>HyperLog</strong>。除此之外，还额外提供了很多功能</p>
 <ul>
@@ -772,7 +773,7 @@
 
                 </ul>
                 <p class="copyright text-muted">
-                    Copyright &copy; lizhi 2018 
+                    Copyright &copy; lizhi 2019 
                     <br>
                     Theme by <a href="http://huangxuan.me">Hux</a> 
                     <span style="display: inline-block; margin: 0 5px;">

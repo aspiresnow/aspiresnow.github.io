@@ -7,14 +7,14 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/categories/java%E5%B7%A5%E5%85%B7/</loc>
+        <loc>http://yoursite-url/categories/todo/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://yoursite-url/categories/todo/</loc>
+        <loc>http://yoursite-url/categories/java%E5%B7%A5%E5%85%B7/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -63,20 +63,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/categories/java/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://yoursite-url/categories/mysql/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/categories/linux/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -84,7 +70,7 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/categories/redis/</loc>
+        <loc>http://yoursite-url/categories/mysql/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -114,6 +100,20 @@
     <url>
         <loc>http://yoursite-url/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/categories/redis/</loc>
+        <lastmod>2018-12-25T10:28:07.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/categories/java/</loc>
+        <lastmod>2018-12-30T17:03:28.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

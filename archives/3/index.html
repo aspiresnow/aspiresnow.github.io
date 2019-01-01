@@ -216,22 +216,24 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/19/spring/spring国际化支持/">
+    <a href="/2018/11/22/spring/spring类型转换器(一)/">
         <h2 class="post-title">
-            spring国际化支持
+            spring类型转换器(一)
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring国际化支持
-...
+            spring类型转换器(一)
+在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring实例化bean过程中对属性值的转换主要是使用BeanWrapperImpl实现的。
+首先来看下BeanWrapperImpl的使用
+123456789......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-19
+            2018-11-22
         </p>
         <div class="tags">
             
@@ -256,6 +258,35 @@
             spring注解
 Annotation injection is performed before XML injection, thus the latter configuration will override the former for properties wired through both approaches.
 1&lt;context:annotation-config/......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-11-19
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#spring" title="spring">spring</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/19/spring/spring国际化支持/">
+        <h2 class="post-title">
+            spring国际化支持
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            spring国际化支持
+...
         </div>
     </a>
     
@@ -331,40 +362,6 @@ Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可�
         <div class="tags">
             
               <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/10/29/spring/spring-AOP/">
-        <h2 class="post-title">
-            spring-AOP
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            spring-AOP
-一、类
-
-AspectJAutoProxyBeanDefinitionParser.paser()
-AnnotationAwareAspectJAutoProxyCreator  需要注册这个类 实现了 BeanPostProcessor接口，加载bean时调用
-AopConfigUtils
-AbstractAutoProxyCreator.postProcessAft......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-10-29
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -451,6 +448,10 @@ AbstractAutoProxyCreator.postProcessAft......
     <ul>
       
         <li>
+          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+        </li>
+      
+        <li>
           <a href="/2018/12/25/自控/">(no title)</a>
         </li>
       
@@ -466,10 +467,6 @@ AbstractAutoProxyCreator.postProcessAft......
           <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
         </li>
       
-        <li>
-          <a href="/2018/11/22/spring/spring类型转换器DataBinder/">spring类型转换器DataBinder</a>
-        </li>
-      
     </ul>
   </div>
 </h5>
@@ -483,9 +480,9 @@ AbstractAutoProxyCreator.postProcessAft......
     <div class="tags">
         
             
-        
+            <a href="/tags/#todo" title="todo" rel="4">todo</a>
             
-            <a href="/tags/#todo" title="todo" rel="3">todo</a>
+        
             
         
             
@@ -561,7 +558,7 @@ AbstractAutoProxyCreator.postProcessAft......
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
     </div>
 </h5>
         <hr>
@@ -603,7 +600,7 @@ AbstractAutoProxyCreator.postProcessAft......
 
                 </ul>
                 <p class="copyright text-muted">
-                    Copyright &copy; lizhi 2018 
+                    Copyright &copy; lizhi 2019 
                     <br>
                     Theme by <a href="http://huangxuan.me">Hux</a> 
                     <span style="display: inline-block; margin: 0 5px;">

@@ -9,13 +9,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/todo/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/tags/%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -30,13 +23,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/elasticSearch/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/tags/Hexo/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -45,6 +31,13 @@
 
     <url>
         <loc>http://yoursite-url/tags/Blog/</loc>
+        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/elasticSearch/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -121,13 +114,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/mysql/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/tags/linux/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -135,7 +121,7 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/redis/</loc>
+        <loc>http://yoursite-url/tags/mysql/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -186,6 +172,20 @@
     <url>
         <loc>http://yoursite-url/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/redis/</loc>
+        <lastmod>2018-12-25T10:28:07.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/todo/</loc>
+        <lastmod>2018-12-30T17:03:28.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
