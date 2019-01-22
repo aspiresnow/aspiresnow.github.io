@@ -216,25 +216,23 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/09/hbase/hbase参数调优/">
+    <a href="/2017/09/15/hbase/hbase的memstore/">
         <h2 class="post-title">
-            hbase调优
+            hbase的memstore
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            Hbase调优
-[HBase优化相关]
-zookeeper.session.timeout
-默认值：3分钟(180000ms)
-说明：RegionServer与Zookeeper间的连接超时时间。当超时时间到后，ReigonServer会被Zookeeper从RS集群清单中移除，HMaster收到移除通知后，会对这台server负责的regions重新balance，让其他存活的Region......
+            Memstore是HBase框架中非常重要的组成部分之一，是HBase能够实现高性能随机读写至关重要的一环。深入理解Memstore的工作原理、运行机制以及相关配置，对hbase集群管理、性能调优都有着非常重要的帮助。
+Memstore 概述
+HBase中，Region是集群节点上最小的数据服务单元，用户数据表由一个或多个Region组成。在Region中每个ColumnFamily的数据组......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-09
+            2017-09-15
         </p>
         <div class="tags">
             
@@ -248,23 +246,22 @@ zookeeper.session.timeout
 
 <div class="post-preview">
 
-    <a href="/2017/09/09/hbase/hbase过滤器/">
+    <a href="/2017/09/14/hbase/hbase的WAL详解/">
         <h2 class="post-title">
-            hbase过滤器
+            hbase的WAL详解
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            hbase过滤器
-​
-...
+            hbase的WAL详解
+WAL(Write-Ahead Logging)是一种高效的日志算法，基本原理是在数据写入之前首先顺序写入日志，然后再写入缓存，等到缓存写满之后统一落盘。之所以能够提升写性能，是因为WAL将一次随机写转化为了一次顺序写加一次内存写。提升写性能的同时，WAL可以保证数据的可靠性，即在任何情况下数据不丢失。假如一次写入完成之后发生了宕机，即使所有缓存中的数据丢失，也可以通......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-09
+            2017-09-14
         </p>
         <div class="tags">
             
@@ -278,25 +275,27 @@ zookeeper.session.timeout
 
 <div class="post-preview">
 
-    <a href="/2017/09/08/hbase/hbase的增删改查/">
+    <a href="/2017/09/14/hbase/hbase中HFile详解/">
         <h2 class="post-title">
-            hbase读写操作
+            hbase中HFile详解
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            hbase的增删改查
-hbase写操作
-客户端流程解析
+            hbase中HFile详解
+HBase中KeyValue数据的存储格式，是Hadoop的二进制格式文件，有固定的结构。实际上StoreFile就是对HFile做了轻量级包装，即StoreFile底层就是HFile
+HFile的物理结构
+HFile逻辑结构
+HFile V2的逻辑结构如下图所示：
 
-用户提交put请求后，HBase客户端会将put请求添加到本地buffer中，符合一定条件就会通过AsyncProcess异步批量提交。HBase默认设置autoflush=true，表示put请求直接会提交给服务器进行处理；用户可以设置autoflush=false，这样的话put请求会首先放到本地buffer，等到本地buffer......
+文件主要分为四个部分：Scanned block section，Non-scanned blo......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-08
+            2017-09-14
         </p>
         <div class="tags">
             
@@ -310,39 +309,26 @@ hbase写操作
 
 <div class="post-preview">
 
-    <a href="/2017/09/07/hbase/hbase设计模型/">
+    <a href="/2017/09/14/hbase/hbase的容错/">
         <h2 class="post-title">
-            hbase数据模型
+            hbase的容错
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            Hbase设计模型
-HBase基本组件
-
-
-
-Client
-
-使用HBase RPC机制与HMaster和HRegionServer进行通信
-Client与HMaster进行通信进行管理类操作
-Client与HRegionServer进行数据读写类操作
-Client访问ZK获取_ROOT_表位置，获取集群的属性
-缓存Region的位置信息来加快对HBase的访问
-
-
-
-
-
-HMaster
-H......
+            HBase容错性
+Master容错：Zookeeper重新选择一个新的Master
+　　1).无Master过程中，数据读取仍照常进行；
+　　2).无master过程中，region切分、负载均衡等无法进行；
+RegionServer容错：定时向Zookeeper汇报心跳，如果一旦时间内未出现心跳
+　　1).Master将该RegionServer上的Region重新分配到其他RegionS......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-07
+            2017-09-14
         </p>
         <div class="tags">
             
@@ -356,24 +342,26 @@ H......
 
 <div class="post-preview">
 
-    <a href="/2017/09/06/hbase/hbase认识与安装配置/">
+    <a href="/2017/09/13/hbase/hbase的RegionServer定位/">
         <h2 class="post-title">
-            hbase认识与安装配置
+            hbase的RegionServer定位
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            hbase认识与安装配置
-认识
-HBase是一种构建在HDFS之上提供高可靠性、高性能、列存储、分布式、可伸缩、实时读写的存储系统。在需要实时读写、随机访问超海量数据时，可以使用HBase。与hadoop一样，通过不断增加廉价的服务器，可以对HBase进行横向扩展，增加HBase的计算和存储能力。
-HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底层存储支持，H......
+            hbase的RegionServer定位
+Hbase 使用三层类似B+树的结构来保存region位置：
+
+第一层是保存zookeeper里面的文件，它持有root region的位置。
+第二层root region是.META.表的第一个region其中保存了.META.z表其它region的位置。通过root region，我们就可以访问.META.表的数据。
+.META.是第三层，它是一......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-06
+            2017-09-13
         </p>
         <div class="tags">
             
@@ -464,23 +452,23 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -565,6 +553,10 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -574,7 +566,7 @@ HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

@@ -216,25 +216,34 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/27/hbase/hbase的读流程/">
+    <a href="/2017/10/20/spring/spring boot初识/">
         <h2 class="post-title">
-            hbase的读流程
+            spring-boot初识
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            和写流程相比，HBase读数据是一个更加复杂的操作流程，这主要基于两个方面的原因：其一是因为整个HBase存储引擎基于LSM-Like树实现，因此一次范围查询可能会涉及多个分片、多块缓存甚至多个数据存储文件；其二是因为HBase中更新操作以及删除操作实现都很简单，更新操作并没有更新原有数据，而是使用时间戳属性实现了多版本。删除操作也并没有真正删除原有数据，只是插入了一条打上”deleted”......
+            spring boot初识
+使用spring boot
+
+
+继承
+
+
+引入
+如果不想继承spring-boot-starter-parent，可以引入spring-boot-dependencies的jar包，指定scope为import。
+1234567891011121314151617181920&lt;dependencyManagement&gt;     &lt;dependen......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-27
+            2017-10-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#hbase" title="hbase">hbase</a>
+              <a href="/tags/#spring-boot" title="spring-boot">spring-boot</a>
             
         </div>
     
@@ -244,26 +253,35 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/27/hbase/hbase的读写优化/">
+    <a href="/2017/10/16/java基础/java反射之对象创建/">
         <h2 class="post-title">
-            hbase的读写优化
+            对象的创建
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            任何系统都会有各种各样的问题，有些是系统本身设计问题，有些却是使用姿势问题。HBase也一样，在真实生产线上大家或多或少都会遇到很多问题，有些是HBase还需要完善的，有些是我们确实对它了解太少。总结起来，大家遇到的主要问题无非是Full GC异常导致宕机问题、RIT问题、写吞吐量太低以及读延迟较大。
-Full GC问题之前在一些文章里面已经讲过它的来龙去脉，主要的解决方案目前主要有两方面需......
+            对象的创建
+java创建对象的方式
+
+1、直接new
+2、通过反射clazz的newInstance调用无参构造函数创建对象
+3、通过反射获取构造函数直接newInstance创建对象
+4、实现Serializable接口，通过反系列化创建对象
+5、实现Cloneable接口，覆盖clone方法，通过克隆创建对象
+
+
+1234567891011121314151617181920212223......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-27
+            2017-10-16
         </p>
         <div class="tags">
             
-              <a href="/tags/#hbase" title="hbase">hbase</a>
+              <a href="/tags/#反射" title="反射">反射</a>
             
         </div>
     
@@ -273,25 +291,30 @@ Full GC问题之前在一些文章里面已经讲过它的来龙去脉，主要�
 
 <div class="post-preview">
 
-    <a href="/2017/09/21/hbase/hbase的HFile合并/">
+    <a href="/2017/10/16/java基础/java反射之泛型/">
         <h2 class="post-title">
-            hbase的HFile合并
+            泛型
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            了解HBase的童鞋都知道，HBase是一种Log-Structured Merge Tree架构模式，用户数据写入先写WAL，再写缓存，满足一定条件后缓存数据会执行flush操作真正落盘，形成一个数据文件HFile。随着数据写入不断增多，flush次数也会不断增多，进而HFile数据文件就会越来越多。然而，太多数据文件会导致数据查询IO次数增多，因此HBase尝试着不断对这些文件进行合并，......
+            泛型
+Java 泛型中? super T和? extends T的区别
+​	经常有List&lt;? super T&gt;、Set&lt;? extends T&gt;的声明，是什么意思呢？&lt;? super T&gt;表示包括T在内的任何T的父类，&lt;? extends T&gt;表示包括T在内的任何T的子类。
+
+super
+​	List&lt;? super Integer&g......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-21
+            2017-10-16
         </p>
         <div class="tags">
             
-              <a href="/tags/#hbase" title="hbase">hbase</a>
+              <a href="/tags/#反射" title="反射">反射</a>
             
         </div>
     
@@ -301,26 +324,30 @@ Full GC问题之前在一些文章里面已经讲过它的来龙去脉，主要�
 
 <div class="post-preview">
 
-    <a href="/2017/09/19/hbase/hbase的BlockCache/">
+    <a href="/2017/10/15/java基础/动态代理/">
         <h2 class="post-title">
-            hbase的BlockCache
+            动态代理
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            hbase的BlockCache
-和其他数据库一样，优化IO也是HBase提升性能的不二法宝，而提供缓存更是优化的重中之重。最理想的情况是，所有数据都能够缓存到内存，这样就不会有任何文件IO请求，读写性能必然会提升到极致。然而现实是残酷的，随着请求数据的不断增多，将数据全部缓存到内存显得不合实际。幸运的是，我们并不需要将所有数据都缓存起来，根据二八法则，80%的业务请求都集中在20%的热点数......
+            动态代理
+代理的实质是在运行期间手动创建class类，对被代理对象的方法进行代理，调用被代理对象的方法，动态代理就是动态的创建Proxy对象，用完之后销毁class类，避免冗杂，动态代理的实现方式主要有以下两种。
+CGLIB代理主要是对指定的类生成一个子类，覆盖其中的所有方法，所以该类或方法不能声明称final的。
+
+一、通过jdk实现InvocationHandler实现动态代理
+1、定义......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-19
+            2017-10-15
         </p>
         <div class="tags">
             
-              <a href="/tags/#hbase" title="hbase">hbase</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -330,27 +357,44 @@ Full GC问题之前在一些文章里面已经讲过它的来龙去脉，主要�
 
 <div class="post-preview">
 
-    <a href="/2017/09/15/hbase/hbase的memstore/">
+    <a href="/2017/10/02/elasticSearch入门/">
         <h2 class="post-title">
-            hbase的memstore
+            elasticSearch入门
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            Memstore是HBase框架中非常重要的组成部分之一，是HBase能够实现高性能随机读写至关重要的一环。深入理解Memstore的工作原理、运行机制以及相关配置，对hbase集群管理、性能调优都有着非常重要的帮助。
-Memstore 概述
-HBase中，Region是集群节点上最小的数据服务单元，用户数据表由一个或多个Region组成。在Region中每个ColumnFamily的数据组......
+            elasticSearch入门
+
+elasticSearch是一个实时的分布式搜索和分析引擎，基于lucene，可以用于全文搜索、结构化搜索、分析等功能。
+
+分布式的实时文件存储，每个字段都可以被索引用于搜索
+分布式的实时分析搜索引擎
+支持扩展，可以处理PB级结构化和非结构化的数据
+面向文档存储，支持复杂的数据格式存储
+
+
+
+概念介绍
+
+es中的概念对比关系数据库
+
+
+
+
+ES
+Indexe......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-09-15
+            2017-10-02
         </p>
         <div class="tags">
             
-              <a href="/tags/#hbase" title="hbase">hbase</a>
+              <a href="/tags/#elasticSearch" title="elasticSearch">elasticSearch</a>
             
         </div>
     
@@ -437,23 +481,23 @@ HBase中，Region是集群节点上最小的数据服务单元，用户数据表
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -538,6 +582,10 @@ HBase中，Region是集群节点上最小的数据服务单元，用户数据表
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -547,7 +595,7 @@ HBase中，Region是集群节点上最小的数据服务单元，用户数据表
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

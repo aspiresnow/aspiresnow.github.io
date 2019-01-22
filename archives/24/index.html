@@ -216,36 +216,167 @@
 
 <div class="post-preview">
 
-    <a href="/2017/03/18/hexo-theme-beantech/">
+    <a href="/2017/08/05/java8/java8之CompletableFuture/">
         <h2 class="post-title">
-            [Hexo] Theme BeanTech
+            java8之CompletableFuture
         </h2>
         <h3 class="post-subtitle">
-            This is hexo theme Demo.
+            
         </h3>
         <div class="post-content-preview">
-            
-Ported Theme of Hux Blog, Thank Huxpro for designing such a flawless theme.
-This BeanTech theme created by YuHsuan modified from the original Porter Kaijun
+            java8之CompletableFuture
+CompletableFuture实现了Future接口，是jdk8新添加的对与并发编程的扩展支持。通过CompletableFuture可以方便的操作多个异步任务、执行结果的回调等操作。
 
-
-
-
-Usage
-
-I publish the whole project f......
+CompletableFuture优点
+jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞获取异步任务的结果。但是依然存在一些局限性......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-03-18
+            2017-08-05
         </p>
         <div class="tags">
             
-              <a href="/tags/#Hexo" title="Hexo">Hexo</a>
+              <a href="/tags/#java8" title="java8">java8</a>
             
-              <a href="/tags/#Blog" title="Blog">Blog</a>
+              <a href="/tags/#多线程" title="多线程">多线程</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/08/05/java8/java8之Optional/">
+        <h2 class="post-title">
+            java8之Optional
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java8之Optional
+开发过程中最常遇到的是空指针异常，jdk8对空指针进行了再次处理，Optional类就是一个简单的容器，可以通过isPresent()方法判断是否为空，然后通过get()方法返回容器中对象，但是这样用跟判断空没什么区别，Optional提供了一些其他的方法，可以避免这种判断
+
+Optional实现
+Optional是一个值容器。在Optional对象中维护了一个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-08-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#java8" title="java8">java8</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/08/05/java8/java8之Comparator/">
+        <h2 class="post-title">
+            java8之Comparator
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java8之Comparator
+java8新提供了一个Comparator方法接口，通过实现Comparator接口可以实现对象的排序。Comparator接口中提供了一些默认方法来更加方便使用排序，通过静态方法提供了一些java8内部实现Comparator的实现类对象，比如正序Comparator，逆序Comparator，处理Null的NullComparator。
+
+Compara......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-08-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#java8" title="java8">java8</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/08/05/java8/java8之Stream流/">
+        <h2 class="post-title">
+            java8之Stream流
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java8之Stream流
+Stream是java8的新特性之一，为了方便操作集合类数据结构，结合lambda表达式能够更好的处理集合的遍历、查询、映射、聚合等操作。
+
+原理
+流的工作过程
+
+一个数据源(如集合)来执行一个查询;
+多个中间操作链，形成一条流的流水线;
+一个终端操作，执行流水线，并能生成结果。
+
+特点
+
+数据源可以是无限，但是不存储任何数据
+流只能遍历一次，遍历完后，流就被关闭......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-08-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#java8" title="java8">java8</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/08/05/java8/java8之lambda表达式/">
+        <h2 class="post-title">
+            java8之lambda表达式
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java8之lambda表达式
+为了使方法更加的灵活，可以将行为作为参数传递，这样就需要用到匿名内部类，为了简化匿名内部类的书写，jdk8推出了lambda表达式，lambda表达式基本上就是一个只有一个抽象方法的匿名内部类对象，通过使用lambda表达式能够使代码更加的简洁。
+
+lambda语法
+lambda表达式格式常见的有两种 (parameters) -&gt; expression......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-08-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#java8" title="java8">java8</a>
             
         </div>
     
@@ -263,6 +394,10 @@ I publish the whole project f......
             <a href="/archives/23/">&larr; Newer Posts</a>
         </li>
     
+    
+        <li class="next">
+            <a href="/archives/25/">Older Posts &rarr;</a>
+        </li>
     
 </ul>
 
@@ -328,23 +463,23 @@ I publish the whole project f......
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -429,6 +564,10 @@ I publish the whole project f......
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -438,7 +577,7 @@ I publish the whole project f......
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

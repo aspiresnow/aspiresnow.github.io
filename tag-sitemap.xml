@@ -86,20 +86,6 @@
     </url>
 
     <url>
-        <loc>http://yoursite-url/tags/java8/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://yoursite-url/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</loc>
-        <lastmod>2018-12-25T10:23:42.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://yoursite-url/tags/spring/</loc>
         <lastmod>2018-12-25T10:23:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -186,6 +172,27 @@
     <url>
         <loc>http://yoursite-url/tags/todo/</loc>
         <lastmod>2018-12-30T17:03:28.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</loc>
+        <lastmod>2019-01-22T16:22:46.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/utils/</loc>
+        <lastmod>2019-01-22T16:22:46.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://yoursite-url/tags/java8/</loc>
+        <lastmod>2019-01-22T16:25:17.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

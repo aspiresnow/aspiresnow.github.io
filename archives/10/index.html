@@ -216,27 +216,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/05/24/设计模式/设计模式之适配器模式/">
+    <a href="/2018/05/29/设计模式/设计模式之观察者模式/">
         <h2 class="post-title">
-            设计模式之适配器模式
+            设计模式之观察者模式
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            设计模式之适配器模式
-适配器模式是将一个类的接口变为客户端想要的另外一个接口，从而使原本因接口不匹配无法在一起工作的两个类能够在一起工作。适配器的目的是复用已有的功能。
+            设计模式之观察者模式
+观察者模式是对象的行为模式，定义了一种一对多的依赖关系，多个观察者对象同时监听一个主题对象，当主题对象状态发生改变时，会通知所有观察者对象更新。是一种发布-订阅模式。
 
-认识
-适配器分为类适配器和对象适配器两种
-缺省适配:为一个接口提供缺省实现，一般是一个抽象类
-适配器模式跟代理模式的不同之处：适配器模式中适配器和被适配对象中的接口方法不一致，适配器对被适配对象中的接口进行了改造或者扩展。......
+思考
+在观察者模式中，观察者和目标是单向依赖的，只有观察者依赖目标，观察者只能被动的去等到目标的通知，等待目标传值给它。
+
+推模型是假定目标知道观察者需要的数据；而拉模型是目标不知道观察者具体需要什么数......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-05-24
+            2018-05-29
         </p>
         <div class="tags">
             
@@ -250,31 +250,31 @@
 
 <div class="post-preview">
 
-    <a href="/2018/05/24/设计模式/设计模式之代理模式/">
+    <a href="/2018/05/29/设计模式/设计模式之策略模式/">
         <h2 class="post-title">
-            设计模式之代理模式
+            设计模式之策略模式
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            设计模式之代理模式
-代理模式是对象的结构模式。代理模式给某一个对象提供一个代理对象，并由代理对象控制对原对象的引用。
-
-认识
-
-客户端操作代理对象时，具体的操作还是由被代理对象实现，客户端操作代理，代理操作被代理，被代理对象对于客户端是透明的。
-代理模式同装饰模式不同在，装饰模式是要对原对象的功能进行增强，而代理模式一般只是对原对象的使用进行控制，并不会增加原对象的任何功能。
+            设计模式之策略模式
+策略模式属于对象的行为模式。将类中的行划分为固定行为和变化行为，把变化行为抽离出去抽象，提供实现类去实现不同的细节。在固定行为中控制选择变动行为实现类来实现不同的功能。这样当遇到类的行为变化时，类中的固定行为不需要改动，通过扩展变化行为实现类达到行为变化的目的，体现了设计中的开闭原则，分离变化和不变。
 
 思考
 
-保护......
+
+本质：抽离变化算法，选择实现
+
+
+策略模式的重心
+策略模式......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-05-24
+            2018-05-29
         </p>
         <div class="tags">
             
@@ -288,26 +288,25 @@
 
 <div class="post-preview">
 
-    <a href="/2018/05/24/设计模式/设计模式之装饰模式/">
+    <a href="/2018/05/28/设计模式/设计模式之模板方法模式/">
         <h2 class="post-title">
-            设计模式之装饰模式
+            设计模式之模板方法模式
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            设计模式之装饰模式
-通过装饰模式可以动态的扩展对象功能。可以在对象执行完相关方法后再执行包装在外面的方法。
+            设计模式之模板方法模式
+java最重要的一个特性就是继承，通过父类定义一些公共的方法，将变化的方法放到子类中去实现。在父类中定义的方法就是模板，所有的子类都会继承父类的方法。
 
 认识
-透明式装饰模式：装饰对象和被装饰对象实现完全相同的接口，或者装饰对象完全继承被装饰对象，装饰对象没有定义额外的方法实现。
-半透明装饰模式：装饰对象在实现被装饰对象的接口或者继承被装饰对象之外，还有单独额外的自定义方法。这时装饰角色实际上已经成为一个适配器角色。适配器类的接口会比......
+模板方法模式是类的行为模式。准备一个抽象类，将部分逻辑以具体方法以及具体构造函数的形式实现，然后声明一些抽象方法来迫使子类实现剩余的逻辑。不同的子类可以以不同的方式实现这些抽象方法，从而对剩余的逻辑有不同的实现......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-05-24
+            2018-05-28
         </p>
         <div class="tags">
             
@@ -321,64 +320,60 @@
 
 <div class="post-preview">
 
-    <a href="/2018/05/24/设计模式/设计模式之门面模式/">
+    <a href="/2018/05/25/设计模式/设计模式之组合模式/">
         <h2 class="post-title">
-            设计模式之门面模式
+            设计模式之组合模式
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            设计模式之门面模式
-提供一个门面去调用系统各个子模块，客户端调用门面，减少客户端与系统中各个子模块的交互，松散耦合。提现了迪米特法则。
-
-思考
-
-Facade知道各个子模块，而各个子模块不应该知道Facade的存在
-客户端也可以直接调用各个子模块，有外观也可以不使用
-
-使用场景
-当需要调用系统内部多个子模块的时候，为了避免客户端分别调用子模块，提供一个门面，让门面分别去调用各个子模块，然后客......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-05-24
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#设计模式" title="设计模式">设计模式</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/05/24/设计模式/设计模式之原型模式/">
-        <h2 class="post-title">
-            设计模式之原型模式
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            设计模式之原型模式
-所谓原型模式就是用原型实例指定创建对象的种类，并且通过复制这些原型创建新的对象。
+            设计模式之组合模式
+组合模式组合多个对象形成树形结构以表示“整体-部分”的结构层次。
 
 认识
-原型模式要求对象实现一个可以“克隆”自身的接口，这样就可以通过复制一个实例对象本身来创建一个新的实例。通过原型实例创建新的对象，就不再需要关心这个实例本身的类型，只要实现了克隆自身的方法，就可以通过这个方法来获取新的对象，而无须再去通过new来创建。
-思考
-原型模式属于对象的创建模式......
+组合模式让我们能用树形方式创建对象的结构，树里面包含了Composite以及Leaf的对象。使用组合结构，我们能把相同的操作应用在Composite和Leaf上，即大多数情况下，我们可以忽略Composite和Leaf之间的差别，以相同的方式使用它们。为了保持透明性，Leaf和Composite都要......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-05-24
+            2018-05-25
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#设计模式" title="设计模式">设计模式</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/05/25/设计模式/设计模式之桥接模式/">
+        <h2 class="post-title">
+            设计模式之桥接模式
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            设计模式之桥接模式
+如果说某个系统能够从多个角度来进行分类，且每一种分类都可能会变化，那就需要将多个角度分别分离出来，使得他们能独立变化，减少他们之间的耦合，这个分离过程就使用了桥接模式。所谓桥接模式就是将多个抽象部分和实现部分隔离开来，使得他们能够独立变化。
+
+认识
+桥接模式将继承关系转化成关联关系，封装了变化，完成了解耦，减少了系统中类的数量，也减少了代码量。
+思考
+
+桥接模式实现了两个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-05-25
         </p>
         <div class="tags">
             
@@ -469,23 +464,23 @@ Facade知道各个子模块，而各个子模块不应该知道Facade的存在
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -570,6 +565,10 @@ Facade知道各个子模块，而各个子模块不应该知道Facade的存在
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -579,7 +578,7 @@ Facade知道各个子模块，而各个子模块不应该知道Facade的存在
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

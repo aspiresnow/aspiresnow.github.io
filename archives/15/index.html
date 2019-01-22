@@ -216,112 +216,23 @@
 
 <div class="post-preview">
 
-    <a href="/2017/11/11/Responses 部分/">
+    <a href="/2017/11/21/多线程/java并发之CountDownLatch/">
         <h2 class="post-title">
-            Requests部分
+            java并发之CountDownLatch
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            Requests部分
-
-
-
-Header
-解释
-示例
-
-
-
-
-Accept
-指定客户端能够接收的内容类型
-Accept: text/plain, text/html
-
-
-Accept-Charset
-浏览器可以接受的字符编码集。
-Accept-Charset: iso-8859-5
-
-
-Accept-Encoding
-指定浏览器可以支持的web服务器返回内容压缩编码类型。
-Accept-En......
+            java并发之CountDownLatch
+当创建一个 new CountDownLatch(n)的时候相当执行了n次lock.lock()，将AQS的state设置为n，对资源重入了n次，后面每次执行await相当于去获取这个锁的资源，都会被阻塞，除非state减为0。
+调用countDown就是讲state减1，需要执行n次countDown才能释放资源。当state减为0的时候唤醒等待......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-11-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#todo" title="todo">todo</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2017/11/11/线上问题排查/">
-        <h2 class="post-title">
-            线上问题排查
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            问题排查
-
-Linux环境下如何查找哪个线程使用CPU最长
-
-获取项目的pid，jps或者ps -ef | grep java，这个前面有讲过
-top -H -p pid 或者使用 jps pid 顺序不能改变
-top -H -p pid 打出来的LWP是十进制的，”jps pid”打出来的本地线程号是十六进制的，转换一下，就能定位到占用CPU高的线程的当前线程堆栈了
-
-
-
-...
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2017-11-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#问题排查" title="问题排查">问题排查</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2017/10/29/多线程/java并发之StampedLock/">
-        <h2 class="post-title">
-            java并发之StampedLock
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            java并发之StampedLock
-StamedLock 防止读线程多的时候写线程饥饿现象，读不阻塞写，写成功后重读
-...
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2017-10-29
+            2017-11-21
         </p>
         <div class="tags">
             
@@ -335,26 +246,23 @@ StamedLock 防止读线程多的时候写线程饥饿现象，读不阻塞写，
 
 <div class="post-preview">
 
-    <a href="/2017/10/29/多线程/java并发之ReentrantLock/">
+    <a href="/2017/11/21/多线程/java并发之CyclicBarrier/">
         <h2 class="post-title">
-            java并发之ReentrantLock
+            java并发之CyclicBarrier
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            java并发之ReentrantLock
-ReentrantLock是基于AQS实现的可重入独享锁，内部提供了公平锁和非公平锁两种方式。
-
-ReentrantLock和synchronized的区别
-
-ReentrantLock在等待锁时可以使用lockInterruptibly()方法选择中断， 改为处理其他事情，而synchronized关键字，线程需要一直等待下去。同样的，tryLoc......
+            java并发之CyclicBarrier
+CyclicBarrier初始化时规定一个数目，然后计算调用了CyclicBarrier.await()进入等待的线程数。当线程数达到了这个数目时，所有进入等待状态的线程被唤醒并继续。
+当线程A调用Exchange对象的exchange()方法后，他会陷入阻塞状态，直到线程B也调用了exchange()方法，然后以线程安全的方式交换数据，之后线程A和......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-10-29
+            2017-11-21
         </p>
         <div class="tags">
             
@@ -368,26 +276,96 @@ ReentrantLock在等待锁时可以使用lockInterruptibly()方法选择中断，
 
 <div class="post-preview">
 
-    <a href="/2017/10/29/多线程/java并发之无锁CAS/">
+    <a href="/2017/11/16/多线程/java并发之LockSupport/">
         <h2 class="post-title">
-            java并发之无锁CAS
+            java并发之LockSupport
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            java并发之无锁CAS
-上面的乐观锁用到的机制就是CAS，Compare and Swap。
-CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当且仅当预期值A和内存值V相同时，将内存值V修改为B，否则什么都不做。
-非阻塞算法 （nonblocking algorithms）
-一个线程的失败或者挂起不应该影响其他线程的失败或挂起的算法。
-现代的CPU提供了特殊的指令，可以自动更新......
+            java并发之LockSupport
+LockSupport提供了park和unpark方法， 通过这两个方法实现线程的阻塞和唤醒，park和unpark方法类比suspend和resume方法，不过避免了这两个方法可能会出现的死锁问题。JUC包中的线程阻塞和唤醒都依赖LockSupport类。LockSupport底层是通过Unsafe实现线程的阻塞。
+
+实现
+LockSupport和每个......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-10-29
+            2017-11-16
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#多线程" title="多线程">多线程</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/11/14/java基础/java之动态代理/">
+        <h2 class="post-title">
+            java之动态代理
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java之动态代理
+
+什么是AOP**
+​    AOP（Aspect Orient Programming），也就是面向切面编程
+​    面向对象编程（OOP）是从静态角度考虑程序结构， 面向切面编程（AOP）是从动态角度考虑程序运行过程
+AOP的作用
+​    处理一些具有横切性质的系统性服务，如事务管理、安全检查、缓存、对象池管理等
+AOP的实现原理
+​    AOP 实际上是由目标......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-11-14
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#spring" title="spring">spring</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/11/13/多线程/java并发之ThreadLocal/">
+        <h2 class="post-title">
+            java并发之ThreadLocal
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java并发之ThreadLocal
+多线程中存在共享变量并发的问题，如果每个线程的变量只能自己才能访问到，那么就不会存在线程安全问题。ThreadLocal就是jdk中提供了用于存储线程本地变量的类。
+对于多线程资源共享的问题，同步机制采用了“以时间换空间”的方式，而ThreadLocal采用了“以空间换时间”的方式。
+
+实现原理
+
+
+每个线程都一个一个threadLocals变量，是一个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-11-13
         </p>
         <div class="tags">
             
@@ -478,23 +456,23 @@ CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -579,6 +557,10 @@ CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -588,7 +570,7 @@ CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

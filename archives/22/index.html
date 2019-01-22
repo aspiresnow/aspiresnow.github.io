@@ -216,22 +216,83 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/01/多线程/java线程状态/">
+    <a href="/2017/09/06/hbase/hbase认识与安装配置/">
         <h2 class="post-title">
-            java线程状态
+            hbase认识与安装配置
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            java线程状态
-线程从创建到销毁经过了新建、就绪、运行、阻塞、死亡等状态，jdk的中一个方法、磁盘io、网络io都会导致线程状态的切换。理解线程的运行状态对于掌握线程的运行情况、多线程调优至关重要。
+            hbase认识与安装配置
+认识
+HBase是一种构建在HDFS之上提供高可靠性、高性能、列存储、分布式、可伸缩、实时读写的存储系统。在需要实时读写、随机访问超海量数据时，可以使用HBase。与hadoop一样，通过不断增加廉价的服务器，可以对HBase进行横向扩展，增加HBase的计算和存储能力。
+HBase位于结构化存储层，Hadoop HDFS为HBase提供了高可靠性的底层存储支持，H......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-09-06
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#hbase" title="hbase">hbase</a>
+            
+        </div>
+    
 
+</div>
+<hr>
 
-线程间的状态转换:
+<div class="post-preview">
 
-新建(new)：一个new出来的线程对象，还未执行。
-就绪(runnable)：线程对象创建并调用了该对象的**start()**方法后。该状态的线程位于可运行线程池......
+    <a href="/2017/09/04/消息队列/队列Queue/">
+        <h2 class="post-title">
+            队列Queue
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            队列Queue
+Queue接口与List、Set同一级别，都是继承了Collection接口。LinkedList实现了Queue接 口。
+Queue是一种数据结构．它有两个基本操作：在队列尾部加人一个元素，和从队列头部移除一个元素就是说，队列以一种先进先出的方式管理数据，如果你试图向一个 已经满了的阻塞队列中添加一个元素或者是从一个空的阻塞队列中移除一个元索，将导致线程阻塞．
+在多线程进行......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2017-09-04
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#多线程" title="多线程">多线程</a>
+            
+              <a href="/tags/#集合" title="集合">集合</a>
+            
+              <a href="/tags/#数据结构" title="数据结构">数据结构</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2017/09/01/多线程/java synchronized原理/">
+        <h2 class="post-title">
+            java synchronized原理
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            java synchronized原理
+在java多线程编程中，最常用的加锁方式就是使用synchronized关键字。synchronized可以加在方法上、代码块上从而使方法和代码实现线程安全，当一个线程进入synchronized代码块后，其他线程会被阻塞在代码块外面，处于对象的锁池中，这时不再消耗cpu资源，等待对象锁的释放，然后从阻塞状态切换为可运行状态，参与竞争对象锁。
+sync......
         </div>
     </a>
     
@@ -251,17 +312,21 @@
 
 <div class="post-preview">
 
-    <a href="/2017/09/01/多线程/java线程/">
+    <a href="/2017/09/01/多线程/java线程池/">
         <h2 class="post-title">
-            java线程
+            java线程池
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            java线程
-在早期的操作系统中并没有线程的概念，进程是能拥有资源和独立运行的最小单位，也是程序执行的最小单位。任务调度采用的是时间片轮转的抢占式调度方式，而进程是任务调度的最小单位，每个进程有各自独立的一块内存，使得各个进程之间内存地址相互隔离。
-后来，随着计算机的发展，对CPU的要求越来越高，进程之间的切换开销较大，已经无法满足越来越复杂的程序的要求了。于是就发明了线程，线程是程序执行中......
+            线程池
+当需要使用多线程的时候，通常需要创建一个新的线程去执行程序，但是如果不停的创建线程，会消耗更多的内存，增加cpu切换的速度，那么这时就需要使用线程池控制对线程进行有效的控制,线程池不是为了提供性能，而是为了控制线程数量从而达到控制资源，防止内存溢出。
+
+线程池的优点：
+
+降低系统资源消耗，通过重用已存在的线程，降低线程创建和销毁造成的消耗；
+有效的控制线程的最大并发数，线程若是无限制......
         </div>
     </a>
     
@@ -281,104 +346,32 @@
 
 <div class="post-preview">
 
-    <a href="/2017/08/05/java8/java8之日期实现/">
+    <a href="/2017/09/01/多线程/volatile/">
         <h2 class="post-title">
-            java8之日期实现
+            volatile修饰符详解
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            java8之日期实现
-历史问题
+            volatile修饰符详解
+java编程语言允许线程访问共享变量，为了确保共享变量能被准确和一致的更新，线程应该确保通过排他锁单独获得这个变量。Java语言提供了volatile，在某些情况下比锁更加方便。如果一个字段被声明成volatile，java线程内存模型确保所有线程看到这个变量的值是一致的。
 
-jdk api中提供了两类日期实现Date和Calendar，存在一些缺陷和不足
+volatile 作用
 
-Date的实现是年份从1900年开始，月份是从0开始
-DateForm不是线程安全的，多线程 并发时会出现不可知的问题
-Date和Calendar是可变类
-日期的toString输出的格式不够人性化
+保证内存可见性
+防止指令重排,有序性
+不能解决原子性
 
-
-
-JDK8 接口定义
-
-
-TemporalAccessor:定义日期类的......
+CPU......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2017-08-05
+            2017-09-01
         </p>
         <div class="tags">
-            
-              <a href="/tags/#java8" title="java8">java8</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2017/08/05/java8/java8之Collector/">
-        <h2 class="post-title">
-            java8之Collector
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            java8之Collector
-Stream流的终端操作常常需要聚合，Collector就是对Stream流进行聚合的实现。jdk提供了Collectors工具类封装了一些常用的聚合操作。
-
-Collector接口
-Collector是一个接口，它是一个可变的汇聚操作，通过累加器将输入元素汇集到一个可伸展的结果容器中；如果是并行流会产生多个结果容器，还需将结果容器合并为一个，最后将累积的结果......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2017-08-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#java8" title="java8">java8</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2017/08/05/java8/java8之CompletableFuture/">
-        <h2 class="post-title">
-            java8之CompletableFuture
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            java8之CompletableFuture
-CompletableFuture实现了Future接口，是jdk8新添加的对与并发编程的扩展支持。通过CompletableFuture可以方便的操作多个异步任务、执行结果的回调等操作。
-
-CompletableFuture优点
-jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞获取异步任务的结果。但是依然存在一些局限性......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2017-08-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#java8" title="java8">java8</a>
             
               <a href="/tags/#多线程" title="多线程">多线程</a>
             
@@ -467,23 +460,23 @@ jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -568,6 +561,10 @@ jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -577,7 +574,7 @@ jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

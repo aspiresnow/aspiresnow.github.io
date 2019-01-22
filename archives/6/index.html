@@ -216,33 +216,29 @@
 
 <div class="post-preview">
 
-    <a href="/2018/09/12/源码学习/mybatis-generator源码/">
+    <a href="/2018/09/20/spring/spring-IOC BeanDifinition注册/">
         <h2 class="post-title">
-            mybatis-generator源码
+            spring-IOC BeanDifinition注册
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            mybatis-generator源码
-一、xml规范dtd文件解读
-框架中很多配置文件都是用的xml，对于xml的格式约束分两种dtd和schema两种，mybatis-generator使用的就是dtd方式。有时候在写配置的时候不看文档的话不知道如何配置，不知道都有哪些节点，节点都有哪些属性，这时可以通过配置文件的约束dtd来查看。
+            spring-IOC BeanDifinition注册
 
+BeanFactory继承体系
 
-元素声明
-
-
-1&lt;!ELEMENT gene......
+Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。从继承图可以看出，BeanFactory的继承主要分成两个体系，一条是spring-context中ApplicationContext的继承体系，一条是spring-core中XMLBeanFactory的继承体系。首先......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-09-12
+            2018-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#mybatis" title="mybatis">mybatis</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -252,28 +248,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/09/12/codePies/">
+    <a href="/2018/09/20/spring/spring-FactoryBean/">
         <h2 class="post-title">
-            Code-Pieces
+            spring FactoryBean
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            Code-Pieces
-代码片段
-声明一个全局不可改变的map
-1234567public static final Map&lt;String, String&gt; SHORT_IDS;static &#123;    Map&lt;String, String&gt; map = new HashMap&lt;&gt;(64);    map.put("ACT", "Australia......
+            spring FactoryBean
+介绍与使用
+Spring容易中注册了两类的Bean，一种是普通Bean对象，另一种是实现FactoryBean接口的对象。实现FactoryBean接口的对象同普通Bean对象有很大不同，实现FactoryBean接口的对象会在spring容器中注册两个对应，一个是该对象本身，一个是该对象getObject方法返回的对象。如果要获取FactoryBean......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-09-12
+            2018-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#代码片段" title="代码片段">代码片段</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -283,30 +278,28 @@
 
 <div class="post-preview">
 
-    <a href="/2018/09/10/linux/vim编辑器/">
+    <a href="/2018/09/20/spring/spring BeanPostProcceser/">
         <h2 class="post-title">
-            vim编辑器
+            BeanPostProcceser
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            vim编辑器
-定制vim的工作特性： 配置文件：永久有效  全局：/etc/vimrc  个人：~/.vimrc
-屏幕翻滚类命令
-12345Ctrl+u  #向文件首翻半屏Ctrl+d  #向文件尾翻半屏Ctrl+f #向文件尾翻一屏Ctrl＋b #向文件首翻一屏nz  #将第n行滚至屏幕顶部，不指定n时将当前行滚至屏幕顶部
-进入vim的命令
-123456vim filename #打开或新......
+            BeanPostProcceser
+applyMergedBeanDefinitionPostProcessors 这个方法中会调用 BeanPostProcessor的postProcessMergedBeanDefinition方法
+PostProcessorRegistrationDelegate 用于激活注册的BeanFactoryPostProcessor
+ReflectionUt......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-09-10
+            2018-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#linux" title="linux">linux</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -316,27 +309,31 @@
 
 <div class="post-preview">
 
-    <a href="/2018/08/04/docker初识/">
+    <a href="/2018/09/20/spring/spring工厂方法创建/">
         <h2 class="post-title">
-            docker初识
+            spring工厂方法创建
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            docker初识
-Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术，实现隔离，不需要操作系统另外开销。硬件是共享的,容器只能运行与底层宿主机相同或者相似的操作系统。
-容器与管理程序虚拟化有所不同，管理程序虚拟化通过中间层将一台或者多台独立的机器虚拟运行与物理硬件之上，而容器则是直接运行在操作系统内核之上的用户空间，容器技术可以让多个独立的用户空间运行在同一台......
+            spring工厂方法创建
+在spring创建bean流程中说到创建bean对象有两种方式，工厂方法和构造器，工厂方法优先级高。
+diff FactoryBean
+实现FactoryBean接口的实例是spring中一种特殊的bean。
+对象工厂模式和静态工厂模式更多的是为了提供一个创建bean的工具。
+
+In Spring documentation, factory bean refers......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-08-04
+            2018-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#docker" title="docker">docker</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -346,32 +343,31 @@ Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术�
 
 <div class="post-preview">
 
-    <a href="/2018/07/30/maven实现环境切换/">
+    <a href="/2018/09/20/spring/spring入门/">
         <h2 class="post-title">
-            maven实现环境切换
+            spring入门
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            maven实现环境切换
-在项目开发过程中往往会有多个环境，不同的环境配置会不同，maven提供一种profiles切换和filter来实现在编译的时候根据环境来替换变量的功能
-
-配置过程
+            spring入门
+一、spring-framework组成
 
 
-在maven的pom.xml中配置各个环境的profiles，在编译打包的时候使用 -Pprod来指定环境
-123456789101112131415161718192021222324&lt;prof......
+spring-core、spring-beans 提供了基础的依赖注入和控制反转功能 BeanFactory。
+spring-context 提供了ApplicationContext接口集成容器。 并提供了资源加载、国际化等功能
+spring-context-support 提供了集成第三方jar包(guava、javaMai......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-07-30
+            2018-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#Maven" title="Maven">Maven</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -458,23 +454,23 @@ Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -559,6 +555,10 @@ Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -568,7 +568,7 @@ Docker是Container容器引擎，基于Go语言，基于linux虚拟内核技术�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

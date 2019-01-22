@@ -216,26 +216,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/12/26/数据结构和算法/算法/">
+    <a href="/2019/01/20/项目积累/异常机制处理/">
         <h2 class="post-title">
-            算法
+            异常机制处理
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            算法
-12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910010......
+            异常机制处理
+一、自定义返回实体
+123456789101112131415161718192021222324252627282930313233343536373839import com.alibaba.fastjson.JSON;import lombok.Data;import lombok.ToString;import java.io.Serializable;@Data@To......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-12-26
+            2019-01-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#todo" title="todo">todo</a>
+              <a href="/tags/#utils" title="utils">utils</a>
             
         </div>
     
@@ -245,28 +246,29 @@
 
 <div class="post-preview">
 
-    <a href="/2018/12/25/自控/">
+    <a href="/2019/01/20/项目积累/SignUtils/">
         <h2 class="post-title">
-            Untitled
+            SignUtils
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            自知之明是自控的基础，认识到自己的意志力存在问题，则是自控的关键
-意志力实际上是我要做、我不要和我想要这三种力量，他们协同努力，让我们编程更好的自己。
-
-**我要做**意志力挑战，有没有什么事是你想多做一些，或是停止拖延的，因为你知道这样做能提供生活质量
-**我不要**意志力挑战，你生活中最顽固的习惯是什么？有没有你想放弃的，或者想少做一点，因为它妨碍了你健康、幸福甚至成功？
-**我想要**......
+            SignUtils
+用于签名验签
+逻辑就是对javaBean或者map中的内容，根据属性或者key进行排序，然后转换成string，对其进行hmac签名，通常用于对https接口的内容进行签名验证
+例如支付接口，对参数进行签名，将签名后的字符串放到header中传递给被调方，被调方对接收到参数进行同样逻辑的签名，然后比较header中的签名String与计算出来的签名String是否一致
+1......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-12-25
+            2019-01-20
         </p>
         <div class="tags">
+            
+              <a href="/tags/#utils" title="utils">utils</a>
             
         </div>
     
@@ -276,26 +278,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/12/20/spring/spring-AOP-动态代理/">
+    <a href="/2019/01/20/项目积累/JdkDateUtils/">
         <h2 class="post-title">
-            spring-AOP 动态代理
+            JdkDateUtils
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-AOP 动态代理
-有动态代理就有静态代理，静态代理就是创建一个代理类，持有一个被代理对象，然后在提供代理方法，供外界调用，在方法中调用相应的代理类的方法，达到代理的效果。但是由于代理需要去写代理类，当需要很多代理的时候需要定义大量的代理类，所以就有了一个想法，能不能在运行期间去通过程序代码创建代理class类并创建代理对象。当代理对象不需要的时候销毁运行期间创建的代理类。动态代......
+            JdkDateUtils
+用于转换jdk8中LocalDateTime和Date之间的转换
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-12-20
+            2019-01-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#spring" title="spring">spring</a>
+              <a href="/tags/#utils" title="utils">utils</a>
             
         </div>
     
@@ -305,28 +308,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">
+    <a href="/2019/01/20/项目积累/BigDecimalUtil/">
         <h2 class="post-title">
-            spring-BeanDefinitionParser
+            BigDecimalUtil
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-BeanDefinitionParser
-resolve中调用了其init方法，此方法用以向NamespaceHandler对象注册BeanDefinitionParser对象。此接口用以解析顶层(beans下)的非默认命名空间元素，比如&lt;context:annotation-config /&gt;。
-BeanExpressionResolver
-注意此时尚未进行bea......
+            BigDecimalUtil
+主要用于针对BigDecimal进行格式化处理。后续需求需要运算，再添加
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162import java.math.BigDecimal;im......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-12-17
+            2019-01-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#spring" title="spring">spring</a>
+              <a href="/tags/#utils" title="utils">utils</a>
             
         </div>
     
@@ -336,31 +338,26 @@ BeanExpressionResolver
 
 <div class="post-preview">
 
-    <a href="/2018/12/17/spring/spring-SPEL表达式/">
+    <a href="/2019/01/20/项目积累/redis分布式锁/">
         <h2 class="post-title">
-            spring SPEL表达式
+            redis分布式锁
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring SPEL表达式
-EvaluationContext
-SpelParserConfiguration
-SpelCompilerMode
-StandardBeanExpressionResolver
-@Value里面可以写spel表达式，@Value可以写在字段上，setter上，构造函数参数上
-...
+            redis分布式锁
+123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566@Component@Slf4jpublic class RedisLockUtil &#123;    private sta......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-12-17
+            2019-01-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#spring" title="spring">spring</a>
+              <a href="/tags/#utils" title="utils">utils</a>
             
         </div>
     
@@ -443,23 +440,23 @@ StandardBeanExpressionResolver
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -544,6 +541,10 @@ StandardBeanExpressionResolver
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -553,7 +554,7 @@ StandardBeanExpressionResolver
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

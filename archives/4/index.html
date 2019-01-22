@@ -216,27 +216,25 @@
 
 <div class="post-preview">
 
-    <a href="/2018/10/29/spring/spring-AOP/">
+    <a href="/2018/11/22/spring/spring类型转换器(二)/">
         <h2 class="post-title">
-            spring-AOP
+            spring类型转换器(二)
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-AOP
-一、类
-
-AspectJAutoProxyBeanDefinitionParser.paser()
-AnnotationAwareAspectJAutoProxyCreator  需要注册这个类 实现了 BeanPostProcessor接口，加载bean时调用
-AopConfigUtils
-AbstractAutoProxyCreator.postProcessAft......
+            spring类型转换器(二)
+类型转换器Converter
+Converter
+除了使用PropertyEditor，spring自己还提供了另外一种类型转换器Converter，该接口声明了一个从源数据类型转换为目标数据类型的方法。只需要实现convert方法，该方法支持泛型
+123public interface Converter&lt;S, T&gt; &#123;   T conv......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-10-29
+            2018-11-22
         </p>
         <div class="tags">
             
@@ -250,29 +248,24 @@ AbstractAutoProxyCreator.postProcessAft......
 
 <div class="post-preview">
 
-    <a href="/2018/10/05/spring/spring-Context/">
+    <a href="/2018/11/22/spring/spring类型转换器(一)/">
         <h2 class="post-title">
-            spring-Context
+            spring类型转换器(一)
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-Context
-PropertyPlaceholderHelper
-ObjectUtils
-AbstractPropertyResolver  PropertyResolver
-PostProcessorRegistrationDelegate
-PathMatchingResourcePatternResolver 用于解析配置文件位置
-
-源码解读
-以ApplicationCo......
+            spring类型转换器(一)
+在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring实例化bean过程中对属性值的转换主要是使用BeanWrapperImpl实现的。
+首先来看下BeanWrapperImpl的使用
+123456789......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-10-05
+            2018-11-22
         </p>
         <div class="tags">
             
@@ -286,23 +279,23 @@ PathMatchingResourcePatternResolver 用于解析配置文件位置
 
 <div class="post-preview">
 
-    <a href="/2018/10/05/spring/spring-IOC创建bean/">
+    <a href="/2018/11/19/spring/spring注解/">
         <h2 class="post-title">
-            spring-IOC创建bean
+            spring注解
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-IOC创建bean
-循环依赖
-在创建bean的时候会存在依赖注入的情况，即A依赖B，B又依赖A。在创建bean的时候为了避免循环依赖，创建完bean对象后，依赖注入前，将未实例化完毕的bean提早曝光，也就是将ObjectFactory或者未添加依赖注入的bean加入到缓存中，这样下个bean创建时需要依赖上个bean则直接使用ObjectFactory或者未set依赖的bea......
+            spring注解
+Annotation injection is performed before XML injection, thus the latter configuration will override the former for properties wired through both approaches.
+1&lt;context:annotation-config/......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-10-05
+            2018-11-19
         </p>
         <div class="tags">
             
@@ -316,24 +309,22 @@ PathMatchingResourcePatternResolver 用于解析配置文件位置
 
 <div class="post-preview">
 
-    <a href="/2018/09/28/spring/spring事务/">
+    <a href="/2018/11/19/spring/spring国际化支持/">
         <h2 class="post-title">
-            spring事务
+            spring国际化支持
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring事务
-一、在同一类中一个调用本类中另一个有事务的方法,事务是无效
-第一步：首先在spring的配置文件中加入以下配置
-123&lt;!-- 激活自动代理功能 --&gt;&lt;aop:aspectj-autoproxy/&gt;&lt;aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true" /&gt......
+            spring国际化支持
+...
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-09-28
+            2018-11-19
         </p>
         <div class="tags">
             
@@ -347,29 +338,26 @@ PathMatchingResourcePatternResolver 用于解析配置文件位置
 
 <div class="post-preview">
 
-    <a href="/2018/09/20/spring/spring-IOC BeanDifinition注册/">
+    <a href="/2018/11/12/redis/redis慢命令分析/">
         <h2 class="post-title">
-            spring-IOC BeanDifinition注册
+            redis慢命令分析
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring-IOC BeanDifinition注册
-
-BeanFactory继承体系
-
-Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。从继承图可以看出，BeanFactory的继承主要分成两个体系，一条是spring-context中ApplicationContext的继承体系，一条是spring-core中XMLBeanFactory的继承体系。首先......
+            redis慢命令分析
+...
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-09-20
+            2018-11-12
         </p>
         <div class="tags">
             
-              <a href="/tags/#spring" title="spring">spring</a>
+              <a href="/tags/#redis" title="redis">redis</a>
             
         </div>
     
@@ -456,23 +444,23 @@ Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -557,6 +545,10 @@ Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -566,7 +558,7 @@ Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

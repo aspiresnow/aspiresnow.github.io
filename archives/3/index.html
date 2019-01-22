@@ -216,18 +216,50 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/22/spring/spring类型转换器(一)/">
+    <a href="/2018/12/17/spring/spring-SPEL表达式/">
         <h2 class="post-title">
-            spring类型转换器(一)
+            spring SPEL表达式
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring类型转换器(一)
-在spring容器初始化的时候，BeanDefinition中配置的bean的属性值一般都为String类型，如何将String类型转换为Bean中属性对应的类型呢，在这个过程中就需要用到类型转换器了。spring实例化bean过程中对属性值的转换主要是使用BeanWrapperImpl实现的。
-首先来看下BeanWrapperImpl的使用
-123456789......
+            spring SPEL表达式
+EvaluationContext
+SpelParserConfiguration
+SpelCompilerMode
+StandardBeanExpressionResolver
+@Value里面可以写spel表达式，@Value可以写在字段上，setter上，构造函数参数上
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-12-17
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#spring" title="spring">spring</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/22/spring/spring类型转换器DataBinder/">
+        <h2 class="post-title">
+            spring类型转换器DataBinder
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            spring类型转换器DataBinder
+...
         </div>
     </a>
     
@@ -247,23 +279,27 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/19/spring/spring注解/">
+    <a href="/2018/11/22/spring/spring-Validation/">
         <h2 class="post-title">
-            spring注解
+            spring Validation
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring注解
-Annotation injection is performed before XML injection, thus the latter configuration will override the former for properties wired through both approaches.
-1&lt;context:annotation-config/......
+            spring Validation
+
+spring完全支持JSR-303 Bean Validation API
+Spring DataBinder可以在绑定值的时候实现验证
+spring MVC 对于@Controller的参数支持声明式验证
+
+Since Spring 3, a DataBinder instance can be configured with a Validator.......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-19
+            2018-11-22
         </p>
         <div class="tags">
             
@@ -277,22 +313,26 @@ Annotation injection is performed before XML injection, thus the latter configur
 
 <div class="post-preview">
 
-    <a href="/2018/11/19/spring/spring国际化支持/">
+    <a href="/2018/11/22/spring/spring类型转换器(四)/">
         <h2 class="post-title">
-            spring国际化支持
+            spring类型转换器(四)
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring国际化支持
-...
+            spring类型转换器(四)
+在spring实例化和spring mvc中涉及到了大量的属性注入。这个过程中不可避免的就是类型转换，这章将会详细说明spring中类型转换器的使用和源码。
+使用
+PropertyEditor
+首先来看下如何在spring中注册自定义的 PropertyEditor
+123456public class CustomPropertyEditorRegistrar......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-19
+            2018-11-22
         </p>
         <div class="tags">
             
@@ -306,62 +346,28 @@ Annotation injection is performed before XML injection, thus the latter configur
 
 <div class="post-preview">
 
-    <a href="/2018/11/12/redis/redis慢命令分析/">
+    <a href="/2018/11/22/spring/spring类型转换器(三)/">
         <h2 class="post-title">
-            redis慢命令分析
+            spring类型转换器(三)
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            redis慢命令分析
-...
+            spring类型转换器(三)
+格式化Formatter
+Converter用来将源数据类型转换目标数据类型，不过有时候一个数据类型会对应不同格式的字符串，如日期类型在不同国家显示的字符是不一样的，需要根据Locale进行转换，或者需要将日期类型转换为不同格式化的字符串，spring针对这种情况提供了Formatter接口来针对格式化进行处理。
+格式化Formatter其实也是一种Conver......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-12
+            2018-11-22
         </p>
         <div class="tags">
             
-              <a href="/tags/#redis" title="redis">redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/11/12/redis/redis基础/">
-        <h2 class="post-title">
-            redis基础
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            redis基础
-redis是一个高效的内存数据库，性能极高，读的速度能达到100000次/s,写的速度达到80000次/s
-为什么快
-
-首先也是最重要的redis所有的数据都存放在内存中
-其次redis是C语言实现的，C语言更底层，执行速度相对更快
-Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可能产生的竞争和cpu切换问题
-
-单线程有个问题，如果某个命令执行过长，会造......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-11-12
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#redis" title="redis">redis</a>
+              <a href="/tags/#spring" title="spring">spring</a>
             
         </div>
     
@@ -448,23 +454,23 @@ Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可�
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -549,6 +555,10 @@ Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可�
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -558,7 +568,7 @@ Redis使用了单线程架构epoll IO多路复用技术，预防了多线程可�
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>

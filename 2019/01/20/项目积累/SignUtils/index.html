@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          SignUtils - aspireSnow | 爱雪
+        
+    </title>
+
+    <link rel="canonical" href="http://yoursite-url/2019/01/20/项目积累/SignUtils/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('undefined')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container" style="width:1280px;">
+            <div class="row">
+                <!--
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    -->
+                <div class="col-lg-10 col-md-10">    
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#utils" title="utils">utils</a>
+                            
+                        </div>
+                        <h1>SignUtils</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by lizhi on
+                            2019-01-20
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">aspiresnow</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container" style="max-width:1280px;">
+        <div class="row" style="overflow-y:hidden;">
+
+            <!-- Post Container -->
+            <!--
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+            <div class="
+                col-lg-10
+                col-md-11
+                post-container">
+            -->
+            <div class="
+                col-lg-10
+                col-md-10
+                post-container" style="padding-right:10px;">
+
+                <h1><span id="signutils">SignUtils</span></h1>
+<p>用于签名验签</p>
+<p>逻辑就是对javaBean或者map中的内容，根据属性或者key进行排序，然后转换成string，对其进行hmac签名，通常用于对https接口的内容进行签名验证</p>
+<p>例如支付接口，对参数进行签名，将签名后的字符串放到header中传递给被调方，被调方对接收到参数进行同样逻辑的签名，然后比较header中的签名String与计算出来的签名String是否一致</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.annotation.JsonInclude;</span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.core.JsonProcessingException;</span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.core.type.TypeReference;</span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.PropertyNamingStrategy;</span><br><span class="line"><span class="keyword">import</span> com.google.common.base.CaseFormat;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.codec.binary.Base64;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.MapUtils;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.lang.StringUtils;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.crypto.Mac;</span><br><span class="line"><span class="keyword">import</span> javax.crypto.spec.SecretKeySpec;</span><br><span class="line"><span class="keyword">import</span> java.beans.BeanInfo;</span><br><span class="line"><span class="keyword">import</span> java.beans.IntrospectionException;</span><br><span class="line"><span class="keyword">import</span> java.beans.Introspector;</span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyDescriptor;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 签名验证工具类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> lizhi.zhang</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SignUtils</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HEADER_CLIENT_ID = <span class="string">"client_id"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HEADER_SIGN_TYPE = <span class="string">"sign_type"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HEADER_SIGN = <span class="string">"signature"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PARAM_NONCE = <span class="string">"nonce"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ObjectMapper objectMapper = <span class="keyword">new</span> ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SIGN_TYPE_SHA256 = <span class="string">"SHA256"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SIGN_TYPE_MD5 = <span class="string">"MD5"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(SignUtils.class);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SignUtils</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 签名验证</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jsonStr 原始字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key     密钥key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> reqSign 加密后的字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">checkSign</span><span class="params">(String jsonStr, String key, String reqSign)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String checkSign = sign(jsonStr, key);</span><br><span class="line">        logger.info(<span class="string">"reqSign=&#123;&#125;, checkSign=&#123;&#125;"</span>, reqSign, checkSign);</span><br><span class="line">        <span class="keyword">return</span> StringUtils.equals(checkSign, reqSign);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 签名（业务数据是字符串）</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jsonStr  业务数据字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key      密钥key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nonceStr 随机数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">sign</span><span class="params">(String jsonStr, String key, String nonceStr)</span> </span>&#123;</span><br><span class="line">        Map&lt;String, Object&gt; params;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            params = objectMapper.readValue(jsonStr, <span class="keyword">new</span> TypeReference&lt;Map&lt;String, Object&gt;&gt;() &#123;</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="keyword">return</span> HmacSHA256(params, key, nonceStr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(<span class="string">"format json to map error"</span>, e);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对实体类进行签名。注意：此实体类对应的Class必须是可见的（public）</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> obj   要签名的对象</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key   加salt的密钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nonce 随机字符串，如果obj中已包含，则此字段作废</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">sign</span><span class="params">(Object obj, String key, String nonce)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String originalStr = sortedText(obj, nonce);</span><br><span class="line">            <span class="keyword">return</span> sign(originalStr, key);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(<span class="string">"get sort string error"</span>, e);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对字符串进行 HmacSHA256，</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> data 原始字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key  secret密钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">sign</span><span class="params">(String data, String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isEmpty(data) || StringUtils.isEmpty(key)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Mac sha256_HMAC = Mac.getInstance(<span class="string">"HmacSHA256"</span>);</span><br><span class="line">        SecretKeySpec secret_key = <span class="keyword">new</span> SecretKeySpec(key.getBytes(<span class="string">"UTF-8"</span>), <span class="string">"HmacSHA256"</span>);</span><br><span class="line">        sha256_HMAC.init(secret_key);</span><br><span class="line">        String hash = Base64.encodeBase64String(sha256_HMAC.doFinal(data.getBytes()));</span><br><span class="line">        logger.debug(<span class="string">"pre sign text: &#123;&#125;"</span>, data);</span><br><span class="line">        logger.debug(<span class="string">"signature: &#123;&#125;"</span>, hash);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> hash;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 通过SHA-256对参数进行签名，</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> params   要签名的参数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key      加salt的密钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nonceStr 随机数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">HmacSHA256</span><span class="params">(Map&lt;String, Object&gt; params, String key, String nonceStr)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String data = sortedText(params, nonceStr);</span><br><span class="line">        <span class="keyword">return</span> sign(data, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 排序</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> params</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nonceStr</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">sortedText</span><span class="params">(Map&lt;String, Object&gt; params, String nonceStr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (MapUtils.isEmpty(params)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!params.containsKey(PARAM_NONCE)) &#123;</span><br><span class="line">            params.put(PARAM_NONCE, nonceStr);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        StringBuilder paramsString = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        params.keySet().stream().sorted().forEach(k -&gt; &#123;</span><br><span class="line">            String value = String.valueOf(params.get(k));</span><br><span class="line">            <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            paramsString.append(camelToUnderScore(k)).append(<span class="string">"="</span>).append(value).append(<span class="string">"&amp;"</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">        paramsString.deleteCharAt(paramsString.length() - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> paramsString.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将实体类进行字段排序，并转换为字符串。注意：此实体类对应的Class必须是可见的（public）</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> obj</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nonce 随机字符串，如果obj中已包含，则此字段作废</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IntrospectionException</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> ReflectiveOperationException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">sortedText</span><span class="params">(Object obj, String nonce)</span> <span class="keyword">throws</span> IntrospectionException, ReflectiveOperationException, JsonProcessingException </span>&#123;</span><br><span class="line">        BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());</span><br><span class="line">        PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();</span><br><span class="line">        Arrays.sort(descriptors, Comparator.comparing(PropertyDescriptor::getName));</span><br><span class="line">        StringBuilder str = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">boolean</span> containsNonce = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (PropertyDescriptor descriptor : descriptors) &#123;</span><br><span class="line"></span><br><span class="line">            String name = descriptor.getName();</span><br><span class="line">            <span class="comment">//去除getClass方法</span></span><br><span class="line">            <span class="keyword">if</span> (name.equalsIgnoreCase(<span class="string">"class"</span>)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (name.equals(PARAM_NONCE)) &#123;</span><br><span class="line">                containsNonce = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 添加随机字符串</span></span><br><span class="line">            <span class="keyword">if</span> (name.compareTo(PARAM_NONCE) &gt; <span class="number">0</span> &amp;&amp; !containsNonce &amp;&amp; StringUtils.isNotEmpty(nonce)) &#123;</span><br><span class="line">                str.append(<span class="string">"nonce="</span>).append(nonce).append(<span class="string">"&amp;"</span>);</span><br><span class="line">                containsNonce = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            Object objValue = descriptor.getReadMethod().invoke(obj);</span><br><span class="line">            <span class="keyword">if</span> (objValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String value = objectMapper.writeValueAsString(objValue);</span><br><span class="line">            <span class="keyword">if</span> (value.startsWith(<span class="string">"\""</span>)) &#123;</span><br><span class="line">                value = value.substring(<span class="number">1</span>, value.length() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            value = value.replaceAll(<span class="string">"\\\\"</span>, <span class="string">""</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (<span class="string">""</span>.equals(value) || <span class="string">"[]"</span>.equals(value) || <span class="string">"&#123;&#125;"</span>.equals(value)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            str.append(camelToUnderScore(name)).append(<span class="string">"="</span>).append(value).append(<span class="string">"&amp;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        str.deleteCharAt(str.length() - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> str.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 驼峰转下划线</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> str</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">camelToUnderScore</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, str);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Map&lt;String, Object&gt; <span class="title">toUnderScoreMap</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        String jsonStr = objectMapper.writeValueAsString(obj);</span><br><span class="line">        <span class="keyword">return</span> objectMapper.readValue(jsonStr, <span class="keyword">new</span> TypeReference&lt;Map&lt;String, Object&gt;&gt;() &#123;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建32位的随机字符</span></span><br><span class="line"><span class="comment">     * 为了防止拼出来的订单号太长看错位, 保证第一位是英文</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">buildRandom</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Integer length = <span class="number">32</span>;</span><br><span class="line">        String chars = <span class="string">"ABDEGHJKMNPQVWXZ"</span>;</span><br><span class="line">        String charAndDigit = <span class="string">"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"</span>;</span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> number = random.nextInt(chars.length());</span><br><span class="line">                sb.append(chars.charAt(number));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> number = random.nextInt(charAndDigit.length());</span><br><span class="line">                sb.append(charAndDigit.charAt(number));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2019/01/20/项目积累/异常机制处理/" data-toggle="tooltip" data-placement="top" title="异常机制处理">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/01/20/项目积累/JdkDateUtils/" data-toggle="tooltip" data-placement="top" title="JdkDateUtils">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+             <!-- Table of Contents -->
+ 
+  <aside id="sidebar" class="post-container">
+    <div id="toc" class="toc-article">
+    <!-- mytoc -->
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" style="top:20px;" role="complementary">
+        <h4><i class="fa fa-bookmark"></i> Catalog</h4>
+        <ul class="nav bs-docs-sidenav">
+
+        </ul>
+
+    </div>
+    </div>
+  </aside>
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#utils" title="utils">utils</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "http://yoursite-url/2019/01/20/项目积累/SignUtils/";
+    var disqus_url = "http://yoursite-url/2019/01/20/项目积累/SignUtils/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/aspiresnow">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; lizhi 2019 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://yoursite-url/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://yoursite-url/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

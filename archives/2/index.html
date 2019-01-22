@@ -216,22 +216,112 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/22/spring/spring类型转换器DataBinder/">
+    <a href="/2019/01/20/项目积累/重试Util/">
         <h2 class="post-title">
-            spring类型转换器DataBinder
+            重试Utils
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring类型转换器DataBinder
-...
+            重试Utils
+在项目中有很多这样的场景，调用一个接口，第一次调用失败，但是想重试几次，所以封装了一个这样的工具类，用于重试。同时在重试n次后失败，则调用callback处理。例如发送消息，重试几次，最后还是失败则记录失败消息记录表。
+1234567891011121314151617181920212223242526272829303132333435363738394041424344......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-22
+            2019-01-20
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#utils" title="utils">utils</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/12/26/数据结构和算法/算法/">
+        <h2 class="post-title">
+            算法
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            算法
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910010......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-12-26
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#todo" title="todo">todo</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/12/25/自控/">
+        <h2 class="post-title">
+            Untitled
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            自知之明是自控的基础，认识到自己的意志力存在问题，则是自控的关键
+意志力实际上是我要做、我不要和我想要这三种力量，他们协同努力，让我们编程更好的自己。
+
+**我要做**意志力挑战，有没有什么事是你想多做一些，或是停止拖延的，因为你知道这样做能提供生活质量
+**我不要**意志力挑战，你生活中最顽固的习惯是什么？有没有你想放弃的，或者想少做一点，因为它妨碍了你健康、幸福甚至成功？
+**我想要**......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-12-25
+        </p>
+        <div class="tags">
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/12/20/spring/spring-AOP-动态代理/">
+        <h2 class="post-title">
+            spring-AOP 动态代理
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            spring-AOP 动态代理
+有动态代理就有静态代理，静态代理就是创建一个代理类，持有一个被代理对象，然后在提供代理方法，供外界调用，在方法中调用相应的代理类的方法，达到代理的效果。但是由于代理需要去写代理类，当需要很多代理的时候需要定义大量的代理类，所以就有了一个想法，能不能在运行期间去通过程序代码创建代理class类并创建代理对象。当代理对象不需要的时候销毁运行期间创建的代理类。动态代......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by lizhi on
+            2018-12-20
         </p>
         <div class="tags">
             
@@ -245,123 +335,24 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/22/spring/spring-Validation/">
+    <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">
         <h2 class="post-title">
-            spring Validation
+            spring-BeanDefinitionParser
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            spring Validation
-
-spring完全支持JSR-303 Bean Validation API
-Spring DataBinder可以在绑定值的时候实现验证
-spring MVC 对于@Controller的参数支持声明式验证
-
-Since Spring 3, a DataBinder instance can be configured with a Validator.......
+            spring-BeanDefinitionParser
+resolve中调用了其init方法，此方法用以向NamespaceHandler对象注册BeanDefinitionParser对象。此接口用以解析顶层(beans下)的非默认命名空间元素，比如&lt;context:annotation-config /&gt;。
+BeanExpressionResolver
+注意此时尚未进行bea......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by lizhi on
-            2018-11-22
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#spring" title="spring">spring</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/11/22/spring/spring类型转换器(四)/">
-        <h2 class="post-title">
-            spring类型转换器(四)
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            spring类型转换器(四)
-在spring实例化和spring mvc中涉及到了大量的属性注入。这个过程中不可避免的就是类型转换，这章将会详细说明spring中类型转换器的使用和源码。
-使用
-PropertyEditor
-首先来看下如何在spring中注册自定义的 PropertyEditor
-123456public class CustomPropertyEditorRegistrar......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-11-22
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#spring" title="spring">spring</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/11/22/spring/spring类型转换器(三)/">
-        <h2 class="post-title">
-            spring类型转换器(三)
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            spring类型转换器(三)
-格式化Formatter
-Converter用来将源数据类型转换目标数据类型，不过有时候一个数据类型会对应不同格式的字符串，如日期类型在不同国家显示的字符是不一样的，需要根据Locale进行转换，或者需要将日期类型转换为不同格式化的字符串，spring针对这种情况提供了Formatter接口来针对格式化进行处理。
-格式化Formatter其实也是一种Conver......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-11-22
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#spring" title="spring">spring</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/11/22/spring/spring类型转换器(二)/">
-        <h2 class="post-title">
-            spring类型转换器(二)
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            spring类型转换器(二)
-类型转换器Converter
-Converter
-除了使用PropertyEditor，spring自己还提供了另外一种类型转换器Converter，该接口声明了一个从源数据类型转换为目标数据类型的方法。只需要实现convert方法，该方法支持泛型
-123public interface Converter&lt;S, T&gt; &#123;   T conv......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by lizhi on
-            2018-11-22
+            2018-12-17
         </p>
         <div class="tags">
             
@@ -452,23 +443,23 @@ Converter
     <ul>
       
         <li>
-          <a href="/2018/12/26/数据结构和算法/算法/">算法</a>
+          <a href="/2019/01/20/项目积累/异常机制处理/">异常机制处理</a>
         </li>
       
         <li>
-          <a href="/2018/12/25/自控/">(no title)</a>
+          <a href="/2019/01/20/项目积累/SignUtils/">SignUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/20/spring/spring-AOP-动态代理/">spring-AOP 动态代理</a>
+          <a href="/2019/01/20/项目积累/JdkDateUtils/">JdkDateUtils</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-BeanDefinitionParser/">spring-BeanDefinitionParser</a>
+          <a href="/2019/01/20/项目积累/BigDecimalUtil/">BigDecimalUtil</a>
         </li>
       
         <li>
-          <a href="/2018/12/17/spring/spring-SPEL表达式/">spring SPEL表达式</a>
+          <a href="/2019/01/20/项目积累/redis分布式锁/">redis分布式锁</a>
         </li>
       
     </ul>
@@ -553,6 +544,10 @@ Converter
             <a href="/tags/#设计模式" title="设计模式" rel="25">设计模式</a>
             
         
+            
+            <a href="/tags/#utils" title="utils" rel="6">utils</a>
+            
+        
     </div>
 </section>
 
@@ -562,7 +557,7 @@ Converter
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java基础/">java基础</a><span class="category-list-count">33</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/java工具/">java工具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/todo/">todo</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程/">多线程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a><span class="category-list-count">16</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/权限/">权限</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/源码/">源码</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/项目积累/">项目积累</a><span class="category-list-count">6</span></li></ul>
     </div>
 </h5>
         <hr>
