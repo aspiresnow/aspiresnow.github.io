@@ -111,7 +111,6 @@ public class ChannelCollectProcessor implements BeanFactoryPostProcessor {
 @Component
 public class SpringUtil implements ApplicationContextAware {
     private static ApplicationContext ac;
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException{
         ac = applicationContext;
