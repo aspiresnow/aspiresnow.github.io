@@ -24,7 +24,7 @@ categories:
 JDK中提供了一个Proxy类用于实现动态代理，JDK的动态代理是基于接口实现的，被代理的对象要有实现的接口，会创建一个实现被代理类接口的代理类，因此只能代理接口中的方法
 
 ```java
-interface IComputorService {
+public interface IComputorService {
     //卖电脑
     void sellComputor(String brand);
     //修电脑
@@ -115,7 +115,7 @@ public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces,
 public static void generateClassFile(Class clazz, String proxyName) throws IOException {
     //根据类信息和提供的代理类名称，生成字节码
     byte[] classFile = ProxyGenerator.generateProxyClass(proxyName, clazz.getInterfaces());
-    String paths = clazz.getResource(".").getPath();
+    String paths = clazz.getResource("/").getPath();
     System.out.println(paths);
     FileOutputStream out = null;
     out = new FileOutputStream(paths + proxyName + ".class");
