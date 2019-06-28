@@ -77,3 +77,27 @@ public class RedisLockUtil {
     }
 }
 ```
+
+创建key的lua脚本
+
+```lua
+-- 接收keys args第一个参数为value，第二个参数为过期时间
+if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then
+    return redis.call('pexpire', KEYS[1], ARGV[2])
+else
+    return 0
+end
+```
+
+
+
+删除key的lua脚本
+
+```lua
+if redis.call("get",KEYS[1]) == ARGV[1] then
+	return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
+
