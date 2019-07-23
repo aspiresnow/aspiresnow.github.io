@@ -152,6 +152,7 @@ Spring 的 Aop 实现是遵守 Aop 联盟的约定。同时 Spring 又扩展了�
 ```java
 RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 beanDefinition.setSource(source);
+//添加属性
 beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
 beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 registry.registerBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME, beanDefinition);

@@ -217,3 +217,34 @@ task.cancel(true); // 取消线程
 ```
 
 使用 FutureTask 的好处是 FutureTask 是为了弥补 Thread 的不足而设计的，它可以让程序员准确地知道线程什么时候执行完成并获得到线程执行完成后返回的结果。FutureTask 是一种可以取消的异步的计算任务，它的计算是通过 Callable 实现的，它等价于可以携带结果的Runnable，并且有三个状态：等待、运行和完成。完成包括所有计算以任意的方式结束，包括正常结束、取消和异常。
+
+## 线程的监控处理
+
+```java
+public static void main(String[] args) {
+    //全局默认的未抓取异常处理器
+    Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) ->
+                                              System.out.printf("DefaultUncaughtExceptionHandler thread [%s] msg [%s]", t.getName(), e.getMessage()
+                                                               )
+                                             );
+
+    Thread thread = new Thread(() -> {
+        throw new RuntimeException("我异常了");
+    });
+
+    //会覆盖默认的未抓取异常处理器
+    thread.setUncaughtExceptionHandler((Thread t, Throwable e) ->
+                                       System.out.printf("UncaughtExceptionHandler thread [%s] msg [%s]", t.getName(), e.getMessage()
+                                                        ));
+    thread.start();
+
+    ThreadMXBean threadMXBean = com.sun.management.ThreadMXBean.class.cast(ManagementFactory.getThreadMXBean());
+    long[] threadIdList = threadMXBean.getAllThreadIds();
+    Arrays.stream(threadIdList).forEach(s -> {
+        ThreadInfo threadInfo = threadMXBean.getThreadInfo(s);
+        long kSize = threadMXBean.getThreadAllocatedBytes(s) / 1024;
+        System.out.printf("threadInfo [%s] 线程分配内存 [%d] \n", JSON.toJSONString(threadInfo), kSize);
+    });
+}
+```
+
