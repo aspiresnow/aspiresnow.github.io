@@ -314,7 +314,15 @@ git pull #有冲突，拉取远程代码，
 		5. git push #推送到远程仓库
 ```
 
+### 更换git地址
 
+```shell
+git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done  #从远处仓库获取所有分支
+git remote rm origin # 删除原来origin
+git remote add origin git@gitlab_host:admin/your_project.git #在gitlab上创建项目
+git push -u origin --all #将本地项目推送到远程gitlab项目上
+git push origin --tags #推送tags
+```
 
 ### 清除git提交历史记录
 

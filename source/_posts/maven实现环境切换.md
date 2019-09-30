@@ -28,10 +28,19 @@ categories:
            </activation>
            <properties>
                <profile.id>dev</profile.id>
+               <!--可用于变量替换-->
+               <userName>hahah</userName>
            </properties>
        </profile>
        <profile>
            <id>beta</id>
+           <activation>
+               <!--指定当存在属性 test=x时激活，会覆盖默认激活-->
+               <property>
+                   <name>test</name>
+                   <value>x</value>
+               </property>
+           </activation>
            <properties>
                <profile.id>beta</profile.id>
            </properties>
@@ -65,6 +74,7 @@ categories:
    					<!--排除掉不使用maven进行参数替换的文件-->
    					<exclude>expicate.xml</exclude>
    				</excludes>
+                     <!--对main/resources下配置文件开启资源过滤-->
    				<filtering>true</filtering>
    			</resource>
    		</resources>
@@ -115,6 +125,4 @@ categories:
    ```
 
    我们可以在自己的pom中重新将 `resource.delimiter` 指定为 `${}`,当然也可以听从建议直接使用 `@变量名@`
-
-
 
