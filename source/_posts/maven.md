@@ -77,7 +77,7 @@ A依赖B，B依赖C，那么A自动依赖C
 
   ```xml
   <repository>
-      <id>mintq-snapshots</id>
+      <id>snapshots</id>
       <url>http://localhost:6666/nexus/content/repositories/snapshots/</url>
       <!--maven 默认使用default-->
       <layout>default</layout>
