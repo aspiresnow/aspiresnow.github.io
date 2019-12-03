@@ -26,7 +26,49 @@ HashMap 1.8 与 1.7 对比
 
 
 
-找到比当前值大的最小的2的幂次方的数作为table的长度
+
+
+HashMap是一种key value的结构体，在
+
+```java
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+}
+```
+
+
+
+HashMap中采用了数组+链表的数据结构，在jdk8中，当链表节点的个数超过一定数量之后，会转换为红黑树，所以在jdk8中HashMap的数据结构为 树组+链表+红黑树。
+
+首先来看下链表节点类型
+
+```java
+static class Node<K,V> implements Map.Entry<K,V> {
+    final int hash;//key的hash值，避免重复计算，resize的时候使用
+    final K key;//key
+    V value;//value值
+    Node<K,V> next;//下一个节点
+}
+```
+
+接着看HashMap的构造器，接收一个数组长度的参数，和一个平衡因子，HashMap中能所能容纳的最大个数size=initialCapacity*loadFactor，不满足的时候，数组将进行扩容，每次扩容2倍长度，然后使用扩容后新的数组替换原数组。
+
+```java
+public HashMap(int initialCapacity, float loadFactor) {
+    if (initialCapacity < 0)
+        throw new IllegalArgumentException("Illegal initial capacity: " +
+                                           initialCapacity);
+    if (initialCapacity > MAXIMUM_CAPACITY)
+        initialCapacity = MAXIMUM_CAPACITY;
+    if (loadFactor <= 0 || Float.isNaN(loadFactor))
+        throw new IllegalArgumentException("Illegal load factor: " +
+                                           loadFactor);
+    this.loadFactor = loadFactor;
+    //这里只是赋值，当第一次添加元素的时候，threshold = table length *loadFactor
+    this.threshold = tableSizeFor(initialCapacity);
+}
+```
 
 ```java
 static final int tableSizeFor(int cap) {
@@ -40,18 +82,9 @@ static final int tableSizeFor(int cap) {
 }
 ```
 
-
-
-因此，我们在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为16扩充为32的resize示意图.
-![img](https://img-blog.csdn.net/20171008102726065?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvVVNUQ19abg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-
-这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。有兴趣的同学可以研究下JDK1.8的resize源码，写的很赞，如下:
-
-
-
 因为2的幂-1都是11111结尾的，所以碰撞几率小。使Hash算法的结果均匀分布。这样计算之后， 在 n 为 2 ^ n 时， 其实相当于 hash % n，& 当然比 % 效率高
 
-
+Hash算法的后两步运算（高位运算和取模运算，下文有介绍）来定位该键值对的存储位置，有时两个key会定位到相同的位置，表示发生了Hash碰撞。当然Hash算法计算结果越分散均匀，Hash碰撞的概率就越小，map的存取效率就会越高。
 
 ```java
 static final int hash(Object key) {    
@@ -68,6 +101,8 @@ table[(n - 1) & hash]
 
 那么问题来了，为什么是异或，而不是&或者|呢，因为 &会产生大量的0，|会产生大量的1，高位和低位的影响都是单方面的，异或是高位和低位都会起作用，所以选择了异或操作，能够使hash&长度-1更分散。
 
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashMap1.png)
+
 接下来就是我们要说的table的长度为什么必须是2的n次方：
 
 1、保证为2次幂，n-1的二进制表示形式肯定是：00000.....1111，这样（n-1）&hash的结果肯定落在table区间里面，这是前提。
@@ -76,7 +111,17 @@ table[(n - 1) & hash]
 
 3、便是在resize()时，使得扩展的数组更加分散，接下来详细分析resize实现过程。
 
+添加元素流程
 
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap2.png)
+
+```java
+public V put(K key, V value) {
+    return putVal(hash(key), key, value, false, true);
+}
+```
+
+调用putVal
 
 ```java
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
@@ -132,6 +177,10 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     return null;
 }
 ```
+
+当单个entry长度达到8
+	如果当前map的长度小于64则table扩容
+	如果当前map的长度大于64则当前entry转换为红黑树
 
 resize流程,分两步，第一步是计算扩容后数组的长度和threshold，第二步是rehash重新将元素节点添加到新数组上。
 
@@ -209,6 +258,106 @@ final Node<K,V>[] resize() {
         }
     }
     return newTab;
+}
+```
+
+JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置
+
+因此，我们在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为16扩充为32的resize示意
+
+这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。有兴趣的同学可以研究下JDK1.8的resize源码，写的很赞，如下:
+
+![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap3.png)
+
+get流程
+
+```java
+public V get(Object key) {
+    Node<K,V> e;
+    return (e = getNode(hash(key), key)) == null ? null : e.value;
+}
+```
+
+调用getNode
+
+```java
+final Node<K,V> getNode(int hash, Object key) {
+    Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
+    //先获取数组的头节点
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (first = tab[(n - 1) & hash]) != null) {
+        //如果头节点是要找的元素(hash相等并且key相等)，直接返回
+        if (first.hash == hash && // always check first node
+            ((k = first.key) == key || (key != null && key.equals(k))))
+            return first;
+        if ((e = first.next) != null) {
+            //头节点不是所找元素，判断是否是红黑树，如果是则走红黑树查找流程
+            if (first instanceof TreeNode)
+                return ((TreeNode<K,V>)first).getTreeNode(hash, key);
+            do {
+                //链表，则遍历链表匹配元素
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    return e;
+            } while ((e = e.next) != null);
+        }
+    }
+    return null;
+}
+```
+
+删除流程
+
+```java
+public V remove(Object key) {
+    Node<K,V> e;
+    return (e = removeNode(hash(key), key, null, false, true)) == null ?
+        null : e.value;
+}
+```
+
+调用removeNode
+
+```java
+final Node<K,V> removeNode(int hash, Object key, Object value,
+                               boolean matchValue, boolean movable) {
+    Node<K,V>[] tab; Node<K,V> p; int n, index;
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (p = tab[index = (n - 1) & hash]) != null) {
+        Node<K,V> node = null, e; K k; V v;
+        if (p.hash == hash &&
+            ((k = p.key) == key || (key != null && key.equals(k))))
+            node = p;
+        else if ((e = p.next) != null) {
+            if (p instanceof TreeNode)
+                node = ((TreeNode<K,V>)p).getTreeNode(hash, key);
+            else {
+                do {
+                    if (e.hash == hash &&
+                        ((k = e.key) == key ||
+                         (key != null && key.equals(k)))) {
+                        node = e;
+                        break;
+                    }
+                    p = e;
+                } while ((e = e.next) != null);
+            }
+        }
+        if (node != null && (!matchValue || (v = node.value) == value ||
+                             (value != null && value.equals(v)))) {
+            if (node instanceof TreeNode)
+                ((TreeNode<K,V>)node).removeTreeNode(this, tab, movable);
+            else if (node == p)
+                tab[index] = node.next;
+            else
+                p.next = node.next;
+            ++modCount;
+            --size;
+            afterNodeRemoval(node);
+            return node;
+        }
+    }
+    return null;
 }
 ```
 
