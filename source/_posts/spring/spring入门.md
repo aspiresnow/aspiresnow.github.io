@@ -77,7 +77,3 @@ spring默认使用`commons-logging`记录日志。在`spring-core`中依赖了�
    <version>1.1.7</version>
 </dependency>
 ```
-
-## jjjj
-
-Depend-on属性， 明确初始化先后顺序和销毁先后顺序

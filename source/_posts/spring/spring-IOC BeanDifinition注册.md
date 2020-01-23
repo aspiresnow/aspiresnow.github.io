@@ -20,11 +20,11 @@ categories:
 
 Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。从继承图可以看出，BeanFactory的继承主要分成两个体系，一条是spring-context中ApplicationContext的继承体系，一条是spring-core中XMLBeanFactory的继承体系。首先简单介绍下spring-core继承体系中各个继承类的功能
 
-- BeanFactory:访问spring容器的根接口，主要提供了 getBean方法。通过id获取容器中bean对象
+- BeanFactory:访问spring容器的根接口，主要提供了 getBean方法。通过beanName获取容器中bean对象
 - ListableBeanFactory:提供获取容器中所有bean对象的功能实现。通俗讲就是获取多个bean对象
 - HierarchicalBeanFactory：提供获取父类容器的功能
 - AutowireCapableBeanFactory:提供创建bean、配置bean、自动注入、bean初始化以及应用BeanPostProcesror的后处理器。
-- ConfigurableBeanFactory:提供配置spring容器的方法接口
+- ConfigurableBeanFactory:提供配置spring容器的方法接口,用于对容器进行扩展
 - ConfigurableListableBeanFactory：配置容器要忽略的类型和接口。综合了listable和configurable的功能。
 - AbstractBeanFactory:综合了FactoryBeanRegistrySupport的注册功能，并实现了部分容器的具体功能实现
 - AbstractAutowireCapableBeanFactory:对自动配置的具体实现，综合了AbstractBeanFactory的功能
@@ -62,8 +62,8 @@ spring的加载bean配置的过程是将spring配置转换为spring内部数据�
 - BeanDefinitionRegistry：注册器  DefaultListableBeanFactory 实现了注册器功能
 
 XmlBeanFactory的初始化是从`loadBeanDefinition`方法开始的,主要过程如下:
-1. 通过ResourceLoader来完成资源文件位置的定位，DefaultResourceLoader是默认的实现，同时上下文本身就给出了ResourceLoader的实现，可以从类路径，文件系统, URL等方式来定为资源位置。如果是XmlBeanFactory作为IOC容器，那么需要为它指定bean定义的资源，也就是说bean定义文件时通过抽象成Resource来被IOC容器处理的
-2. 容器通过BeanDefinitionReader来完成定义信息的解析和Bean信息的注册,往往使用的是XmlBeanDefinitionReader来解析bean的xml定义文件
+1. 通过ResourceLoader来完成资源文件位置的定位，DefaultResourceLoader是默认的实现，同时上下文本身就给出了ResourceLoader的实现，可以从类路径，文件系统, URL等方式来定位资源位置。如果是XmlBeanFactory作为IOC容器，那么需要为它指定bean定义的资源，也就是说bean定义文件是通过抽象成Resource来被IOC容器处理的
+2. 容器通过BeanDefinitionReader来完成定义信息的解析和Bean信息的注册,使用的是XmlBeanDefinitionReader来解析bean的xml定义文件
 3. 实际的处理过程是委托给BeanDefinitionParserDelegate来完成的，从而得到bean的定义信息，这些信息在Spring中使用BeanDefinition对象来表示 
 4. IoC容器解析得到BeanDefinition以后，需要把它在IOC容器中注册，这由IOC实现 BeanDefinitionRegistry接口来实现。注册过程就是在IOC容器内部维护的一个HashMap来保存得到的 BeanDefinition的过程。这个HashMap是IoC容器持有bean信息的场所，以后对bean的操作都是围绕这个HashMap来实现的
 
@@ -153,7 +153,7 @@ public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefin
             "IOException parsing XML document from " + encodedResource.getResource(), ex);
     }
     finally {
-        //最终在移除文件正在加载的标识
+        //最终移除文件正在加载的标识
         currentResources.remove(encodedResource);
         if (currentResources.isEmpty()) {
             this.resourcesCurrentlyBeingLoaded.remove();
@@ -512,9 +512,9 @@ public AbstractBeanDefinition parseBeanDefinitionElement(
         if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
             parent = ele.getAttribute(PARENT_ATTRIBUTE);
         }
-        //就是创建一个AbstractBeanDefinition对象返回
+         //就是创建一个AbstractBeanDefinition对象返回
         AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-		//解析<bean>标签上的属性，如 init-method singleton scope lazy-init autowire等属性
+		    //解析<bean>标签上的属性，如 init-method singleton scope lazy-init autowire等属性
         parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
         //解析description
         bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));

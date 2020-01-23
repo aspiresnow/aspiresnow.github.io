@@ -115,7 +115,7 @@ protected final void refreshBeanFactory() throws BeansException {
         //创建一个DefaultListableBeanFactory对象
         DefaultListableBeanFactory beanFactory = createBeanFactory();
         beanFactory.setSerializationId(getId());
-        customizeBeanFactory(beanFactory);//设置是佛允许循环依赖和覆盖
+        customizeBeanFactory(beanFactory);//设置是否允许循环依赖和覆盖
         loadBeanDefinitions(beanFactory);
         synchronized (this.beanFactoryMonitor) {
             this.beanFactory = beanFactory;//将BeanFactory声明为内部的一个全局变量
@@ -277,7 +277,7 @@ protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFa
 }
 ```
 
-###添加国际化支持
+### 添加国际化支持
 
 通过注册一个MessageSource的bean。bean的id必须为 messageSource。默认实现为DelegatingMessageSource
 
