@@ -148,7 +148,7 @@ public class PropertyEditorSupport implements PropertyEditor {
 
 首先先看下BeanWrapperImpl的继承图。还有一个跟BeanWrapperImpl平级的实现类DirectFieldAccessor，用于处理getter和setter的字段访问
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/BeanWrapper%E7%BB%A7%E6%89%BF.png)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/BeanWrapper%E7%BB%A7%E6%89%BF.png?raw=true)
 
 从图可以看出，BeanWrapperImpl实现了3个顶级接口，提供了对象属性访问、类型转换器的注册和查找、类型转换功能
 
@@ -206,7 +206,7 @@ public void registerCustomEditor(Class<?> requiredType, String propertyPath, Pro
 
 来看PropertyEditor的查找流程
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E6%9F%A5%E6%89%BE%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%99%A8.png)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/%E6%9F%A5%E6%89%BE%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%99%A8.png?raw=true)
 
 首先根据属性名从customEditorsForPath查找特定的类型转换器
 
@@ -330,7 +330,7 @@ public <T> T convertIfNecessary(String propertyName, Object oldValue, Object new
 }
 ```
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%B5%81%E7%A8%8B%E5%9B%BE.png?raw=true)
 
 首先通过propertyEditorRegistry查找自定义的类型转换器PropertyEditor和ConversionService
 

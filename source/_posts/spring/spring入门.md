@@ -12,7 +12,7 @@ categories:
 
 ## 一、spring-framework组成
 
-![](https://image-1257941127.cos.ap-beijing.myqcloud.com/springComponent.jpg)
+![](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/springComponent.jpg?raw=true)
 
 - spring-core、spring-beans 提供了基础的依赖注入和控制反转功能 BeanFactory。
 - spring-context 提供了ApplicationContext接口集成容器。 并提供了资源加载、国际化等功能
