@@ -17,6 +17,8 @@ AQS内部对线程的阻塞依赖LockSupport.part(thread)，其功能是用来�
 
 <!--more-->
 
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts2.jpg?raw=true)
+
 ## AQS模式
 
 AQS内部提供了两种实现，即独占模式和共享模式，在独占模式下只运行同时一个线程访问代码块如ReentrantLock，共享模式下允许指定多个线程同时访问代码块，如Semaphore和CountDownLatch
@@ -34,7 +36,7 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
 
 ### 独占锁加锁流程
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/aqs2.jpg?raw=true)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/并发/aqs2.jpg?raw=true)
 
 - 首先AQS内部维护了一个节点类型，用于存储被阻塞的线程,内部维护了被阻塞线程的状态
 
@@ -84,7 +86,7 @@ static final class Node {
        acquire(1);//调用AQS的acquire方法
    }
   ```
-  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/aqs4.jpg)
+  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/aqs4.jpg?raw=true)
 
 - AQS中的acquire方法，调用钩子方法tryAcquire，tryAcquire由子类覆盖实现，如果获取资源成功，则当前线程获取执行权，如果失败，调用acquireQueued将当前线程加入等待队列，设置当前为独占锁模式，并阻塞当前线程
 
@@ -255,7 +257,7 @@ static final class Node {
 
   4. 如果线程在等待过程中被中断过，它是不响应的。只是获取资源后才再进行自我中断selfInterrupt()，将中断补上。
 
-     ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/aqs3.jpg)
+     ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/aqs3.jpg?raw=true)
 
 ### 独占锁释放锁流程
 

@@ -11,9 +11,9 @@ date: 2018-02-04 10:26:48
 
 ## git中的提交逻辑
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git4.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/git/git4.jpg?raw=true)
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git1.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/git/git1.jpg?raw=true)
 
 - Workspace：工作区，工作使用的地方，是当前能看到的最新的代码
 - Index / Stage：暂存区，.git目录下的index文件，通过`git status`可以查看暂存区状态
@@ -39,7 +39,7 @@ HEAD，它始终指向当前所处分支的最新的提交点。你所处的分�
 
 ## git常用的指令
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git2.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/git/git2.jpg?raw=true)
 
 ### git clone
 
@@ -130,7 +130,7 @@ revert和reset区别
 
 - git reset 是把HEAD向后移动了一下，而git revert是HEAD继续前进，只是新的commit的内容和要revert的内容正好相反，能够抵消要被revert的内容。
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/git3.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/git/git3.jpg?raw=true)
 
 ### git log
 
@@ -355,6 +355,3 @@ git push origin master # 推到origin远程
 
 ```
 
-# 参考资料
-
-[一篇文章，教你学会Git](https://www.jianshu.com/p/072587b47515)

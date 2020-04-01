@@ -27,14 +27,14 @@ java编程语言允许线程访问共享变量，为了确保共享变量能被�
 
 计算机在执行程序时，每条指令都是在CPU中执行的，而执行指令过程中，势必涉及到数据的读取和写入。由于程序运行过程中的临时数据是存放在主存（物理内存）当中的，这时就存在一个问题，由于CPU执行速度很快，而从内存读取数据和向内存写入数据的过程跟CPU执行指令的速度比起来要慢的多，因此如果任何时候对数据的操作都要通过和内存的交互来进行，会大大降低指令执行的速度。因此在CPU里面就有了高速缓存。也就是，当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中,如果一个变量在多个CPU中都存在缓存（一般在多线程编程时才会出现），那么就可能存在缓存不一致的问题
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts3.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts3.jpg?raw=true)
 
 ## java内存模型
 
 java中多线程共享的变量存储在主内存中，处理器CPU为了提高执行效率，每个线程都有自己的工作内存，工作内存保存了主内存的副本，线程要操作共享变量，实际操作的是线程工作内存的副本，操作完毕后再同步写入主内存，各个线程线程只能访问自己的工作内存，不可以访问其它线程的工作内存。
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts4.png)
-​									`java中线程工作内存跟主内存的交互`
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts4.png?raw=true)
+									`java中线程工作内存跟主内存的交互`
 
 Java内存模型规定了工作内存与主内存之间交互的协议，首先是定义了8种原子操作：
 
@@ -192,7 +192,9 @@ public class Counter {
 ```
 这段程序执行完毕后无法保证count的数量最终为1000，这是因为volatile只能保证使用count的时候去主内存读取到最新的值，但是在对count进行+1操作的时候，其它线程可能会对count进行修改+1然后写会主内存，造成最后的结果不是1000，如果要保证1000，还是要对整个read到write回主内存保证一致性，这就需要使用synchronized或者lock去实现了。
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts5.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts5.jpg?raw=true)
+
+
 
 ## 原理和实现机制
 

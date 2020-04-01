@@ -20,7 +20,7 @@ shiro是一个简单适用的安全框架，通过shiro可以方便的对应用�
   - 支持记忆**登录
 - shiro的组件
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/shiro1.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/shiro1.jpg?raw=true)
 
 ​	**Authentication(认证)**：系统验证用户登录信息
 ​	**Authorization(授权)**：验证用户有哪些资源的访问权限
@@ -66,7 +66,7 @@ shiro是一个简单适用的安全框架，通过shiro可以方便的对应用�
    ```
 ## 基本原理
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/shiro2.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/shiro2.jpg?raw=true)
 **Subject**：一个抽象概念，同shiro应用交互的对象的抽象，shiro提供的唯一交互接口
 **Security Manager**:shiro的核心模块,subject的后期处理都由它进行处理，Security Manager是模块化的继承，每个模块分别负责不同的功能。
 **Realm**：shiro的DAO层，提供用户、角色、权限信息，连接一个或多个数据源并将数据转换成shiro可以理解的数据
@@ -83,7 +83,7 @@ shiro是一个简单适用的安全框架，通过shiro可以方便的对应用�
 
 ### 权限认证流程
 调用Subject的api的isPermitted和人checkPermission方法，首先会将请求提交给Security Manager，Security Manager调用Authorizer进行权限验证，Authorizer调用底层的多个Realm实现获取用户权限信息，将用户角色所属的权限信息和直接绑定到用户上的权限信息进行聚合，然后判断权限是否在该集合中。
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/shiro3.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/shiro3.jpg?raw=true)
 
 
 

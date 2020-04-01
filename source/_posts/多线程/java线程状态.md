@@ -14,7 +14,7 @@ categories:
 
 <!--more-->
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/ts1.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts1.jpg?raw=true)
 
 ### 线程间的状态转换:
 
