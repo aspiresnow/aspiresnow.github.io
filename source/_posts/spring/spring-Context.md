@@ -20,8 +20,6 @@ PostProcessorRegistrationDelegate
 
 PathMatchingResourcePatternResolver 用于解析配置文件位置
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/spring/Application%E7%BB%A7%E6%89%BF%E5%9B%BE.png)
-
 ## 源码解读
 
 以ApplicationContext为例,创建一个ApplicationContext对象，指定配置文件的位置
