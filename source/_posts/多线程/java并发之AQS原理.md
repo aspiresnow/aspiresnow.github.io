@@ -13,8 +13,6 @@ categories:
 
 AQS内部维护了一个volatile int state和一个FIFO线程等待队列，当state的值为0的时候，任意线程可以获取执行权，当存在竞争即state不为0时，将线程添加到等待队列并阻塞，等待当前占用state的线程原子减少state并激活队列头的节点线程。自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可tryLock和tryRelease方法，等待队列的维护由AQS内部实现。
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/aqs1.jpg)
-
 AQS内部对线程的阻塞依赖LockSupport.part(thread)，其功能是用来代替wait和notity/notifyall的，更好的地方是LockSupport对park方法和unpark方法的调用没有先后的限制，而notify/notifyall必须在wait调用之后调用。
 
 <!--more-->
@@ -36,24 +34,20 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
 
 ### 独占锁加锁流程
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/aqs2.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/aqs2.jpg?raw=true)
 
 - 首先AQS内部维护了一个节点类型，用于存储被阻塞的线程,内部维护了被阻塞线程的状态
 
-  ​	CANCELLED，值为1，表示当前的线程被取消。
-
-  　　 SIGNAL，值为-1，表示当前节点的后继节点包含的线程需要运行，需要进行unpark操作。
-
-  　　 CONDITION，值为-2，表示当前节点在等待condition，也就是在condition queue中。
-
-  　　 PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行。
-
-  　　值为0，表示当前节点在sync queue中，等待着获取锁。
+     1. CANCELLED，值为1，表示当前的线程被超时取消或者中断。
+2. SIGNAL，值为-1，表示当前节点的后继节点包含的线程被阻塞，当前线程执行完毕后需要对其进行unpark操作。
+  3. CONDITION，值为-2，表示当前节点在等待condition，也就是在condition queue中。
+4. PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行。
+  5. 值为0，表示当前节点在sync queue中，等待着获取锁。
 
   ```java
-  static final class Node {
+static final class Node {
       /** Marker to indicate a node is waiting in shared mode */
-      static final Node SHARED = new Node();
+    static final Node SHARED = new Node();
       /** Marker to indicate a node is waiting in exclusive mode */
       static final Node EXCLUSIVE = null;
       static final int CANCELLED =  1;
@@ -79,7 +73,7 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
       }
   }
   ```
-
+  
 - ReetrantLock内部的Sync类继承AbstractQueuedSynchronizer，调用lock方法的时候实际上是原子性去设置state为1，成功则竞争成功，失败就加入等待队列
 
   ```java
@@ -182,14 +176,15 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
         //自旋  当线程从阻塞状态被唤醒后再次循环获取资源，如果是interrupt唤醒，循环再次获取锁
           for (;;) {
               final Node p = node.predecessor();//获取前一个节点
-            //如果前一个节点已经是head(空的节点)，当前节点已经是排队中的第一个，则尝试去获取资源
+              //如果前一个节点已经是head(空的节点)，当前节点已经是排队中的第一个，则尝试去获取资源
               if (p == head && tryAcquire(arg)) {
-                  setHead(node);//加锁成功后将从队列中移除 当前节点，保证head节点为空的
+                  setHead(node);//加锁成功后将从队列中移除当前节点，保证head节点为空的
+                  //从头开始删除链表节点
                   p.next = null; // help GC
                   failed = false;
                   return interrupted;//获得资源，当前线程获取执行权
               }
-            //在阻塞线程之前判断线程状态是否适合阻塞
+              //在阻塞线程之前判断线程状态是否适合阻塞
               if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt())
                   interrupted = true;
           }
@@ -197,6 +192,12 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
           if (failed)
               cancelAcquire(node);
       }
+  }
+  //链表中移除当前节点
+  private void setHead(Node node) {
+    head = node;
+    node.thread = null;
+    node.prev = null;
   }
   ```
   在线程阻塞之前调用shouldParkAfterFailedAcquire方法检查线程状态是否应该阻塞，避免队列中其他线程已经都被取消，当前线程无效等待
@@ -215,7 +216,7 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
           pred.next = node;
       } else {
         //为PROPAGATE -3 或者是0 表示无状态,(为CONDITION -2时，表示此节点在condition queue中)
-        //比较并设置设置其状态为SIGNAL，通知他在释放资源后激活自己，如果失败 继续在acquireQueued循环
+        //比较并设置其状态为SIGNAL，通知他在释放资源后激活自己，如果失败 继续在acquireQueued循环
           compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
       }
       return false;
@@ -504,7 +505,7 @@ AQS内部提供了两种实现，即独占模式和共享模式，在独占模�
       // fail if not, in which case, we lost race vs another cancel
       // or signal, so no further action is necessary.
       Node predNext = pred.next;
-    //设置为取消状态
+      //设置为取消状态
       node.waitStatus = Node.CANCELLED;
       //如果当前节点为队尾，直接移除
       if (node == tail && compareAndSetTail(node, pred)) {

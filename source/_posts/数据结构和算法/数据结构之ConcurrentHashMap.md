@@ -52,6 +52,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
             //如果当前桶中已经有了链表，锁住头节点，将新元素添加到链表尾部，
             V oldVal = null;
             synchronized (f) {
+              	//判断头结点是否发生变化，如果发生变化，重新循环尝试
                 if (tabAt(tab, i) == f) {
                     //大于0，代表是链表
                     if (fh >= 0) {
@@ -445,3 +446,7 @@ static final class ForwardingNode<K,V> extends Node<K,V> {
 ## 参考
 
 [ConcurrentHashMap底层实现原理(JDK1.7 & 1.8)](https://www.jianshu.com/p/865c813f2726)
+
+[谈谈ConcurrentHashMap1.7和1.8的不同实现](https://www.jianshu.com/p/e694f1e868ec)
+[深入浅出ConcurrentHashMap1.8](https://www.jianshu.com/p/c0642afe03e0)
+[深入分析ConcurrentHashMap1.8的扩容实现](https://www.jianshu.com/p/f6730d5784ad)

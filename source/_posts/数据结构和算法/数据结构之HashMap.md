@@ -13,16 +13,17 @@ categories:
 HashMap 1.8 与 1.7 对比
 
 - HashMap创建对象的时候，1.8中数组的长度一定是2的倍数,无论构造器参数中initialCapacity传的多少
-
 - 红黑树的出现，1.8 中当每个桶中的冲突超过 7 个时，链表则会转成红黑树，让 O(N) 访问效率转为O(logN)。
-
 - 在 JDK 1.8 的实现中，优化了高位运算的算法，通过 hashCode() 的高 16 位异或低 16 位实现的，目的为了使得位置索引更离散些。
+- JDK8中是插入元素，再判断长度进行扩容，这时因为JDK8添加元素是一次遍历完成插入(+1)或者更新(**长度不变**)的，所以是添加完之后判断扩容，JDK7是先遍历一遍，存在直接更新，不存在再扩容 遍历找插入位置，所以JDK8只能后扩容，要不然肯定先扩容好，少copy一个新增的元素
 
 1.7 中 resize，只有当 size >= threshold 并且 table 中的那个槽中已经有 Entry 时，才会发生 resize。1.8 中只要大于 threshold 即扩容。
 
 1.7 中添加元素时候，有冲突时，先遍历整个链表，确认是否已存在，不存在则进行头插法。而 1.8 中有冲突时候，链表形态下，是添加在尾部的。
 
 1.7 中扩充时候，也是采用头插法，会导致之前元素相对位置倒置了。而 1.8 中扩充时，链表形态下，采用尾插法。之前元素相对位置未变化。
+
+HashMap中采用了数组+链表的数据结构，在jdk8中，当链表节点的个数超过一定数量之后，会转换为红黑树，所以在jdk8中HashMap的数据结构为 树组+链表+红黑树。
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap4.png)
 
@@ -38,10 +39,6 @@ static final int hash(Object key) {
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 }
 ```
-
-
-
-HashMap中采用了数组+链表的数据结构，在jdk8中，当链表节点的个数超过一定数量之后，会转换为红黑树，所以在jdk8中HashMap的数据结构为 树组+链表+红黑树。
 
 首先来看下链表节点类型
 
@@ -84,7 +81,7 @@ static final int tableSizeFor(int cap) {
 }
 ```
 
-因为2的幂-1都是11111结尾的，所以碰撞几率小。使Hash算法的结果均匀分布。这样计算之后， 在 n 为 2 ^ n 时， 其实相当于 hash % n，& 当然比 % 效率高
+因为2的幂 - 1都是11111结尾的，所以碰撞几率小。使Hash算法的结果均匀分布。这样计算之后， 在 n 为 2 ^ n 时， 其实相当于 hash % n，& 当然比 % 效率高
 
 Hash算法的后两步运算（高位运算和取模运算，下文有介绍）来定位该键值对的存储位置，有时两个key会定位到相同的位置，表示发生了Hash碰撞。当然Hash算法计算结果越分散均匀，Hash碰撞的概率就越小，map的存取效率就会越高。
 
@@ -113,7 +110,7 @@ table[(n - 1) & hash]
 
 3、便是在resize()时，使得扩展的数组更加分散，接下来详细分析resize实现过程。
 
-添加元素流程
+### put添加元素流程
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap2.png)
 
@@ -271,7 +268,7 @@ JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表�
 
 ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap3.png)
 
-get流程
+### get流程
 
 ```java
 public V get(Object key) {
@@ -308,7 +305,7 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-删除流程
+### 删除流程
 
 ```java
 public V remove(Object key) {
@@ -363,7 +360,20 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
 }
 ```
 
+### 死循环问题
 
+jdk1.7的transfer是用头插法，新的链表和原来的是倒着的，所以这时候假如有两个线程，第一个线程只执行到**Entry next = e.next;**然后就第二个线程执行了，等到第二个线程执行完，其实这时候已经完成了扩容的任务，且链表里的顺序 已经倒置了，这时候第一个线程继续执行，这时候就把尾巴又指向头了，然后就造成了环。
+
+JDK8中其实就是声明两对指针，维护两个链表，依次在末端添加新的元素。虽然解决了死循环问题，但还是会有其他问题，所以多线程还是尽量用ConcurrentHashMap。
+
+### 线程安全问题
+
+HashMap不是线程安全的，线程安全问题在操作共享遍历的时候会出现，在HashMap中 table、size是最主要的成员变量，所以在操作table和size的地方会出现线程安全问题
+
+1. resize的时候会将table重新赋值，如果这个时候有多个线程并发resize，会出现获取到的resize前table是一个线程刚刚赋值的新的空table，造成丢失数据
+2. table中的链表也是共享变量，当多个线程并发向链表尾部添加元素的时候，会出现覆盖丢失的情况
+3. size变量共享操作的时候 ++size也会出现并发安全问题
+4. 删除元素的时候，并发删除的时候也会出现覆盖问题
 
 ## 参考
 
@@ -372,4 +382,6 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
 [JDK8 HashMap源码详解](https://www.jianshu.com/p/715918ac18f4)
 
 [最新JDK8HashMamp实现过程源码分析（二）](https://blog.csdn.net/youngogo/article/details/81281959)
+
+[详解并发下的HashMap以及JDK8的优化](https://www.jianshu.com/p/e1c020d37c6a)
 
