@@ -11,7 +11,7 @@ categories:
 
 ## HBase基本组件
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase3.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase3.jpg?raw=true)
 
 - Client
 
@@ -33,7 +33,7 @@ categories:
 
 - HRegion Server
 
-  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase4.jpg)
+  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase4.jpg?raw=true)
 
   - 负责响应client的I\O请求，存储hbase的数据文件，查询并返回数据
   - HRS上存储多个Region
@@ -77,9 +77,9 @@ categories:
 
   - 一个Region有多个Store，一个Store包含一个MemStore(内存数据)和多个StoreFile(磁盘数据)， 每个StoreFile保存一个ColumnFamily，其中StoreFile存储在HDFS上，对应为HFile文件。
 
-    ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase5.jpg)
+    ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase5.jpg?raw=true)
 
-    ​
+    
 
 - Store
 
@@ -105,7 +105,7 @@ categories:
 
 ## 数据模型
 
-![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase6.jpg)
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase6.jpg?raw=true)
 
 - Rowkey
 
@@ -146,7 +146,7 @@ categories:
 
 - KeyValue
 
-  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase7.jpg)
+  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase7.jpg?raw=true)
 
   - KeyValue就是一个简单的byte数组，以两个分别表示键长度和值长度的定长数字开始。通过这两个值可以忽略键直接访问值
   - 每一个KeyValue实例包含了行键、列键和时间戳索引和值 (Table,RowKey,Family,Column,Timestamp)—>value，(Timestamp是一个 64 位Java的long型)，数据按照一个四维坐标系统来组织：行键、列族、列限定符和时间版本

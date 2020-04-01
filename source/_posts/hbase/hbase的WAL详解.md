@@ -38,7 +38,7 @@ HBase中可以通过设置WAL的持久化等级决定是否开启WAL机制、以
 
 - HLog Sequece File的Value是HBase的KeyValue对象，即对应HFile中的KeyValue.
 
-  ![image](https://image-1257941127.cos.ap-beijing.myqcloud.com/hbase2.jpg)
+  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase2.jpg?raw=true)
 
 region name和table name分别表征该段日志属于哪个region以及哪张表；cluster ids用于将日志复制到集群中其他机器上。
 
