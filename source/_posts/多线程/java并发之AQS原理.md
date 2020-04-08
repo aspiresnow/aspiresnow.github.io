@@ -75,7 +75,7 @@ static final class Node {
       }
   }
   ```
-  
+
 - ReetrantLock内部的Sync类继承AbstractQueuedSynchronizer，调用lock方法的时候实际上是原子性去设置state为1，成功则竞争成功，失败就加入等待队列
 
   ```java
@@ -132,7 +132,7 @@ static final class Node {
       Node node = new Node(Thread.currentThread(), mode);
       // Try the fast path of enq; backup to full enq on failure
       Node pred = tail;
-    	//节点已经初始化
+    	//节点已经初始化 快速尝试添加到队尾
       if (pred != null) {
         //尝试将节点加到队尾，在无竞争情况下保证会成功返回，如果失败再调用enq方法，循环尝试
           node.prev = pred;
@@ -168,7 +168,9 @@ static final class Node {
   }
   ```
 
-- 线程已经加入等待队列，并返回所处队列的节点node，**当前线程进入阻塞状态，直到其他线程释放资源后唤醒自己，然后在获取CPU执行权**，在死循环中CAS获取资源直到成功移除等待队列中获取资源的节点，线程获取执行权并返回中断标识，
+- 线程已经加入等待队列，并返回所处队列的节点node，**当前线程进入阻塞状态，直到其他线程释放资源后唤醒自己，然后在获取CPU执行权**，在死循环中CAS获取资源直到成功移除等待队列中获取资源的节点，线程获取执行权并返回中断标识。阻塞线程只能依靠前驱节点唤醒或者被interupt唤醒(**不会抛出异常，只会唤醒线程**)
+
+  head节点是取的锁获取执行权的线程，当该线程执行完毕前会唤醒其后继节点线程，后继节点被唤醒后需要判断其前继节点是否是头结点，这是为了避免是interrupt中断唤醒线程。当前继节点是头结点的时候，也有可能是中断唤醒，所以还要再去调用 tryAcquire 尝试获取锁，成功则真正获取执行权，然后再删除头结点，将head指向自己
 
   ```java
   final boolean acquireQueued(final Node node, int arg) {
@@ -191,6 +193,7 @@ static final class Node {
                   interrupted = true;
           }
       } finally {
+        //如果上面for循环中抛出异常，线程会死亡，没有获取资源成功，会执行取消流程，将该结点作废
           if (failed)
               cancelAcquire(node);
       }
@@ -204,7 +207,7 @@ static final class Node {
   ```
   在线程阻塞之前调用shouldParkAfterFailedAcquire方法检查线程状态是否应该阻塞，避免队列中其他线程已经都被取消，当前线程无效等待
 
-- 只有当前节点前面的节点状态是SIGNAL的，这样当前一个节点释放资源后才能通知唤醒后一个等待的节点。所以当前线程在被阻塞前，需要保证前一个节点的状态为SIGNAL，如果已是取消状态，则从队列中移除，
+- 只有当前节点前面的节点状态是SIGNAL的，这样当前一个节点释放资源后才能通知唤醒后一个等待的节点。所以当前线程在被阻塞前，**需要保证将前一个节点的状态设置为SIGNAL**，如果已是取消状态，则从队列中移除，
 
   ```java
   private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
@@ -217,14 +220,13 @@ static final class Node {
           } while (pred.waitStatus > 0);
           pred.next = node;
       } else {
-        //为PROPAGATE -3 或者是0 表示无状态,(为CONDITION -2时，表示此节点在condition queue中)
-        //比较并设置其状态为SIGNAL，通知他在释放资源后激活自己，如果失败 继续在acquireQueued循环
+          //当前线程要park的条件是必须成功的将其前继节点设置为 SIGNAL状态
           compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
       }
       return false;
   }
   ```
-
+  
 - 调用LockSupport.park(thread)阻塞线程，直到获得执行权的线程调用unpark(thread)激活当前线程，再次尝试去获取资源，等待线程被激活的顺序是遵从队列的FIFO原则的，无法达到公平锁是因为入队的顺序无法保证
 
   当线程被激活后，返回中断信号，用于响应在阻塞状态下无法响应的中断信号，如果阻塞期间被中断过则会调用selfInterrupt()方法，执行当前线程interrupt()
@@ -376,7 +378,14 @@ static final class Node {
   private void setHeadAndPropagate(Node node, int propagate) {
       Node h = head; // Record old head for check below
       setHead(node);//head指向当前节点
-      //如果还有剩余量，继续唤醒下一个邻居线程
+      //如果还有剩余量，继续唤醒当前节点的后继节点线程
+    //1.propagate>0 表示还有剩余资源，需要唤醒后继共享节点
+  //2.h.waitStatus<0 如果h.waitStatus = PROPAGATE，表示之前的某次调用暗示了资源有剩余，所以需要
+  //唤醒后继共享模式节点，由于PROPAGATE状态可能转化为SIGNAL状态，所以直接使用h.waitStatus < 0来判断
+  //如果现在的头节点的waitStatus<0，唤醒
+  //3.h==null，表示此节点变成头节点之前，同步队列为空，现在当前线程获得了资源，那么后面共享的节点也
+  //可能获得资源
+  //以上3种情况可以看出，非常的保守，可能导致多次不必要的唤醒。
       if (propagate > 0 || h == null || h.waitStatus < 0 ||
           (h = head) == null || h.waitStatus < 0) {
           Node s = node.next;
@@ -404,25 +413,38 @@ static final class Node {
 
   ```java
   private void doReleaseShared() {
-      
-      for (;;) {
-          Node h = head;
-          if (h != null && h != tail) {//等待队列存在等待线程
-              int ws = h.waitStatus;
-              if (ws == Node.SIGNAL) {//需要保证将清除节点状态，失败则for循环中重新校验
-                  if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
-                      continue;            // loop to recheck cases
-                  unparkSuccessor(h);//激活下一个节点
+          for (;;) {
+              //唤醒操作由头结点开始，注意这里的头节点已经是上面新设置的头结点了
+              //其实就是唤醒上面新获取到共享锁的节点的后继节点
+              Node h = head;
+              //1.如果头节点不为空，且头节点不等于尾节点，说明还有线程在同步队列中等待。
+              //需要注意的是，等待队列的头节点是已经获得了锁的线程，所以如果等待队列中只有一个节点，那就说明没
+              //有线程阻塞在这个等待队列上
+              if (h != null && h != tail) {
+                  int ws = h.waitStatus;
+                  //表示后继节点需要被唤醒
+                  if (ws == Node.SIGNAL) {
+                      //这里需要控制并发，因为入口有setHeadAndPropagate跟release两个，避免两次unpark
+                      if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                          continue;      
+                      //执行唤醒操作      
+                      unparkSuccessor(h);
+                  }
+                  //如果头节点的状态为0，说明后继节点还没有被阻塞，不需要立即唤醒，把当前节点状态设置为PROPAGATE确保以后可以传递下去，下次调用setHeadAndPropagate的时候前任头节点的状态就会是PROPAGATE，就会继续调用doReleaseShared方法把唤醒“传播”下去
+                  else if (ws == 0 &&
+                           !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                      continue;                
               }
-              else if (ws == 0 &&
-                       !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))//设置为-3，在下次
-                  continue;                // loop on failed CAS
+              //如果头结点没有发生变化，表示设置完成，退出循环
+              //如果头结点发生变化，比如说其他线程获取到了锁，为了使自己的唤醒动作可以传递，必须进行重试
+              if (h == head)                   
+                  break;
           }
-          if (h == head) //如果
-              break;
       }
-  }
   ```
+
+设置PROPAGATE状态的意义主要在于，每次释放permit都会调用doReleaseShared函数，而该函数每次只唤醒等待队列的**第一个等待节点**。所以在本次归还的permit足够多的情况下，如果仅仅依靠释放锁之后的一次doReleaseShared函数调用，可能会导致明明有permit但是有些线程仍然阻塞的情况。所以在每个线程获取到permit之后，会根据剩余的permit来决定是否把唤醒传播下去。但不保证被唤醒的线程一定能获得permit。
+
 
 ## 其他方法
 

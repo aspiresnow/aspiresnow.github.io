@@ -35,7 +35,7 @@ park()和unpark()不会有 “Thread.suspend和Thread.resume所可能引发的�
 
 - 如果调用线程被中断，则park方法会返回。同时park也拥有可以设置超时时间的版本。
 
-- park 还各自支持一个 blocker 对象参数。此对象在线程受阻塞时被记录，以允许监视工具和诊断工具确定线程受阻塞的原因。（这样的工具可以使用方法 getBlocker(java.lang.Thread) 访问 blocker。）建议最好使用这些形式，而不是不带此参数的原始形式。在锁实现中提供的作为 blocker 的普通参数是 this。
+- park 还各自支持一个 blocker 对象参数。此对象在线程受阻塞时被记录，以允许监视工具和诊断工具确定线程受阻塞的原因。（这样的工具可以使用方法 getBlocker(java.lang.Thread) 访问 blocker。）建议最好使用这些形式，而不是不带此参数的原始形式。**在锁实现中提供的作为 blocker 的普通参数是 this**。
 
    该对象被LockSupport的getBlocker和setBlocker来获取和设置，且都是通过地址偏移量方式获取和修改的
 
