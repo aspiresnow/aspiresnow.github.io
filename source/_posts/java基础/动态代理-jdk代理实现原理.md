@@ -17,7 +17,7 @@ JDK中提供了一个Proxy类用于实现动态代理，JDK的动态代理是基
 
 ## 知识导读
 
-- Proxy提供了根据接口在运行动态创建接口实现类和对象的功能，不要局限于代理
+- Proxy提供了根据接口在运行时动态创建接口实现类和对象的功能，不要局限于代理
 - 使用Proxy动态创建类的时候，该类一定要有实现的接口
 - Proxy动态创建的类会将所有方法的调用都委托给InvocationHandler对象的invoke方法来执行
 - 可以在构造InvocationHandler对象的时候传递一个被代理类对象，在invoke方法中通过method反射调用被代理类对象的方法，在方法执行前后可以增加逻辑，也可以覆写，从而实现代理功能
@@ -95,7 +95,7 @@ public static void main(String[] args) throws IOException {
 - 第二个参数是一个Interface接口列表，生成代理类要实现的接口。
 - 第三个参数是一个InvocationHandler实现类，生成的代理类中所有方法的调用都会委托给这个InvocationHandler对象的invoke方法执行
 
-代理类中所有方法的调用都会委托给参数InvocationHandler对象的invoke方法来执行，所以代理类所有方法的逻辑都需要再这个InvocationHandler对象中的invoke方法中来实现。
+代理类中所有方法的调用都会委托给参数InvocationHandler对象的invoke方法来执行，所以代理类所有方法的逻辑都需要在这个InvocationHandler对象中的invoke方法中来实现。
 
 ```java
 public static void main(String[] args) throws IOException {

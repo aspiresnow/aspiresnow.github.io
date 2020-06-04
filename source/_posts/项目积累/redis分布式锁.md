@@ -49,7 +49,7 @@ public class RedisLockUtil {
                     redisClient.Key().expire(redisKey, DEFAULT_KEY_EXPIRE);//设置失效时间，防止一直不释放锁
                     return true;
                 }
-                // 短暂休眠，nano避免出现活锁
+               //短暂休眠，nano避免出现活锁，随机延时是为了避免不同客户端同时重试导致谁都无法拿到锁的情况出现
                 Thread.sleep(30, r.nextInt(500));
             }
             log.info("key:{},timeout:{}获取锁超时！", redisKey, timeout);
