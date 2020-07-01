@@ -241,7 +241,7 @@ public class MacBookSeller$$EnhancerByCGLIB$$b857906a extends MacBookSeller impl
             CGLIB$BIND_CALLBACKS(this);
             var10000 = this.CGLIB$CALLBACK_0;
         }
-		//调用Callback的的人实现
+		//调用Callback的实现类实现
         return var10000 != null ? (String)var10000.intercept(this, CGLIB$repairComputor$0$Method, new Object[]{var1}, CGLIB$repairComputor$0$Proxy) : super.repairComputor(var1);
     }
 
@@ -698,7 +698,7 @@ public class MethodProxy {
 }
 ```
 
- 调用目标类的方法,调用FastClass对象的invoke方法，通过索引找到具体的方法
+使用MethodProxy的invoke方法调用目标类的方法,在该方法中会调用目标类对应的FastClass对象的invoke方法，通过索引找到目标对象的具体方法，避免反射
 
   ```java
   public Object invoke(Object obj, Object[] args) throws Throwable {
@@ -710,7 +710,7 @@ public class MethodProxy {
   }
   ```
 
-  调用增强类的方法,调用FastClass对象的invoke方法，通过索引找到具体的方法
+ 使用MethodProxy的invokeSuper方法调用增强类的方法,在该方法中调用增强类对象的FastClass对象的invoke方法，通过索引找到具体的方法，避免反射
 
   ```java
   public Object invokeSuper(Object obj, Object[] args) throws Throwable {

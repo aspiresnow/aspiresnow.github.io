@@ -10,21 +10,21 @@ categories:
 
 # spring-AOP(一) 手动代理
 
+spring的设计原理是构造一个个原子功能，然后不断的通过设计模式在外围进行包装、组合调用，最后实现复杂的逻辑功能。
+
 ## 知识导读
 
 - 了解Aop联盟定义的几个概念，连接点、通知、拦截、切点、增强
-- ProxyFactory 定义了创建代理对象的工厂方法，不过该类主要用于提供配置
+- ProxyFactory 定义了创建代理对象的工厂方法，不过该类主要用于提供代理配置
 - AopProxy 定义创建代理对象的接口，实现类有 jdk代理 和 cglib代理
 - 代理的本质就是对目标方法执行的拦截增强
 - 创建代理最主要是提供 被代理对象 和 增强列表 AdvisorList
-- Advisor封装了通知和切点，实质就是封装了一个可以决定在什么类的什么方法上应用的通知
-
-spring的设计原理是构造一个个原子功能，然后不断的通过设计模式在外围进行包装、组合调用，最后实现复杂的逻辑功能。
+- **Advisor封装了通知和切点，实质就是封装了一个可以决定在什么类的什么方法上进行增强的通知**
 
 ## AOP联盟和Spring扩展
 
 AOP的实质**对连接点的增强**，一般通俗点讲是对对**方法执行**的**拦截增强**
-AOP联盟定义了AOP的规范接口，制定了两个最基础的接口，连接点 和 增强 。
+AOP联盟定义了AOP的规范接口，声明了两个最基础的接口，连接点 和 增强 。
 
 ### 连接点 Joinpoint
 
@@ -51,7 +51,7 @@ public interface Advice {
 }
 ```
 
-AOP联盟声明了通知的接口，用于标记通知类型，最主要的分支的拦截器
+AOP联盟声明了通知的接口，用于标记通知类型，最主要的接口实现是拦截器Interceptor
 
 ```java
 public interface Interceptor extends Advice {
@@ -64,7 +64,6 @@ public interface Interceptor extends Advice {
 public interface MethodInterceptor extends Interceptor {
   //定义了对 方法调用 进行拦截的接口
    Object invoke(MethodInvocation invocation) throws Throwable;
-
 }
 ```
 在MethodInterceptor接口中声明了invoke方法，需要一个MethodInvocation对象参数。用于对方法调用进行拦截，然后执行增强逻辑，在合适的时机回调MethodInvocation，实现增强的功能
@@ -138,7 +137,7 @@ public interface PointcutAdvisor extends Advisor {
 1. 使用jdk Proxy，需要创建一个InvocationHandler的实现类，调用代理对象的方法都会去调用InvocationHandler的实现类的invoke方法，所有的拦截和增强在invoke方法中做
 2. 使用cglib的Enhancer，需要创建一批MethodInterceptor的实现类，调用代理对象所有方法都会去调用MethodInterceptor实现类的intercept方法，所有的拦截和增强都在intercept方法中做
 
-spring中定义了一个AopProxy接口，用于获取代理类，实现就是JdkProxy和cglibProxy，ProxyFactory提供了创建AopProxy的配置信息，创建代理类对象的工作交由AopProxy的实现类实现。
+spring中定义了一个AopProxy接口，用于获取代理类，实现类是JdkProxy和cglibProxy，ProxyFactory提供了创建AopProxy的配置信息，创建代理类对象的工作交由AopProxy的实现类实现。
 
 ![L63YVG](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/L63YVG.png)
 
@@ -151,7 +150,7 @@ ProxyFactory proxyFactory = new ProxyFactory();
 proxyFactory.setTargetSource(targetSource);//设置被代理对象
 factory.setInterfaces(IUserService.class);//设置要代理的接口
 proxyFactory.setProxyTargetClass(true);//设置使用cglib创建代理
-proxyFactory.setExposeProxy(true);//设置暴露代理类对
+proxyFactory.setExposeProxy(true);//设置是否暴露代理类
 Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 proxyFactory.addAdvisors(advisors);//设置目标类的增强 Advisor列表
 return proxyFactory.getProxy(getProxyClassLoader());//创建代理类对象
@@ -282,7 +281,13 @@ public Object getProxy(@Nullable ClassLoader classLoader) {
 
 ![5xLBWL](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/5xLBWL.png)
 
-JdkDynamicAopProxy实现了InvocationHandler的invoke方法，代理类对象所有方法的执行都会通过invoke方法来调用，在该方法中最重要的两步，一步是筛选并封装用于增强目标方法的拦截器链，第二步基于拦截器链封装MethodInvocation实现类对象，方法的调用和拦截增强全由MethodInvocation实现
+JdkDynamicAopProxy实现了InvocationHandler的invoke方法，代理类对象所有方法的执行都会通过invoke方法来调用
+
+1. 根据Pointcut筛选应用目标方法的Advisor，将Advisor中的Advice封装为增强目标方法的拦截器链
+
+2. 基于拦截器链封装MethodInvocation实现类对象，方法的调用和拦截增强全由MethodInvocation实现，
+
+注意每次目标方法执行都会新建一个MethodInvocation对象
 
 ```java
 @Override
@@ -311,7 +316,7 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
          Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
          retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
       }else {
-         //如果存在拦截器链，构造方法调用的封装对象MethodInvocation，被代理对象方法的调用以及拦截器的增强封装都通过该类实现
+         //如果存在拦截器链，构造方法调用的封装对象MethodInvocation，被代理对象方法的调用以及拦截器的增强封装都通过该类实现，每次都新建ReflectiveMethodInvocation对象，这个对象中有currentInterceptorIndex，避免污染
          MethodInvocation invocation =
                new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
          retVal = invocation.proceed();
@@ -332,7 +337,7 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
 }
 ```
 
-来看下spring中是如何筛选目标方法的拦截器链的，在getInterceptorsAndDynamicInterceptionAdvice会首先去获取缓存中的拦截器链，如果没有，再进行筛选解析
+来看下spring中是如何筛选目标方法的拦截器链的，在getInterceptorsAndDynamicInterceptionAdvice会首先去获取缓存中的拦截器链，如果没有，再进行筛选解析，感觉这里还是直接new一个list，然后将cached放进去，避免后续流程修改列表
 
 ```java
 public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, @Nullable Class<?> targetClass) {
@@ -381,13 +386,10 @@ public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
             if (match) {
                MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
                if (mm.isRuntime()) {
-                  // Creating a new object instance in the getInterceptors() method
-                  // isn't a problem as we normally cache created chains.
                   for (MethodInterceptor interceptor : interceptors) {
                      interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
                   }
-               }
-               else {
+               }else {
                   interceptorList.addAll(Arrays.asList(interceptors));
                }
             }
@@ -408,16 +410,15 @@ public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
 }
 ```
 
-获取到目标方法的拦截器链之后，就是通过参数构建MethodInvocation对象，封装了方法的执行，然后直接调用MethodInvocation的proceed方法。在MethodInvocation中会应用拦截器链中各个增强方法，然后在合适的时机调用被代理对象的目标方法，实现代理的逻辑。
+获取到目标方法的拦截器链之后，接下来构建MethodInvocation对象，调用MethodInvocation的proceed方法。在MethodInvocation中会在目标方法执行前后执行拦截器链中的增强方法，然后在合适的时机再回调目标方法，实现代理的逻辑。
 
-先来看ReflectiveMethodInvocation的构造器，其实就是对方法调用和拦截器链的封装
+通过ReflectiveMethodInvocation的构造器可以看出，该对象就是对目标方法调用和拦截器链的封装
 
 ```java
 //构造器
 protected ReflectiveMethodInvocation(
 			Object proxy, @Nullable Object target, Method method, @Nullable Object[] arguments,
 			@Nullable Class<?> targetClass, List<Object> interceptorsAndDynamicMethodMatchers) {
-
 		this.proxy = proxy;//代理类对象
 		this.target = target;//被代理对象
 		this.targetClass = targetClass;//被代理对象类型
@@ -427,10 +428,10 @@ protected ReflectiveMethodInvocation(
 }
 ```
 
-再来看如何在proceed方法完成对方法的增强，在该方法中会遍历执行拦截器链中的拦截方法，所有拦截器都执行完毕后再调用被代理类的目标方法。
+再来看如何在proceed方法完成对方法的增强，在该方法中会遍历执行拦截器链中的拦截方法，所有拦截器都执行完毕后再调用被代理类的目标方法。拦截器链是在代理类的方法中传入的，而且是缓存过的共享对象，这里避免修改该链，使用currentInterceptorIndex来记录链的执行位置。其实这块是可以进行优化的
 
 ```java
-private int currentInterceptorIndex = -1;
+private int currentInterceptorIndex = -1;//记录拦截器链执行第几个拦截器
 
 public Object proceed() throws Throwable {
    // 拦截器链遍历完毕后，调用目标方法
@@ -448,13 +449,11 @@ public Object proceed() throws Throwable {
      //通过参数判断是否需要增强，如果需要直接调用拦截器的invoke方法，并把当前MethodInvocation传递过来，以便方法拦截逻辑执行后再次调回来
       if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
          return dm.interceptor.invoke(this);
-      }
-      else {
+      } else {
         //如果不进行拦截，递归，重新执行下一个拦截器.
          return proceed();
       }
-   }
-   else {
+   } else {
      //静态拦截器，直接调用拦截器对方法进行增强
       return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
    }
@@ -477,8 +476,7 @@ CglibMethodInvocation中覆写了ReflectiveMethodInvocation的invokeJoinpoint方
 protected Object invokeJoinpoint() throws Throwable {
    if (this.methodProxy != null) {
       return this.methodProxy.invoke(this.target, this.arguments);
-   }
-   else {
+   } else {
       return super.invokeJoinpoint();
    }
 }
