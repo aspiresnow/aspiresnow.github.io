@@ -15,9 +15,9 @@ categories:
 - 在何时何处创建代理对象，如何能覆盖被代理对象，返回代理后的对象
 - 自动代理工作流程
   - 拦截获取初始化完成的目标对象
-  - 获取应用目标对象的Advisor
+  - 在spring容器中查找适合目标对象的Advisor
   - 调用ProxyFactory创建代理
-  - 返回代理对象，完成对目标对象的覆盖
+  - 返回代理对象，完成对目标对象的覆盖，注册到spring容器
 - Advisor查找、筛选、排序
 - 查找Advisor的时候，只要切点能拦截目标类中的任意一个方法就返回，在方法执行的时候还会再次判断目标方法
 - AOP注解的解析，转换封装为Advisor
@@ -138,9 +138,9 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 }
 ```
 
-在postProcessAfterInitialization方法中判断 被代理对象不为空，直接调用wrapIfNecessary判断是否对目标类进行代理
+在postProcessAfterInitialization方法中判断 被代理对象不为空，调用wrapIfNecessary判断是否对目标类进行代理
 
-1. 快速判断该类是否需要代理，如果不需要直接返回。
+1. 快速判断该类是否需要代理，如果不需要直接返回目标对象。
 2. 调用子类实现获取可应用于目标类的Advisor列表
 3. 如果存在Advisor ,调用 ProxyFactory创建目标对象的代理对象返回，否则返回目标对象
 

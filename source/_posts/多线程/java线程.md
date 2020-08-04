@@ -18,7 +18,61 @@ categories:
 进程和线程本质的区别是 是否单独占有内存空间及系统资源(如I/O)，**进程是操作系统进行资源分配的基本单位，线程是操作系统进行调度的基本单位**
 
 1. 进程单独占有一定的内存空间，进程之间的内存是隔离的，数据是分开的，线程之间共享同一个进程下的资源
-2. 进程的创建和销毁成本高，不仅需要保存寄存器和栈信息，还需要资源的分配回收以及页调度，开销较大
+2. 线程之间通信比较简单
+3. 进程的创建和销毁成本高，不仅需要保存寄存器和栈信息，还需要资源的分配回收以及页调度，开销较大
+
+## java中Thread类
+
+java中提供了Thread类，用于封装一个可执行的线程，在该类中定义线程的属性
+
+```java
+public
+class Thread implements Runnable {
+  private volatile char  name[];
+    //优先级
+    private int            priority;
+    private Thread         threadQ;
+    //是否是守护线程
+    private boolean     daemon = false;
+    //可执行的任务
+    private Runnable target;
+    //线程组
+    private ThreadGroup group;
+    //ThreadLocal变量
+		ThreadLocal.ThreadLocalMap threadLocals = null;
+    //从父类继承下来的ThreadLocal变量
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+}
+```
+
+创建Thread后会调用init方法，初始化线程的属性
+
+```java
+private void init(ThreadGroup g, Runnable target, String name,
+                  long stackSize, AccessControlContext acc) {
+    this.name = name.toCharArray();
+  //使用当前线程作为父线程
+    Thread parent = currentThread();
+	  //此处省略代码....
+    this.group = g;
+  //如果父类是守护线程，新开启的线程也是守护线程
+    this.daemon = parent.isDaemon();
+    this.priority = parent.getPriority();
+   //设置任务
+    this.target = target;
+  //设置优先级
+    setPriority(priority);
+  //设置ThreadLocal
+    if (parent.inheritableThreadLocals != null)
+        this.inheritableThreadLocals =
+            ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+    /* Stash the specified stack size in case the VM cares */
+    this.stackSize = stackSize;
+
+    /* Set thread ID */
+    tid = nextThreadID();
+}
+```
 
 ## 两种创建线程的方式
 
@@ -65,6 +119,29 @@ public void run() {
 
 ## start与run区别
 
+Thread类中的start方法是同步的，在方法内部进行了状态判断，保证一个线程只能被start成功一次
+
+```java
+public synchronized void start() {
+    //线程开启成功后threadStatus=5
+    if (threadStatus != 0)
+        throw new IllegalThreadStateException();
+    group.add(this);
+    boolean started = false;
+    try {//调用native方法启动线程
+        start0();
+        started = true;
+    } finally {
+        try {
+            if (!started) {
+                group.threadStartFailed(this);
+            }
+        } catch (Throwable ignore) {
+        }
+    }
+}
+```
+
 **start：** 启动线程，真正实现了多线程运行。这时此线程是处于就绪状态， 并没有运行。 然后通过此Thread类调用方法run()来完成其运行操作的， 这里方法run()称为线程体，它包含了要执行的这个线程的内容， run方法运行结束， 此线程终止,然后CPU再调度其它线程。
 
 **run：** 方法当作普通方法被主线程调用，程序还是要顺序执行，要等待run方法体执行完毕后，才可继续执行下面的代码， 程序中只有主线程这一个线程。 
@@ -73,8 +150,8 @@ public void run() {
 
 
 - **Thread.sleep ()** ：使当前线程在指定的时间处于阻塞状态。**线程一直持有对象的锁** 。如果另一线程调用了 interrupt ()方法，它将唤醒那个“睡眠的”线程。使用Thread调用，**只对当前线程有效** 。线程唤醒后直接进入可运行状态。
-- **object.wait (long timeout)** ：使当前线程出于阻塞状态
-  1. 不能使用Thread调用，只能使用object调用，
+- **object.wait (long timeout)** ：当前线程必须持有锁，调用wait后释放锁资源，使当前线程处于阻塞状态
+  1. 不能使用Thread调用，只能使用object调用
   2. 在调用wait前，**线程先要获取这个对象的对象锁，所以都是在同步代码块中调用wait** ，调用wait后，当前线程释放锁并把当前线程添加到等待队列中，随后另一线程B获取对象锁来调用 object.notify ()，将唤醒原来等待中的线程，线程B执行完毕后然后释放该锁。
 
 ## sleep和yield的区别
@@ -159,7 +236,7 @@ public void run() {
 
 ## 守护线程
 
-在后台默默地完成一些系统性的服务，比如垃圾回收线程、JIT线程就可以理解为守护线程， 当一个Java应用内，只有守护线程时，Java虚拟机就会自然退出,如果前台的进程都死亡，那么后台进程也死亡
+在后台默默地完成一些系统性的服务，比如垃圾回收线程、JIT线程就可以理解为守护线程， 当一个Java应用内，如果所有的非守护线程全部结束，那么剩下的守护线程会自动结束，jvm退出
 
 在创建线程的时候，如果父类线程是守护线程，那么子类默认也会是守护线程，在创建线程池使用默认线程工厂的话，会默认设置为非守护线程
 
@@ -180,13 +257,31 @@ public Thread newThread(Runnable r) {
 }
 ```
 
+## 线程问题
+
+- 安全性问题：1.同时修改并发问题 2.执行顺序不可预测导致结果不可预测
+- 活跃性问题： 1.死锁 2.饥饿
+- 性能问题：频繁切换上下文
+
+
+
+## 线程间通信
+
+多线程是个线程间通信的问题
+
+1、主内存共享，通过修改主内存值，并可见实现通信效果
+
+2、while(条件){wait}   条件改变 notify，需要其他线程唤醒的阻塞
+
+3、interupt，发出中断信号
+
 ## 线程安全
 
 首先存在多个线程，操作共享变量，如果多个线程读共享变量不会发生线程安全问题，只有当多个线程同时对共享变量进行写操作的时候会发生线程安全问题
 
 线程安全问题解决方案
 
-- 避免操作共享变量
+- 避免操作共享变量，多例
 - 多读单一写
 - 共享变量设计为不可变对象，如没有set方法或者final对象
 - CAS操作

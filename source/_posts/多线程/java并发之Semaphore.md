@@ -9,16 +9,23 @@ categories:
 
 # java并发之Semaphore
 
-Semaphore称为计数信号量，它允许n个任务同时访问某个资源，可以将信号量看做是在向外分发使用资源的许可证，只有成功获取许可证，才能使用资源。
+## 知识导读
 
-当占有许可证的线程释放了许可证后，其他线程又可以获取许可证。
+- Semaphore相等于是一个电影院装3D眼镜的篮子，每个线程来会申请一定数量的眼镜，如果够就进去看电影，不够就排队等待;每个看完电影的线程会将眼镜放回篮子，并通知队列头部的人去再尝试去拿眼镜。
+- Semaphore用于控制并发的数量
+- Semaphore是AQS共享模式的一种实现。所以需要继承实现AQS的tryAcquireShared和tryReleaseShared方法
+- Semaphore同ReentrantLock一样，提供了公平和非公平两种模式，实现原理一样
+- Semaphore通过控制AQS的state来控制同步状态的获取，当(state-申请数量>=0)的时候可以获取同步状态，当(state-申请数量<0)时阻塞等待。初始化的时候指定state的初始值代表可并发线程的最大数量，线程获取同步状态后state-申请数量，线程执行完毕释放资源时state+申请数量
 
-<!--more-->
+## 用例
 
-## 用法
+Semaphore 称为计数信号量，它允许n个任务同时访问某个资源。Semaphore持有一定数量的执行许可证。
 
-- 调用acquire方法获取许可证，获取成功后state会减1，获取失败，则线程加入等待队列阻塞
-- release 释放许可证，调用release后state会加1
+- 线程获取了执行许可证就可以获取执行权，同时Semaphore的许可证数量减1.
+- 当占有许可证的线程释放了许可证后，Semaphore的许可证数量加1，其他线程又可以获取许可证
+- 当线程无法获取许可证的时候，会阻塞等待获取许可证
+
+acquire方法用于获取许可证，release方法用于释放许可证
 
 ```java
 public class SemaphoreTest {
@@ -52,193 +59,116 @@ public class SemaphoreTest {
     }
   }
 }
-/*
-线程pool-1-thread-2进入，当前已有3个并发
-线程pool-1-thread-1进入，当前已有3个并发
-线程pool-1-thread-3进入，当前已有3个并发
-线程pool-1-thread-3即将离开
-线程pool-1-thread-3已离开，当前已有2个并发
-线程pool-1-thread-4进入，当前已有3个并发
-线程pool-1-thread-4即将离开
-线程pool-1-thread-5进入，当前已有3个并发
-线程pool-1-thread-4已离开，当前已有3个并发
-线程pool-1-thread-2即将离开
-线程pool-1-thread-6进入，当前已有3个并发
-线程pool-1-thread-2已离开，当前已有3个并发
-线程pool-1-thread-1即将离开
-线程pool-1-thread-7进入，当前已有3个并发
-线程pool-1-thread-1已离开，当前已有3个并发
-线程pool-1-thread-6即将离开
-线程pool-1-thread-8进入，当前已有3个并发
-线程pool-1-thread-6已离开，当前已有3个并发
-线程pool-1-thread-5即将离开
-线程pool-1-thread-5已离开，当前已有3个并发
-线程pool-1-thread-9进入，当前已有3个并发
-线程pool-1-thread-9即将离开
-线程pool-1-thread-10进入，当前已有3个并发
-线程pool-1-thread-9已离开，当前已有3个并发
-线程pool-1-thread-10即将离开
-线程pool-1-thread-10已离开，当前已有2个并发
-线程pool-1-thread-7即将离开
-线程pool-1-thread-7已离开，当前已有1个并发
-线程pool-1-thread-8即将离开
-线程pool-1-thread-8已离开，当前已有0个并发
-*/
 ```
-## 实现原理
+## 源码解析
 
-- 创建Semaphore的时候，指定了许可证的数量n，其实就是将AQS的state设置为n
-- 调用Semaphore的acquire方法的时候会尝试将state减一，减完之后如果state<0则获取许可证失败
-- 如果是Semaphore的tryAcquire则直接返回false，如果是acquire方法，将调用AQS中的acquireShared进入等待队列进行阻塞，等待获取许可证的线程唤醒，自己被唤醒的时候传播性的唤醒队列中的下一个，跟CountDownLatch一样
-- 调用release方法会将state加1，并唤醒等待队列的头节点
+Sempaphore的构造方法，创建了内部类Sync的实现,提供了公平模式和非公平模式两种。
 
-### 实现步骤
+```java
+//非公平模式
+public Semaphore(int permits) {
+    sync = new NonfairSync(permits);
+}
+//公平模式
+public Semaphore(int permits, boolean fair) {
+	sync = fair ? new FairSync(permits) : new NonfairSync(permits);
+}
+```
 
-- 首先看下Sempaphore的构造方法，内部是基于实现AQS的Sync来实现的。提供了公平模式和非公平模式两种。
+Sempaphore中的内部类Sync实现了AQS的共享锁模式，通过控制state来控制获取同步状态，当state>0的时候可以获取同步状态。所以初始化的时候指定了state的初始值。
 
-  ```java
-  //非公平模式
-  public Semaphore(int permits) {
-      sync = new NonfairSync(permits);
-  }
-  //公平模式
-  public Semaphore(int permits, boolean fair) {
-  	sync = fair ? new FairSync(permits) : new NonfairSync(permits);
-  }
-  ```
+```java
+abstract static class Sync extends AbstractQueuedSynchronizer {
+   //将state设置为 许可证的最大数量
+    Sync(int permits) {
+        setState(permits);
+    }
 
-- Sempaphore中的内部类Sync，实现了AQS的共享锁模式，重写了tryAcquireShared、tryReleaseShared方法
+    final int getPermits() {
+        return getState();
+    }
+}
+```
+### 公平模式
 
-  ```java
-  static final class NonfairSync extends Sync { //非公平模式实现
-      private static final long serialVersionUID = -2694183684443567898L;
-      NonfairSync(int permits) {//设置AQS中的state
-          super(permits);
-      }
+FairSync提供了公平模式的实现，覆写AQS的tryAcquireShared方法。
+1. 先调用hasQueuedPredecessors判断AQS同步队列是否有排在当前线程之前的等待线程，如果有，直接返回复数表示获取同步状态失败，当前线程加入同步队列并阻塞
+2. 如果当前线程是排名最靠前的，则CAS设置state减去申请的值
 
-      protected int tryAcquireShared(int acquires) {
-          return nonfairTryAcquireShared(acquires);
-      }
-  }
-  static final class FairSync extends Sync { //公平模式实现
-      private static final long serialVersionUID = 2014338818796000944L;
-      FairSync(int permits) {
-          super(permits);
-      }
-      protected int tryAcquireShared(int acquires) {
+```java
+static final class FairSync extends Sync {
+    FairSync(int permits) {
+        super(permits);
+    }
+    protected int tryAcquireShared(int acquires) {
         //判断state是否减到0，如果减到了返回负数会阻塞，否则返回正数，获的许可证
-          for (;;) {
-              if (hasQueuedPredecessors())//公平模式就是必须要保证当前线程在等待队列的头部才去获取锁
-                  return -1;
-              int available = getState();
-              int remaining = available - acquires;
-              if (remaining < 0 ||		
-                  compareAndSetState(available, remaining))
-                  return remaining;
-          }
-      }
-  }
-  ```
+        for (;;) {
+            if (hasQueuedPredecessors())
+                return -1;
+            int available = getState();
+            int remaining = available - acquires;
+            if (remaining < 0 ||
+                compareAndSetState(available, remaining))
+                return remaining;
+        }
+    }
+}
+```
 
-- Sync类中覆写了Sync中的acquire和release的同时，添加了额外操作state的方法
+### 非公平模式
 
-  ```java
-  abstract static class Sync extends AbstractQueuedSynchronizer {
-      private static final long serialVersionUID = 1192457210091910933L;
+NonfairSync提供了非公平模式的实现，覆写AQS的tryAcquireShared方法。非公平模式比较简单，直接修改state值
 
-      Sync(int permits) {
-          setState(permits);
-      }
+1. 判断state是否大于需申请的许可证数量
+2. 如果满足，CAS设置state值，将值修改为减去申请数量后的值
 
-      final int getPermits() {
-          return getState();
-      }
+```java
+static final class NonfairSync extends Sync {
+    NonfairSync(int permits) {
+        super(permits);
+    }
+    protected int tryAcquireShared(int acquires) {
+        return nonfairTryAcquireShared(acquires);
+    }
+}
+```
 
-      final int nonfairTryAcquireShared(int acquires) {
-          for (;;) {
-              int available = getState();
-              int remaining = available - acquires;
-              if (remaining < 0 ||
-                  compareAndSetState(available, remaining))
-                  return remaining;
-          }
-      }
-    //释放资源，state+1
-      protected final boolean tryReleaseShared(int releases) {
-          for (;;) {
-              int current = getState();
-              int next = current + releases;
-              if (next < current) // overflow
-                  throw new Error("Maximum permit count exceeded");
-              if (compareAndSetState(current, next))
-                  return true;
-          }
-      }
-    	//运行期间减少许可证的数量
-      final void reducePermits(int reductions) {
-          for (;;) {
-              int current = getState();
-              int next = current - reductions;
-              if (next > current) // underflow
-                  throw new Error("Permit count underflow");
-              if (compareAndSetState(current, next))
-                  return;
-          }
-      }
-    //清空所有许可证
-      final int drainPermits() {
-          for (;;) {
-              int current = getState();
-              if (current == 0 || compareAndSetState(current, 0))
-                  return current;
-          }
-      }
-  }
-  ```
+for循环+CAS保证并发安全
 
-- 获取许可证并运行
+```java
+final int nonfairTryAcquireShared(int acquires) {
+    for (;;) {
+        int available = getState();
+        int remaining = available - acquires;
+        if (remaining < 0 ||
+            compareAndSetState(available, remaining))
+            return remaining;
+    }
+}
+```
 
-  ```java
-  //获取许可证，如果失败，进入等待队列阻塞，阻塞期间允许中断
-  public void acquire(int permits) throws InterruptedException {
-  	if (permits < 0) throw new IllegalArgumentException();
-          sync.acquireSharedInterruptibly(permits);
-  }
-  //获取许可证，如果失败，进入等待队列阻塞，阻塞期间不允许中断
-  public void acquireUninterruptibly(int permits) {
-  	if (permits < 0) throw new IllegalArgumentException();
-  		sync.acquireShared(permits);
-  }
-  //获取许可证，如果失败，返回false
-  public boolean tryAcquire(int permits) {
+### 释放许用于可证
+
+Semaphore中release方法用于释放许可证，直接调用内部类Sync释放许可证
+
+```java
+public void release(int permits) {
     if (permits < 0) throw new IllegalArgumentException();
-          return sync.nonfairTryAcquireShared(permits) >= 0;
-  }
-  //指定超时时间
-  public boolean tryAcquire(int permits, long timeout, TimeUnit unit)
-  throws InterruptedException {
-      if (permits < 0) throw new IllegalArgumentException();
-      return sync.tryAcquireSharedNanos(permits, unit.toNanos(timeout));
-  }
-  ```
+    sync.releaseShared(permits);
+}
+```
 
-- 释放许可证
+Sync继承了AQS，覆写了tryReleaseShared方法。由于是共享模式，所以在释放的时候会有多线程并发问题。这里使用for循环加CAS将state值加回去
 
-  ```java
-  public void release(int permits) {
-      if (permits < 0) throw new IllegalArgumentException();
-      sync.releaseShared(permits);
-  }
-  ```
-
-- 运行区间动态修改许可证的总数
-
-  ```java
-  protected void reducePermits(int reduction) {
-      if (reduction < 0) throw new IllegalArgumentException();
-      sync.reducePermits(reduction);
-  }
-  public int drainPermits() { //清空剩余的许可证
-    return sync.drainPermits();
-  }
-  ```
+```java
+protected final boolean tryReleaseShared(int releases) {
+    for (;;) {
+        int current = getState();
+        int next = current + releases;
+        if (next < current) // overflow
+            throw new Error("Maximum permit count exceeded");
+        if (compareAndSetState(current, next))
+            return true;
+    }
+}
+```

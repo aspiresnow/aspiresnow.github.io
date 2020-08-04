@@ -116,12 +116,11 @@ public <T> T execute(TransactionCallback<T> action) throws TransactionException 
 
 AbstractPlatformTransactionManager实现了事务管理器的getTransaction，在该方法中完成了事务的开启和事务传播行为的处理。
 
-开启事务的第一步是通过子类实现的doGetTransaction获取一个transaction事务对象，类型是Object的可想而知兼容不好处理啊，但是在这里也做了取巧动作，虽然返回的是Object类型，但是在父类中不会对该事务对象进行任何操作处理，所有关于事务对象的操作都交由子类覆写实现。比如isExistingTransaction(判断是否已存在事务)、doBegin(开启事务)。我们先不考虑子类的具体实现，首先看事务处理的整体逻辑
+1. 通过子类实现的doGetTransaction获取一个transaction事务对象，类型是Object的可想而知兼容不好处理啊，但是在这里也做了取巧动作，虽然返回的是Object类型，但是在父类中不会对该事务对象进行任何操作处理，所有关于事务对象的操作都交由子类覆写实现。比如isExistingTransaction(判断是否已存在事务)、doBegin(开启事务)。我们先不考虑子类的具体实现，首先看事务处理的整体逻辑
 
-获取到事务对象后，通过子类覆写逻辑判断如果已经开启事务，则根据事务的传播行为判断多事务共存的情形，然后返回
-TransactionStatus。
+2. 获取到事务对象后，通过子类覆写逻辑判断如果已经开启事务，则根据事务的传播行为判断多事务共存的情形，然后返回TransactionStatus。
 
-如果当前还未开启事务，则根据事务传播行为判断是否需要开启事务，如果需要则调用子类覆写逻辑 doBegin方法，将事务对象transaction传递下去开启事务，然后封装好TransactionStatus对象返回
+3. 如果当前还未开启事务，则根据事务传播行为判断是否需要开启事务，如果需要则调用子类覆写逻辑 doBegin方法，将事务对象transaction传递下去开启事务，然后封装好TransactionStatus对象返回
 
 ```java
 @Override
@@ -168,7 +167,7 @@ public final TransactionStatus getTransaction(@Nullable TransactionDefinition de
 
 AbstractPlatformTransactionManager.handleExistingTransaction方法处理当前已存在事务的情况。根据TransactionDefinition中配置的传播行为来处理多事务共存情况。最终封装返回事务状态对象TransactionStatus。具体处理看代码注释，
 
-注意到 newTransaction 的配置，该配置会直接影响事务的提交和回滚操作处理
+注意到 newTransaction 属性的配置，该配置会直接影响事务的提交和回滚操作处理
 
 ```java
 private TransactionStatus handleExistingTransaction(
@@ -332,7 +331,7 @@ protected final SuspendedResourcesHolder suspend(@Nullable Object transaction) t
 }
 ```
 
-当事务开启异常时，需要恢复被挂起的事务，AbstractPlatformTransactionManager.resume用于恢复事务，使用TransactionStatus中的SuspendedResources中的调用子类将挂起事务中的资源重新放回到ThreadLocal中，然后将其事务状态配置重新设置到ThreadLocal中。
+当事务开启异常时，需要恢复被挂起的事务，AbstractPlatformTransactionManager.resume用于恢复事务，将TransactionStatus中的SuspendedResources(挂起事务中的资源)重新放回到ThreadLocal中，该逻辑通过子类doResume方法实现，然后将其事务状态配置重新设置到ThreadLocal中。
 
 ```java
 protected final void resume(@Nullable Object transaction, @Nullable SuspendedResourcesHolder resourcesHolder)  throws TransactionException {
@@ -416,7 +415,7 @@ private static Object doGetResource(Object actualKey) {
 
 #### 判断是否已在一个事务中
 
-TransactionSynchronizationManager实现了isExistingTransaction方法。接收Object类型的transaction对象。因为这个对象就是自己创建的，所以可以直接强转为DataSourceTransactionObject类型，事务开启的条件为txObject中存在一个TransactionActive = true 的ConnectionHolder，当事务开启成功后会设置 transactionActive = true
+TransactionSynchronizationManager实现了isExistingTransaction方法。接收Object类型的transaction对象。因为这个对象就是该实现类自己创建的，所以可以直接强转为DataSourceTransactionObject类型，事务开启的条件为txObject中存在一个TransactionActive = true 的ConnectionHolder，当事务开启成功后会设置 transactionActive = true
 
 ```java
 @Override
@@ -665,7 +664,9 @@ protected void doCommit(DefaultTransactionStatus status) {
 
 事务完成之后，只要进行资源的释放、事务配置信息的清除和挂起事务的恢复，所以在finnaly里面调用了cleanupAfterCompletion方法
 
-注意只有是新开启的事务才去调用doCleanupAfterCompletion去清除事务信息，运行在当前事务中的直接跳过
+1. 清除ThreadLocal中事务状态信息
+2. 如果是新开启的时候，调用子类释放connection资源，如果是运行在其他事务中，无需操作
+3. 如果存在被挂起的事务，恢复
 
 ```java
 private void cleanupAfterCompletion(DefaultTransactionStatus status) {
@@ -698,7 +699,11 @@ public static void clear() {
 }
 ```
 
-新开启的事务需要调用子类实现释放事务资源，移除ThreadLocal中connection，将 connection 的autoCommit设置为true，然后释放connection
+新开启的事务需要调用子类释放事务资源
+
+1. 移除ThreadLocal中connection
+2. 将 connection 的autoCommit设置为true
+3. 调用DataSource方法释放connection
 
 ```java
 protected void doCleanupAfterCompletion(Object transaction) {

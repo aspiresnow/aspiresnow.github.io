@@ -88,10 +88,10 @@ if(user!=null){
 }
 ```
 
-User user = new User包括了以下三种语义：
-1：分配对象的内存空间
-2：初始化对象
-3：将user指针指向刚分配的内存地址
+User user = new User()包括了以下三种语义：
+1：memory = allocate();//分配对象的内存空间
+2：ctorInstance(memory);  // 2:初始化对象初始化对象
+3：instance = memory;//将user指针指向刚分配的内存地址
 
 操作2依赖于操作1，但是操作3并不依赖于操作2，所以JVM是可以针对它们进行指令的优化重排序的，优化后变为 1->3->2，这些线程1在执行完第3步而还没来得及执行完第2步的时候，如果内存刷新到了主存，那么线程2将得到一个未初始化完成的对象。
 
@@ -258,12 +258,3 @@ public class Test {
   2. 对变量的写入操作不依赖变量的当前值 （x++）
   3. 该变量没有包含在具有其他变量的不变式中（y=x）
   4. 防止代码重排
-
-## 参考资料
-
-[聊聊并发（一）深入分析Volatile的实现原理](http://ifeve.com/volatile/)
-
-[Java并发：volatile内存可见性和指令重排](http://www.importnew.com/23535.html)
-
-[Java Volatile Keyword](http://tutorials.jenkov.com/java-concurrency/volatile.html)
-

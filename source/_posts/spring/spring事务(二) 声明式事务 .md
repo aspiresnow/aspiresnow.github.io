@@ -111,9 +111,9 @@ private final TransactionAttributeSourcePointcut pointcut = new TransactionAttri
 
 接着看TransactionAttributeSourcePointcut中定义的classFilter和methodMatcher实现逻辑
 
-ClassFilter拦截所有类
+- ClassFilter.TRU，ClassFilter拦截所有类
 
-同时实现了MethodMatcher的matches方法，该方法中会调用TransactionAttributeSource解析获取目标方法和目标类上配置的事务属性，如果解析到则进行拦截增强，否则无需代理增强
+- 实现了MethodMatcher的matches方法，该方法中会调用TransactionAttributeSource解析获取目标方法和目标类上配置的事务属性，如果解析到则进行拦截增强，否则无需代理增强
 
 ```java
 private ClassFilter classFilter = ClassFilter.TRUE;
@@ -281,7 +281,9 @@ protected TransactionAttribute parseTransactionAnnotation(AnnotationAttributes a
 
 ### 通知
 
-TransactionInterceptor实现了MethodInterceptor接口，是一个AOP中的通知类，构造参数中需要一个事务管理器和事务配置属性。当BeanFactoryTransactionAttributeSourceAdvisor中的Pointcut满足切目标方法时，会生成代理类，将当前TransactionInterceptor添加到拦截器链中，目标方法执行的时候会调用invoke方法。接着调用invokeWithinTransaction实现目标方法的事务管理功能
+TransactionInterceptor实现了MethodInterceptor接口，是一个AOP中的通知类，构造参数中需要一个事务管理器和事务配置属性。
+
+当BeanFactoryTransactionAttributeSourceAdvisor中的Pointcut满足切目标方法时，会生成代理类，将当前TransactionInterceptor添加到拦截器链中，目标方法执行的时候会调用其invoke方法。接着调用invokeWithinTransaction实现目标方法的事务管理功能
 
 ```java
 public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable {
@@ -301,6 +303,12 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 ```
 
 调用父类TransactionAspectSupport.invokeWithinTransaction实现开启事务逻辑
+
+1. 获取目标方法的事务配置
+2. 获取spring容器中注册的事务管理器PlatformTransactionManger
+3. 开启事务
+4. 调用目标方法逻辑
+5. 成功提交事务，异常回滚事务
 
 ```java
 protected Object invokeWithinTransaction(Method method, @Nullable Class<?> targetClass,

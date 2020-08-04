@@ -156,7 +156,7 @@ proxyFactory.addAdvisors(advisors);//设置目标类的增强 Advisor列表
 return proxyFactory.getProxy(getProxyClassLoader());//创建代理类对象
 ```
 
-调用ProxyFactory的getProxy创建代理类对象，首先会创建一个AopProxy对象，然后调用AopProxy的getProxy方法获取代理类对象，在整个代理类过程中，ProxyFactory用于提供配置
+调用ProxyFactory的getProxy创建代理类对象，首先会创建一个AopProxy对象，然后调用AopProxy的getProxy方法获取代理类对象，在整个创建代理类过程中，ProxyFactory用于提供配置
 
 ```java
 public Object getProxy(@Nullable ClassLoader classLoader) {
@@ -175,7 +175,9 @@ protected final synchronized AopProxy createAopProxy() {
 }
 ```
 
-在AopProxyFactory的createAopProxy创建了AopProxy的具体实现，会通过ProxyFactory中提供的配置来选择使用jdk代理还是cglib代理,在这里注意了，cglib也可以创建基于接口的代理
+在AopProxyFactory的createAopProxy创建了AopProxy的具体实现，会通过ProxyFactory中提供的配置来选择使用jdk代理还是cglib代理
+
+注意，cglib也可以创建基于接口的代理
 
 ```java
 public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
@@ -385,6 +387,7 @@ public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
             }
             if (match) {
                MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+              //如果是要根据运行时参数进行方法校验，需要封装拦截器，将methodMatcher传下去，用于执行时判断参数
                if (mm.isRuntime()) {
                   for (MethodInterceptor interceptor : interceptors) {
                      interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
@@ -441,7 +444,7 @@ public Object proceed() throws Throwable {
 	 //遍历获取下一个拦截器
    Object interceptorOrInterceptionAdvice =
          this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
-  //如果是动态执行过程中拦截，需要根据参数来判断需要要对目标方法进行拦截增强
+  //如果是动态执行过程中拦截，需要根据参数来判断是否需要对目标方法进行拦截增强
    if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
       InterceptorAndDynamicMethodMatcher dm =
             (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;

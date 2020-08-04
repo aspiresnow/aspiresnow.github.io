@@ -11,6 +11,8 @@ categories:
 
 #  ThreadPoolExecutor源码解析
 
+prestartAllCoreThreads 初始时创建所有的核心线程
+
 ## 源码待析
 
 - 线程池中字段

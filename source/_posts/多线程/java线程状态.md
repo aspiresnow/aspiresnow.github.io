@@ -10,9 +10,45 @@ categories:
 
 #  java线程状态
 
-线程从创建到销毁经过了**新建、就绪、运行、阻塞、死亡**等状态，jdk的中一个方法、磁盘io、网络io都会导致线程状态的切换。理解线程的运行状态对于掌握线程的运行情况、多线程调优至关重要。
+## 知识导读
 
-<!--more-->
+-  JVM 实现都把 Java 线程一一映射到操作系统底层的线程上，把调度委托给了操作系统
+- Thread类的线程状态 对应 操作系统层面的线程状态
+- Thread类中 RUNNABLE 特殊性，运行、等待IO、等待CPU都属于RUNABLE
+- 当线程进入I/O操作时，线程会被阻塞，释放CPU使用权，被放入等待队列中，当I\O操作完成后，CPU会收到硬盘的一个中断信号，将阻塞在该I/O的线程重新变为可运行状态，竞争获取CPU使用权
+- 当线程进入I/O阻塞时，对应的Thread类中线程状态为 RUNNABLE
+- 阻塞类型分为三种 等待锁阻塞、需要依赖其他线程唤醒的阻塞、一定时间后自动唤醒的阻塞
+- I/O阻塞等待类似sleep等待，都不会释放锁资源，一般都会有个超时限制
+
+java中Thread类的状态
+
+```java
+public enum State {
+    //新建未调用start方法
+    NEW,
+    //可运行状态，
+    RUNNABLE,
+    //阻塞状态，等待获取锁
+    BLOCKED,
+		//无限期等待状态
+    WAITING,
+    //有限期等待
+    TIMED_WAITING,
+    //死亡
+    TERMINATED;
+}
+```
+
+- NEW: 新建未调用start方法
+- RUNNABLE : 可运行状态，在JVM层面可执行的线程，在操作系统层面可能在等待其他资源。如果等待的资源是CPU，在操作系统层面线程就是等待被CPU调度的Ready状态；如果等待的资源是磁盘网卡等IO资源，在操作系统层面线程就是等待IO操作完成的IO Wait状态。
+- BLOCKED: 阻塞状态，线程在等待获取monitor lock。比如说进入一个synchronized代码块或者调用wait方法被notify重新等待获取monitor lock
+- WAITING: 无限期等待状态，当前线程需要另外一个线程激活才能进入RUNABLE状态。通过调用了wait（等待其他线程notify）、join（等待目标线程死亡）、park（等待其他线程unpark）线程进入该状态
+- TIMED_WAITING：有限期等待，当前线程等待一段时间后自动进入RUNABLE状态。通过调用 sleep(time)、wait(time)、join(time)、parkNanos(time)、parkUntil() 线程进入该状态
+- TERMINATED
+
+![mIMBcF](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/mIMBcF.png)
+
+操作系统层面线程状态状态流转
 
 ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts1.jpg?raw=true)
 
@@ -22,9 +58,9 @@ categories:
 2. **就绪(runnable)**：线程对象创建并调用了该对象的**start()**方法后。该状态的线程位于可运行线程池中，等待被线程调度选中，获取cpu 的使用权 ，但是此时还未执行，处于就绪状态。
 3. **运行(running)**：可运行状态(runnable)的线程获得了cpu 时间片（timeslice）,执行程序代码。
 4. **阻塞(block)**：阻塞状态是指线程因为某种原因放弃了cpu 使用权，即让出了cpu时间片，暂时停止运行。直到线程进入可运行(runnable)状态，才有机会再次获得cpu时间片转到运行(running)状态。**阻塞和运行的切换涉及当前线程执行上下文内容的保存和恢复，非常耗费cpu资源**，阻塞的情况分三种： 
-   - 等待阻塞：运行(running)的线程执行o.wait()方法，JVM会把该线程放入等待队列(waitting queue)中。
+   - 等待阻塞：运行(running)的线程执行o.wait()方法，释放锁资源，JVM会把该线程放入等待队列(waitting queue)中。
    - 同步阻塞：运行(running)的线程在获取对象的同步锁时，若该同步锁被别的线程占用，则JVM会把该线程放入对象锁的锁池(lock pool)中。
-   - 其他阻塞：运行(running)的线程执行Thread.sleep(long ms)或t.join()方法，或者发出了I/O请求时，JVM会把该线程置为阻塞状态。当sleep()状态超时、join()等待线程终止或者超时、或者I/O处理完毕时，线程重新转入可运行(runnable)状态。
+   - 其他阻塞：运行(running)的线程执行Thread.sleep(long ms)或t.join()方法，或者发出了I/O请求时，JVM会把该线程置为阻塞状态，该状态不会释放锁资源。当sleep()状态超时、join()等待线程终止或者超时、或者I/O处理完毕时，线程重新转入可运行(runnable)状态。
 5. **死亡(dead)**：线程run()、main() 方法执行结束，或者**因异常**退出了run()方法，则该线程结束生命周期。死亡的线程不可再次复生。
 
 ### 改变线程状态的行为

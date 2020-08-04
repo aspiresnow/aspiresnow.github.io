@@ -9,123 +9,140 @@ categories:
 
 # java并发之AQS原理
 
-如果说java.util.concurrent的基础是CAS的话，那么AQS就是整个Java并发包的核心了，ReentrantLock、CountDownLatch、Semaphore等都是基于AQS实现的。
+## 知识导读
 
-AQS内部维护了一个volatile int state和一个FIFO线程等待队列，当state的值为0的时候，任意线程可以获取执行权，当存在竞争即state不为0时，将线程添加到等待队列并阻塞，等待当前占用state的线程原子减少state并激活队列头的节点线程。自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可tryLock和tryRelease方法，等待队列的维护由AQS内部实现。
+- AQS定义了同步队列+阻塞线程+唤醒线程的基本实现。是否该阻塞(tryAcquire)和释放资源(tryRelease)由具体子类实现具体逻辑，在AQS中只关心子类实现的结果
+- AQS中定义了一个volatile修饰的int类型state变量，保证了多线程内存可见性，线程通过操作和判断state值来决定是否能成功获取同步状态
+- AQS的实质是使用带有虚拟头节点的双向队列存储获取同步状态失败的线程，被唤醒后自旋获取同步状态，线程通过park方法阻塞。
+- 一个park后的线程被激活有三种情况
+  - 其他线程调用unpark
+  - 该线程被interrupt
+  - 该线程park时间到了自动激活
+- 每个获取执行权限成功的线程在执行完毕释放资源后，会调用unpark唤醒AQS队列中第一个有效的被阻塞的线程
+- 在调用park阻塞当前线程之前，一定要保证当前节点的前驱节点状态为SINGAL，因为park阻塞的线程需要其他线程显示调用unpark唤醒，所以标记前驱节点为SINGNAL保证前驱节点执行完毕后唤醒后继节点的线程
+- 每个Condition对象对应一个双端双向等待队列。当线程await之后会被阻塞并添加到Condition等待队列尾部。然后线程被唤醒后会自旋判断当前节点是否已经添加回AQS同步队列中，没有的话继续等待，有的话去竞争获取AQS的同步状态
+- Condition的signal方法就是将等待队列头部节点移除并添加到AQS同步队列尾部，让该节点线程用于竞争获取同步状态的权利
+  - 首节点从Condition等待队列出队
+  - 修改首节点状态为0并添加到AQS同步队列尾部
+  - 修改AQS中其前驱节点状态为SIGNAL或者Unpark唤醒节点线程
+- AbstractQueuedSynchronizer中控制资源的state类型是int，有局限性，所以提供了AbstractQueuedLongSynchronizer，其中的state类型为long
 
-AQS内部对线程的阻塞依赖LockSupport.part(thread)，其功能是用来代替wait和notity/notifyall的，更好的地方是LockSupport对park方法和unpark方法的调用没有先后的限制，而notify/notifyall必须在wait调用之后调用。
+## 并发基础
 
-<!--more-->
+AQS是java concurrent包下并发组件实现的基础。AQS定义了同步队列的基本实现
 
 ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts2.jpg?raw=true)
 
-## AQS模式
+AQS使用了模板方法模式，只定义了自旋+队列存储的基本实现。定义了一个volatile修饰的int类型state变量，然后声明了两个方法由子类实现。
 
-AQS内部提供了两种实现，即独占模式和共享模式，在独占模式下只运行同时一个线程访问代码块如ReentrantLock，共享模式下允许指定多个线程同时访问代码块，如Semaphore和CountDownLatch
+- tryAcquire：用于获取同步状态，获取成功返回true，失败返回false
+- tryRelease：用于释放持有的同步资源，释放成功返回true，失败返回false
 
-- 独占模式：实现类覆写以下方法
-  - tryAcquire(int)：尝试获取资源，成功则返回true，失败则返回false。
-  - tryRelease(int)：尝试释放资源，成功则返回true，失败则返回false。
-- 共享模式：实现类覆写以下方法
-  - tryAcquireShared(int)：尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
-  - tryReleaseShared(int)：尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
+```java
+protected boolean tryAcquire(int arg) {
+    throw new UnsupportedOperationException();
+}
+protected boolean tryRelease(int arg) {
+  	throw new UnsupportedOperationException();
+}
+```
 
-## 源码分析
+## AQS同步队列
 
-以ReentrantLock为例，state初始化为0，表示未锁定状态。A线程lock()时，会调用tryAcquire()独占该锁并将state+1。此后，其他线程再tryAcquire()时就会失败，直到A线程unlock()到state=0（即释放锁）为止，其它线程才有机会获取该锁。当然，释放锁之前，A线程自己是可以重复获取此锁的（state会累加），这就是可重入的概念。但要注意，获取多少次就要释放多么次，这样才能保证state是能回到零态的
+AQS 是一个带有虚拟头节点的双端双向队列。队列的节点Node封装了线程，队列存储了获取同步状态失败被阻塞的线程。线程被唤醒后会自旋尝试获取同步状态。
 
-### 独占锁加锁流程
+当线程获取同步状态失败后，会用Node封装线程并添加到AQS尾部，然后调用park阻塞线程。如果获取同步状态成功，则当前节点出队
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/并发/aqs2.jpg?raw=true)
+当获取执行权限成功的线程执行完毕后会释放资源，同时激活AQS同步队列中虚拟头节点后第一个节点包装的线程。被激活的线程会尝试获取同步状态，获取成功则加锁成功，将节点从同步队列中移除，执行完毕后再次激活同步队列中的阻塞节点线程。
 
-- 首先AQS内部维护了一个节点类型，用于存储被阻塞的线程,内部维护了被阻塞线程的状态
+```java
+public abstract class AbstractQueuedLongSynchronizer extends AbstractOwnableSynchronizer implements java.io.Serializable {
+      //头节点
+      private transient volatile Node head;
+      //尾节点
+      private transient volatile Node tail;
+     //操作的资源
+      private volatile int state;
+      protected final int getState() {
+          return state;
+      }
+      protected final void setState(int newState) {
+          state = newState;
+      }
+}
+```
 
-     1. CANCELLED，值为1，表示当前的线程被超时取消或者中断。
-2. SIGNAL，值为-1，表示当前节点的后继节点包含的线程被阻塞，当前线程执行完毕后需要对其进行unpark操作。
-  3. CONDITION，值为-2，表示当前节点在等待condition，也就是在condition queue中。
-4. PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行。
-  5. 值为0，表示当前节点在sync queue中，等待着获取锁。
+双向队列的节点类型是AQS内部类 Node，Node封装了线程Thread，并通过prev和next维护了一个链表，该链表代表了 阻塞在某资源上的阻塞线程链。Node节点的不同状态代表了该节点包装的线程不同的操作
 
-  ```java
+```java
 static final class Node {
-      /** Marker to indicate a node is waiting in shared mode */
+    /** Marker to indicate a node is waiting in shared mode */
     static final Node SHARED = new Node();
-      /** Marker to indicate a node is waiting in exclusive mode */
-      static final Node EXCLUSIVE = null;
-      static final int CANCELLED =  1;
-      static final int SIGNAL    = -1;
-      static final int CONDITION = -2;
-      /** waitStatus value to indicate the next acquireShared should unconditionally propagate*/
-      static final int PROPAGATE = -3;
-      volatile int waitStatus;//当前被阻塞的线程的状态
-      volatile Node prev;//指向上一个节点
-      volatile Node next;//指向下一个节点
-      volatile Thread thread;//被阻塞的线程
-    	//等待condition的下一个线程
-      Node nextWaiter;
-      final boolean isShared() {
-          return nextWaiter == SHARED;
-      }
-      final Node predecessor() throws NullPointerException {
-          Node p = prev;
-          if (p == null)
-              throw new NullPointerException();
-          else
-              return p;
-      }
-  }
-  ```
+    /** Marker to indicate a node is waiting in exclusive mode */
+    static final Node EXCLUSIVE = null;
+    static final int CANCELLED =  1;
+    static final int SIGNAL    = -1;
+    static final int CONDITION = -2;
+    /** waitStatus value to indicate the next acquireShared should unconditionally propagate*/
+    static final int PROPAGATE = -3;
+    volatile int waitStatus;//当前被阻塞的线程的状态
+    volatile Node prev;//指向上一个节点
+    volatile Node next;//指向下一个节点
+    volatile Thread thread;//节点封装的线程
+  	//等待condition的下一个线程
+    Node nextWaiter;
+    final boolean isShared() {
+        return nextWaiter == SHARED;
+    }
+    final Node predecessor() throws NullPointerException {
+        Node p = prev;
+        if (p == null)
+            throw new NullPointerException();
+        else
+            return p;
+    }
+}
+```
 
-- ReetrantLock内部的Sync类继承AbstractQueuedSynchronizer，调用lock方法的时候实际上是原子性去设置state为1，成功则竞争成功，失败就加入等待队列
+1. CANCELLED(1) 表示节点因超时或者中断被取消。被取消的节点上的线程永远不会再被阻塞
+2. SIGNAL(-1) 表示当前节点的后继节点包含的线程被阻塞，当前线程执行完毕或取消后需要对其进行unpark操作。为了避免竞争，在阻塞线程之前一定要先判断前驱节点是否是SIGNAL
+  3. CONDITION(-2) 表示当前节点在等待condition，也就是在condition queue中
+4. PROPAGATE(-3) 表示当前场景下后续的acquireShared能够得以执行。
+  5. 0，表示当前节点在sync queue中，等待着获取执行权限。
 
-  ```java
-   final void lock() {
-     if (compareAndSetState(0, 1))//原子性设置state为1，如果成功，设置当前获取执行权的为当前线程
-       setExclusiveOwnerThread(Thread.currentThread());
-     else
-       acquire(1);//调用AQS的acquire方法
-   }
-  ```
-  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/aqs4.jpg?raw=true)
+## 源码实现
 
-- AQS中的acquire方法，调用钩子方法tryAcquire，tryAcquire由子类覆盖实现，如果获取资源成功，则当前线程获取执行权，如果失败，调用acquireQueued将当前线程加入等待队列，设置当前为独占锁模式，并阻塞当前线程
+按照资源获取的方式区分，AQS内部提供独占模式和共享模式
 
-  ```java
-  public final void acquire(int arg) {
-    //子类需要覆写tryAcquire方法
-  	if (!tryAcquire(arg) &&acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-  		selfInterrupt();//阻塞线程无法响应中断，需要获得执行权后响应在阻塞状态下的中断信号
-  }
-  ```
+- 独占模式：只允许一个线程成功获取执行权限，排他的。如ReentrantLock
+- 共享模式：允许多个线程同时成功获取执行权限，如Semaphore、CountDownLatch
 
-- ReetrantLock中覆写了tryAcquire原子设置state为1，当前线程获取执行权，之后的其他访问该同步块的线程将被阻塞直到当前线程释放；如果获取资源失败，首先判断当前拥有获取资源的线程是是否为当前线程，如果是，当前线程是重入锁，只需要将state+1即可，执行线程任务；否则获取资源失败，返回false，加入等待队列
+### 独占模式获取执行权限
 
-  ```java
-  protected final boolean tryAcquire(int acquires) {
-    return nonfairTryAcquire(acquires);//实际调用nonfairTryAcquire
-  }
-  final boolean nonfairTryAcquire(int acquires) {
-      final Thread current = Thread.currentThread();
-      int c = getState();
-      if (c == 0) {//再次尝试获取资源
-          if (compareAndSetState(0, acquires)) {
-              setExclusiveOwnerThread(current);//如果获取资源成功，设置当前占用执行权的为当前线程
-              return true;//
-          }
-      }
-    //如果是当前线程，重入锁实现
-      else if (current == getExclusiveOwnerThread()) {
-          int nextc = c + acquires;
-          if (nextc < 0) // overflow
-              throw new Error("Maximum lock count exceeded");
-          setState(nextc);
-          return true;
-      }
-      return false;
-  }
-  ```
+![CqLr0z](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/CqLr0z.png)
 
-- AQS中封装的竞争失败线程的入队功能，在enq方法中，使用死循环+CAS模式保证了多线程并发模式下的成功入队，每次能够保证只有一个成功，如果失败下次重试，如果是N个线程，那么每个线程最多loop N次，最终都能够成功。**在这里最终无法保证线程的公平入队，出队能够保证FIFO。**
+AQS中的acquire方法，调用钩子方法tryAcquire，tryAcquire由子类覆盖实现，如果获取资源成功，则当前线程获取执行权，如果失败，调用acquireQueued将当前线程加入等待队列，设置当前为独占锁模式，并阻塞当前线程
+
+AQS的acquire定义了独占模式获取执行权限的逻辑
+
+1. 调用子类的tryAcquire方法判断是否成功获取同步状态
+   1. 如果成功获取同步状态，无需添加到AQS中，线程执行获取执行权
+   2. 如果未获取到同步状态，当前线程添加到AQS中，进行阻塞
+2. 调用addWaiter方法，使用Node封装当前线程，并添加到同步队列AQS的尾部
+3. 调用acquireQueued方法，处理线程的阻塞与激活后再次尝试获取同步状态的逻辑
+4. 当线程成功获取执行权后，响应阻塞阶段产生的中断信号
+
+```java
+public final void acquire(int arg) {
+  //子类需要覆写tryAcquire方法
+	if (!tryAcquire(arg) &&acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+		selfInterrupt();//阻塞线程无法响应中断，需要获得执行权后响应在阻塞状态下的中断信号
+}
+```
+
+addWaiter方法中使用CAS保证了新的节点添加到队列的尾部。同时在第一次添加节点的时候，要保证添加一个虚拟头节点。添加的节点 Node的waitStatus默认为0
+
+**注意**，入队的时候使用了CAS，所以无法保证线程的严格按照时间顺序公平入队
 
   ```Java
   private Node addWaiter(Node mode) {
@@ -162,124 +179,157 @@ static final class Node {
       }
     }
   }
-  //
+  //CAS设置尾节点
   private final boolean compareAndSetTail(Node expect, Node update) {
     return unsafe.compareAndSwapObject(this, tailOffset, expect, update);
   }
   ```
 
-- 线程已经加入等待队列，并返回所处队列的节点node，**当前线程进入阻塞状态，直到其他线程释放资源后唤醒自己，然后在获取CPU执行权**，在死循环中CAS获取资源直到成功移除等待队列中获取资源的节点，线程获取执行权并返回中断标识。阻塞线程只能依靠前驱节点唤醒或者被interupt唤醒(**不会抛出异常，只会唤醒线程**)
+在acquireQueued类似**自旋锁**的逻辑，实现了线程的阻塞、激活以及重复尝试获取同步状态、阻塞的逻辑，在该方法中保证了按照队列的先后顺序获取执行权
 
-  head节点是取的锁获取执行权的线程，当该线程执行完毕前会唤醒其后继节点线程，后继节点被唤醒后需要判断其前继节点是否是头结点，这是为了避免是interrupt中断唤醒线程。当前继节点是头结点的时候，也有可能是中断唤醒，所以还要再去调用 tryAcquire 尝试获取锁，成功则真正获取执行权，然后再删除头结点，将head指向自己
+1. 线程被唤醒后下会进入for循环，判断前驱是否为头结点并不断尝试获取同步状态，成功则当前节点出队并获取执行权，失败则调用park阻塞当前线程
 
-  ```java
-  final boolean acquireQueued(final Node node, int arg) {
-      boolean failed = true;
-      try {
-          boolean interrupted = false;//中断标识
-        //自旋  当线程从阻塞状态被唤醒后再次循环获取资源，如果是interrupt唤醒，循环再次获取锁
-          for (;;) {
-              final Node p = node.predecessor();//获取前一个节点
-              //如果前一个节点已经是head(空的节点)，当前节点已经是排队中的第一个，则尝试去获取资源
-              if (p == head && tryAcquire(arg)) {
-                  setHead(node);//加锁成功后将从队列中移除当前节点，保证head节点为空的
-                  //从头开始删除链表节点
-                  p.next = null; // help GC
-                  failed = false;
-                  return interrupted;//获得资源，当前线程获取执行权
-              }
-              //在阻塞线程之前判断线程状态是否适合阻塞
-              if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt())
-                  interrupted = true;
-          }
-      } finally {
-        //如果上面for循环中抛出异常，线程会死亡，没有获取资源成功，会执行取消流程，将该结点作废
-          if (failed)
-              cancelAcquire(node);
-      }
-  }
-  //链表中移除当前节点
-  private void setHead(Node node) {
-    head = node;
+   1. 当前驱节点为虚拟头节点并且调用tryAcquire成功获取同步状态后，当前线程获取执行权，将头节点从AQS出队并将当前线程所处的节点设置为虚拟头节点，返回中断标识，当前线程获取执行权执行开始执行逻辑
+
+   2. 前驱节点不是虚拟头节点或者调用tryAcquire获取同步状态失败，调用park将当前线程阻塞
+
+      **注意**：一个被park阻塞的线程，会有两种情况被激活，**一种是其他线程调用unpark，一种是interrupt中断唤醒线程**。所以在判断的时候不仅要保证是队列中第一个有效的节点，同时还要调用tryAcquire获取同步状态
+
+2. 定义了interrupted变量用于记录线程阻塞期间的中断标识，因为线程有了中断标识无法被park，所以当有中断时要调用Thread.interrupted()清除中断标识，同时用一个变量记录下interrupted，当线程成功获取执行权后再在外面调用Thread.interrupt发出中断信号
+
+3. 调用failed变量用于记录是否获取执行权成功。当获取执行权成功后会将该变量设置为false，并且会将该节点出队，如果没有成功获取执行权，就不会有出队动作，在finally中会调用cancelAcquire方法将获取执行权失败的节点设置为CANCEL状态。
+
+**注意：**此处的cancelAcquire可能会执行到，比如子类实现的tryAcquire抛出异常，会导致获取同步状态失败，然后需要将节点状态设置为取消，线程抛出异常消亡
+
+```java
+final boolean acquireQueued(final Node node, int arg) {
+    boolean failed = true;
+    try {
+        boolean interrupted = false;//中断标识
+      //自旋  当线程从阻塞状态被唤醒后再次循环获取资源，如果是interrupt唤醒，循环再次获取锁
+        for (;;) {
+            final Node p = node.predecessor();//获取前一个节点
+            //如果前一个节点已经是head(空的节点)，当前节点已经是排队中的第一个，则尝试去获取资源
+            if (p == head && tryAcquire(arg)) {
+                //因为是独占模式，该代码处不会有并发问题
+                setHead(node);
+                //从头开始删除链表节点
+                p.next = null; // help GC
+                failed = false;
+                return interrupted;//获得资源，当前线程获取执行权
+            }
+            //在阻塞线程之前判断线程状态是否适合阻塞
+            if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt())
+                interrupted = true;
+        }
+    } finally {
+      //如果上面for循环中抛出异常，线程会死亡，没有获取资源成功，会执行取消流程，将该结点作废
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+//链表中移除当前节点
+private void setHead(Node node) {
+  head = node;
+  node.thread = null;
+  node.prev = null;
+}
+```
+调用shouldParkAfterFailedAcquire保证当前节点的前驱节点waitStatus设置为SIGNAL，同时将前驱节点中已经标记为取消状态的节点删除，如果没有设置成功会返回false，在外层的for循环中再次进入直到前驱节点的状态为SIGNAL返回true
+
+因为park是无限期的阻塞，需要其他线程显示调用unpark唤醒，当前节点park后要依靠前驱节点获取执行权执行完毕释放资源后调用unpark唤醒后继节点的线程，所以在阻塞当前线程前一定要保证该线程所处节点的前驱节点waitStatus状态为-1SIGNAL
+
+```java
+private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+    int ws = pred.waitStatus;//获取前一个节点的状态
+    //只有当前驱节点状态为SIGNAL，返回true，阻塞当前线程，否则会在外层for循环中再次进入该方法
+    if (ws == Node.SIGNAL)
+        return true;
+    if (ws > 0) {
+        do {//如果前一个节点已经被取消，从等待队列中移除已被取消的节点  循环操作，跳过被取消的线程
+            node.prev = pred = pred.prev;
+        } while (pred.waitStatus > 0);
+        pred.next = node;
+    } else {
+        //当前线程要park的条件是必须成功的将其前继节点设置为 SIGNAL状态
+        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+    }
+    return false;
+}
+```
+
+当shouldParkAfterFailedAcquire方法中保证了当前线程节点的前驱节点状态为SIGNAL返回true，调用parkAndCheckInterrupt方法阻塞当前线程，通过LockSupport.park(this)阻塞线程。
+
+当线程被激活后，调用Thread.interrupted()清除并返回中断是否被中断。清除是为了避免线程带有中断无法再次park
+
+```java
+private final boolean parkAndCheckInterrupt() {
+    LockSupport.park(this);//当前线程被阻塞在该位置
+    return Thread.interrupted();//当前线程是否已被中断，并清除中断标记位，防止再次park时失效
+}
+static void selfInterrupt() {
+  Thread.currentThread().interrupt();//当前线程发出中断信号
+}
+```
+
+当线程获取执行权失败后要将该线程对应的节点设置为CANCELLED状态，同时要保证该节点的后继节点能够被唤醒
+
+- 如果当前节点是尾节点，无需考虑后继节点，直接将当前节点从队列删除
+- 如果不是尾节点，要找到前驱节点为-1的，并找到后继节点需要被唤醒的节点，拼接
+- 如果找不到前驱节点，调用unparkSuccessor唤醒后继节点
+
+```java
+private void cancelAcquire(Node node) {
+    if (node == null)
+        return;
     node.thread = null;
-    node.prev = null;
-  }
-  ```
-  在线程阻塞之前调用shouldParkAfterFailedAcquire方法检查线程状态是否应该阻塞，避免队列中其他线程已经都被取消，当前线程无效等待
 
-- 只有当前节点前面的节点状态是SIGNAL的，这样当前一个节点释放资源后才能通知唤醒后一个等待的节点。所以当前线程在被阻塞前，**需要保证将前一个节点的状态设置为SIGNAL**，如果已是取消状态，则从队列中移除，
+    //删除已经被取消的前驱节点
+    Node pred = node.prev;
+    while (pred.waitStatus > 0)
+        node.prev = pred = pred.prev;
+    Node predNext = pred.next;
+    node.waitStatus = Node.CANCELLED;
 
-  ```java
-  private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
-      int ws = pred.waitStatus;//获取前一个节点的状态
-      if (ws == Node.SIGNAL)//如果前一个节点状态已经为SIGNAL，则当前线程可以被阻塞了
-          return true;
-      if (ws > 0) {
-          do {//如果前一个节点已经被取消，从等待队列中移除已被取消的节点  循环操作，跳过被取消的线程
-              node.prev = pred = pred.prev;
-          } while (pred.waitStatus > 0);
-          pred.next = node;
-      } else {
-          //当前线程要park的条件是必须成功的将其前继节点设置为 SIGNAL状态
-          compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
-      }
-      return false;
-  }
-  ```
-  
-- 调用LockSupport.park(thread)阻塞线程，直到获得执行权的线程调用unpark(thread)激活当前线程，再次尝试去获取资源，等待线程被激活的顺序是遵从队列的FIFO原则的，无法达到公平锁是因为入队的顺序无法保证
+    //如果当前节点为尾节点，直接删除
+    if (node == tail && compareAndSetTail(node, pred)) {
+        compareAndSetNext(pred, predNext, null);
+    } else {
+        // If successor needs signal, try to set pred's next-link
+        // so it will get one. Otherwise wake it up to propagate.
+        int ws;
+        if (pred != head &&
+            ((ws = pred.waitStatus) == Node.SIGNAL ||
+             (ws <= 0 && compareAndSetWaitStatus(pred, ws, Node.SIGNAL))) &&
+            pred.thread != null) {
+            Node next = node.next;
+            if (next != null && next.waitStatus <= 0)
+                compareAndSetNext(pred, predNext, next);
+        } else {
+          //如果找不到唤醒后继节点
+            unparkSuccessor(node);
+        }
+        node.next = node; // help GC
+    }
+}
+```
 
-  当线程被激活后，返回中断信号，用于响应在阻塞状态下无法响应的中断信号，如果阻塞期间被中断过则会调用selfInterrupt()方法，执行当前线程interrupt()
+### 独占模式释放资源
 
-  ```java
-  private final boolean parkAndCheckInterrupt() {
-      LockSupport.park(this);//当前线程被阻塞在该位置
-      return Thread.interrupted();//当前线程是否已被中断，并清除中断标记位，防止再次park时失效
-  }
-  static void selfInterrupt() {
-    Thread.currentThread().interrupt();//当前线程发出中断信号
-  }
-  ```
+AQS中release方法用于独占模式释放资源，由于是独占模式，在该方法中只有同时由一个线程，所以不需要考虑并发问题，处理逻辑会很简单
 
-- 总结 
+1. 调用子类覆写的tryRelease释放资源，AQS上并不会定义释放资源的具体实现，由子类提供，最终返回一个true or false即可。
+2. 释放资源后，调用unparkSuccessor方法唤醒同步队列中第一个有效的节点的线程
 
-  acquireQueued()方法总结
-
-  1. 结点进入队尾后，检查状态，找到安全休息点；
-  2. 调用park()进入waiting状态，等待unpark()或interrupt()唤醒自己；
-  3. 被唤醒后，循环再次获取资源。如果拿到，head出队，将head指向当前结点，并返回从入队到拿到号的整个过程中是否被中断过的信号；如果没拿到，继续流程1。
-
-  acquire()方法总结
-
-  1. 调用自定义同步器的tryAcquire()尝试直接去获取资源，如果成功则直接返回；
-
-  2. 没成功，则addWaiter()将该线程加入等待队列的尾部，并标记为独占模式；
-
-  3. acquireQueued()使线程在等待队列中休息，有机会时（轮到自己，会被unpark()）会去尝试获取资源。获取到资源后才返回。如果在整个等待过程中被中断过，则返回true，否则返回false。
-
-  4. 如果线程在等待过程中被中断过，它是不响应的。只是获取资源后才再进行自我中断selfInterrupt()，将中断补上。
-
-     ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/aqs3.jpg?raw=true)
-
-### 独占锁释放锁流程
-
-独占锁的释放主要是将共享资源从n减到0，然后激活等待队列中的头部节点，在激活的时候只激活一个，并且是等待队列的头部，避免了notify的随机激活(不可控制)和notifyAll激活所有(CPU竞争)，
-
-- ReetrantLock中的unlock方法实际调用的Sync类继承的AQS的realse方法，每次unlock是对state进行原子减1
-
-  ```java
-  public void unlock() {
-    sync.release(1);//调用AQS的release方法操作state
-  }
-  ```
-
-- AQS中的realse调用tryRealse操作state，tryRealse用于减state的值，是AQS中定义的钩子方法，由子类覆盖实现，当state减为0的时候尝试唤醒等待队列中头部节点
+**注意**：第一要先调用tryRelease释放资源，再激活后继节点线程。避免造成线程被唤醒后，本线程还未释放资源，导致被唤醒的线程再次park，由于又没有前驱节点，导致无法被唤醒。同时会导致一个问题，新来的线程可能会先于后继线程获取资源(非公平锁的实现)
 
   ```java
   public final boolean release(int arg) {
-      if (tryRelease(arg)) {//先将status减去
+    //先将status减去,释放资源，新来的获取锁的线程也能获取到锁。
+    //如果先判断head，再调用tryRelease
+      if (tryRelease(arg)) {
           Node h = head;
-        //当state减为0的时候尝试唤醒等待队列中头部节点
+          //当头节点不为空，并且waitStatus不为0，唤醒后继节点
           if (h != null && h.waitStatus != 0)//
               unparkSuccessor(h);
           return true;
@@ -288,38 +338,18 @@ static final class Node {
   }
   ```
 
-- 在Sync中实现了tryRelease方法,在realse的时候已经保证了当前只有一个线程，不会有并发问题，所以只需要将state-1就行，重入多少次则需要release多少次，当state减为0的时候表示不再占用资源，将独占资源的线程设置为null，并且调用unpark唤醒等待队列中的第一个阻塞线程。
-
-  ```Java
-  protected final boolean tryRelease(int releases) {
-      int c = getState() - releases;
-      if (Thread.currentThread() != getExclusiveOwnerThread())
-          throw new IllegalMonitorStateException();
-      boolean free = false;
-      if (c == 0) {
-          free = true;
-          setExclusiveOwnerThread(null);
-      }
-      setState(c);
-      return free;
-  }
-  ```
-
-- **用unpark()唤醒等待队列中最前边的那个未放弃线程**，即状态为SIGNAL 的节点。
+在unparkSuccessor方法中通过LockSupport.unpark()唤醒AQS同步队列中第一个有效的节点
 
   ```java
   private void unparkSuccessor(Node node) {
-      /*
-       * If status is negative (i.e., possibly needing signal) try
-       * to clear in anticipation of signalling.  It is OK if this
-       * fails or if status is changed by waiting thread.
-       */
+      
       int ws = node.waitStatus;
       if (ws < 0)//状态值小于0，为SIGNAL -1 或 CONDITION -2 或 PROPAGATE -3
           compareAndSetWaitStatus(node, ws, 0);
-
+			//找到后继节点
       Node s = node.next;
-      if (s == null || s.waitStatus > 0) {//如果下一个节点为空或者取消，则找队列中下一个不为空并未取消的节点
+      //如果下一个节点为空或者取消，则找队列中下一个不为空并未取消的节点
+      if (s == null || s.waitStatus > 0) {
           s = null;//从后往前找到最前面未被取消的节点
           for (Node t = tail; t != null && t != node; t = t.prev)
               if (t.waitStatus <= 0)
@@ -330,96 +360,110 @@ static final class Node {
   }
   ```
 
-### 共享锁加锁流程
-
-以CountDownLatch以例，任务分为n个子线程去执行，state也初始化为n（注意N要与线程个数一致）。这N个子线程是并行执行的，每个子线程执行完后countDown()一次，state会CAS减1。等到所有子线程都执行完后(即state=0)，会unpark()主调用线程，然后主调用线程就会从await()函数返回，继续后余动作。
-
-- 共享模式下调用的是tryAcquireShared
-
-- 内部调用doAcquireShared
-
-- 在当前节点被唤醒的时候，需要传播性的唤醒队列中的下一个节点
-
-  ```java
-  private void doAcquireShared(int arg) {
-  final Node node = addWaiter(Node.SHARED); //指定node节点模式，比独享锁多了一个nextWaiter
-  boolean failed = true;
-  try {
-      boolean interrupted = false;
-      for (;;) {
-          final Node p = node.predecessor();//获取前一个节点
-          if (p == head) {//如果前一个节点是head，head是当前获取资源在运行的线程，自己是最可能拿到资源
-              int r = tryAcquireShared(arg);//尝试获取资源
-              if (r >= 0) {//如果成功
-                  setHeadAndPropagate(node, r);//将head指向自己，如果state不为0 再次唤醒队列中下一个
-                  p.next = null; // help GC
-                  if (interrupted)//如果等待过程有收到中断，补上中断标记
-                      selfInterrupt();
-                  failed = false;
-                  return;
-              }
-          }
-        //如果获取不到资源，寻找安全点，阻塞，等待获取资源的线程调用unpark 唤醒
-          if (shouldParkAfterFailedAcquire(p, node) &&
-              parkAndCheckInterrupt())
-              interrupted = true;
-      }
-  } finally {
-      if (failed)
-          cancelAcquire(node);
-  }
-  }
-  ```
 
 
-- 自己被唤醒后，判断资源是否有空余，如果有则唤醒队列中自己下一个节点线程
+### 共享模式获取执行权限
 
-  ```java
-  private void setHeadAndPropagate(Node node, int propagate) {
-      Node h = head; // Record old head for check below
-      setHead(node);//head指向当前节点
-      //如果还有剩余量，继续唤醒当前节点的后继节点线程
-    //1.propagate>0 表示还有剩余资源，需要唤醒后继共享节点
-  //2.h.waitStatus<0 如果h.waitStatus = PROPAGATE，表示之前的某次调用暗示了资源有剩余，所以需要
-  //唤醒后继共享模式节点，由于PROPAGATE状态可能转化为SIGNAL状态，所以直接使用h.waitStatus < 0来判断
-  //如果现在的头节点的waitStatus<0，唤醒
-  //3.h==null，表示此节点变成头节点之前，同步队列为空，现在当前线程获得了资源，那么后面共享的节点也
-  //可能获得资源
-  //以上3种情况可以看出，非常的保守，可能导致多次不必要的唤醒。
-      if (propagate > 0 || h == null || h.waitStatus < 0 ||
-          (h = head) == null || h.waitStatus < 0) {
-          Node s = node.next;
-          if (s == null || s.isShared())
-              doReleaseShared();
-      }
-  }
-  ```
+AQS中acquireShared方法用于共享模式下获取资源执行权，如果获取执行权失败当前线程添加到同步队列尾部，并阻塞
 
-### 共享锁释放锁流程
+1. 调用子类实现的tryAcquireShared方法，由子类来决定是否获取同步状态成功
+2. tryAcquireShared成功获取同步状态，返回一个大于0的数，然后线程直接获取执行权
+3. 如果没有获取到同步状态，则调用doAcquireShared方法，将线程添加到阻塞队列，自旋尝试获取同步状态
 
-- 释放锁就是由子类实现去改变state数量，然后在AQS中去唤醒等待队列中的头部节点
+```java
+public final void acquireShared(int arg) {
+    if (tryAcquireShared(arg) < 0)
+        doAcquireShared(arg);
+}
+```
 
-  ```java
-  public final boolean releaseShared(int arg) {
-      if (tryReleaseShared(arg)) {//操作state并判断是否需要激活等待队列头部节点
-          doReleaseShared();
-          return true;
-      }
-      return false;
-  }
-  ```
+doAcquireShared方法中控制线程入队、自旋获取同步状态、阻塞
 
-- fff
+1. addWaiter将线程包装为Node并添加到AQS同步队列尾部
+2. 自旋判断前驱节点是否为头节点并调用tryAcquireShared尝试获取同步状态
+3. 如果未获取到同步状态，跟独占模式一样的处理，保证前驱节点状态为SIGNAL并调用park阻塞当前线程
+4. 如果成功获取同步状态，当前线程节点出队，获取执行权。与独占模式不同的是，释放的资源没有全部使用的情况下需要再次唤醒当前节点的后继节点
 
-  ```java
+```java
+private void doAcquireShared(int arg) {
+final Node node = addWaiter(Node.SHARED); //指定node节点模式，比独享锁多了一个nextWaiter
+boolean failed = true;
+try {
+    boolean interrupted = false;
+    for (;;) {
+        final Node p = node.predecessor();//获取前驱节点
+        if (p == head) {//如果前驱节点是head，则尝试获取同步状态
+            int r = tryAcquireShared(arg);//尝试获取资源
+            if (r >= 0) {//成功获取同步状态，当前线程获取执行权
+              // 当前节点出队，如果r还有剩余可用的，尝试唤醒队列中下个节点的线程
+                setHeadAndPropagate(node, r);
+                p.next = null; // help GC
+                if (interrupted)//如果等待过程有收到中断，补上中断标记
+                    selfInterrupt();
+                failed = false;
+                return;
+            }
+        }
+        //同步状态获取失败，保证前驱节点waitstatus状态，然后调用park阻塞当前线程
+        if (shouldParkAfterFailedAcquire(p, node) &&
+            parkAndCheckInterrupt())
+            interrupted = true;
+    }
+} finally {
+    if (failed)
+        cancelAcquire(node);
+}
+}
+```
+
+当前节点获取执行权后，当前节点出队，判断资源是否有空余，如果有则唤醒队列中自己下一个节点线程
+
+```java
+private void setHeadAndPropagate(Node node, int propagate) {
+    Node h = head; 
+    setHead(node);//head指向当前节点
+    //如果还有剩余量，继续唤醒当前节点的后继节点线程
+  //1.propagate>0 表示还有剩余资源，需要唤醒后继共享节点
+//2.h.waitStatus<0 如果h.waitStatus = PROPAGATE，表示之前的某次调用暗示了资源有剩余，所以需要
+//唤醒后继共享模式节点，由于PROPAGATE状态可能转化为SIGNAL状态，所以直接使用h.waitStatus < 0来判断
+//如果现在的头节点的waitStatus<0，唤醒
+//3.h==null，表示此节点变成头节点之前，同步队列为空，现在当前线程获得了资源，那么后面共享的节点也
+//可能获得资源
+   if (propagate > 0 || h == null || h.waitStatus < 0 ||
+        (h = head) == null || h.waitStatus < 0) {
+        Node s = node.next;
+        if (s == null || s.isShared())
+            doReleaseShared();
+    }
+}
+```
+
+### 共享模式释放资源
+
+AQS中的releaseShared方法用于共享模式下释放资源。共享模式下释放资源比独占模式下复杂一些，因为在共享模式下释放资源时会有并发问题
+
+1. 调用子类实现的tryReleaseShared方法进行资源释放，同时返回是否释放成功
+2. 成功释放资源后，要调用doReleaseShared唤醒同步队列中等待的线程节点
+
+```java
+public final boolean releaseShared(int arg) {
+    if (tryReleaseShared(arg)) {
+        doReleaseShared();
+        return true;
+    }
+    return false;
+}
+```
+
+调用doReleaseShared唤醒同步队列中的节点线程，由于会出现并发执行doReleaseShared，所以这里使用了for循环+CAS保证能唤醒后继节点线程
+
+```java
   private void doReleaseShared() {
           for (;;) {
-              //唤醒操作由头结点开始，注意这里的头节点已经是上面新设置的头结点了
+              //唤醒操作由头节点开始，注意这里的头节点已经是上面新设置的头节点了
               //其实就是唤醒上面新获取到共享锁的节点的后继节点
               Node h = head;
               //1.如果头节点不为空，且头节点不等于尾节点，说明还有线程在同步队列中等待。
-              //需要注意的是，等待队列的头节点是已经获得了锁的线程，所以如果等待队列中只有一个节点，那就说明没
-              //有线程阻塞在这个等待队列上
               if (h != null && h != tail) {
                   int ws = h.waitStatus;
                   //表示后继节点需要被唤醒
@@ -435,20 +479,231 @@ static final class Node {
                            !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
                       continue;                
               }
-              //如果头结点没有发生变化，表示设置完成，退出循环
-              //如果头结点发生变化，比如说其他线程获取到了锁，为了使自己的唤醒动作可以传递，必须进行重试
+              //如果头节点没有发生变化，表示设置完成，退出循环
+              //如果头节点发生变化，比如说其他线程获取到了锁，为了使自己的唤醒动作可以传递，必须进行重试
               if (h == head)                   
                   break;
           }
       }
-  ```
+```
 
-设置PROPAGATE状态的意义主要在于，每次释放permit都会调用doReleaseShared函数，而该函数每次只唤醒等待队列的**第一个等待节点**。所以在本次归还的permit足够多的情况下，如果仅仅依靠释放锁之后的一次doReleaseShared函数调用，可能会导致明明有permit但是有些线程仍然阻塞的情况。所以在每个线程获取到permit之后，会根据剩余的permit来决定是否把唤醒传播下去。但不保证被唤醒的线程一定能获得permit。
+### Condition实现
 
+并发包中定了Condition接口，定义了线程间通信的基本方法，对应wait和notify的实现
 
-## 其他方法
+```java
+public interface Condition {
+    //阻塞并释放锁
+    void await() throws InterruptedException;
+    //可中断的阻塞并释放锁
+    void awaitUninterruptibly();
+    //带超时的阻塞并释放锁
+    long awaitNanos(long nanosTimeout) throws InterruptedException;
+    //带超时的阻塞并释放锁
+    boolean await(long time, TimeUnit unit) throws InterruptedException;
+    //指定时间的阻塞并释放锁
+    boolean awaitUntil(Date deadline) throws InterruptedException;
+    //唤醒等待队列中第一个线程
+    void signal();
+    //唤醒等待队列中所有线程
+    void signalAll();
+}
+```
 
-- 可中断锁
+AQS中定义了内部类ConditionObject实现了Condition接口。内部类可以访问外部类AQS的任意方法。ConditionObject也是一个双端双向队列，队列的节点类型复用了AQS的Node类型。
+
+```java
+public class ConditionObject implements Condition, java.io.Serializable {
+    private transient Node firstWaiter;//头节点
+    private transient Node lastWaiter;//尾节点
+}
+```
+
+![v7buIP](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/v7buIP.png)
+
+#### await
+
+Condition的await实质就是将线程阻塞同时封装线程添加到Condition等待队列尾部。线程被唤醒后自旋判断已经不在等待队列后，要再次去自旋获取同步队列的执行权，如果获取失败再次阻塞在同步队列上
+
+ConditionObject中await方法实现
+
+1. addConditionWaiter封装节点添加到等待队列尾部
+2. 调用AQS的fullyRelease释放同步状态，放弃执行权
+3. 自旋判断当前节点是否已经被转移到AQS的同步队列中，如果没有继续阻塞，如果完成则当前线程获取AQS竞争权
+4. 线程获取AQS竞争权后调用acquireQueued自旋获取同步状态，失败再次阻塞在同步队列上
+
+```java
+public final void await() throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    Node node = addConditionWaiter();
+  //释放同步状态，放弃执行权
+    int savedState = fullyRelease(node);
+    int interruptMode = 0;
+  //自旋，避免是中断唤醒的线程
+    while (!isOnSyncQueue(node)) {
+        LockSupport.park(this);
+        if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+            break;
+    }
+    //线程被唤醒后，调用acquireQueued方法，自旋获取AQS的执行权
+    if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
+        interruptMode = REINTERRUPT;
+    if (node.nextWaiter != null) // clean up if cancelled
+        unlinkCancelledWaiters();
+    if (interruptMode != 0)
+        reportInterruptAfterWait(interruptMode);
+}
+```
+
+添加到Condition等待队列的尾部
+
+```java
+private Node addConditionWaiter() {
+    Node t = lastWaiter;
+    // If lastWaiter is cancelled, clean out.
+    if (t != null && t.waitStatus != Node.CONDITION) {
+        unlinkCancelledWaiters();
+        t = lastWaiter;
+    }
+    Node node = new Node(Thread.currentThread(), Node.CONDITION);
+    if (t == null)
+        firstWaiter = node;
+    else
+        t.nextWaiter = node;
+    lastWaiter = node;
+    return node;
+}
+```
+
+调用AQS的fullyRelease释放当前线程占用的资源，当前线程放弃执行权
+
+```java
+final int fullyRelease(Node node) {
+    boolean failed = true;
+    try {
+        int savedState = getState();
+      //调用release方法释放资源
+        if (release(savedState)) {
+            failed = false;
+            return savedState;
+        } else {
+            throw new IllegalMonitorStateException();
+        }
+    } finally {
+        if (failed)
+            node.waitStatus = Node.CANCELLED;
+    }
+}
+```
+
+调用AQS的isOnSyncQueue方法判断当前节点是否已经转移到AQS的同步队列中
+
+```java
+final boolean isOnSyncQueue(Node node) {
+  //AQS中有虚拟头节点，所以一定会存在pre
+    if (node.waitStatus == Node.CONDITION || node.prev == null)
+        return false;
+    if (node.next != null) // If has successor, it must be on queue
+        return true;
+    //避免CAS操作带来的next问题，node.prev一定不为空，从后往前找一定没问题
+    return findNodeFromTail(node);
+}
+//从后往前在队列中查找node节点
+private boolean findNodeFromTail(Node node) {
+  Node t = tail;
+  for (;;) {
+    if (t == node)
+      return true;
+    if (t == null)
+      return false;
+    t = t.prev;
+  }
+}
+```
+
+调用AQS的acquireQueued方法，自旋获取同步状态。
+
+**注意**，此时当前线程在signal方法已经从等待队列中出队，**并且已经完成了了在AQS同步队列的入队操作**。所以这里自旋获取同步状态，失败则进入阻塞状态
+
+```java
+final boolean acquireQueued(final Node node, int arg) {
+    boolean failed = true;
+    try {
+        boolean interrupted = false;
+        for (;;) {
+            final Node p = node.predecessor();
+            if (p == head && tryAcquire(arg)) {
+                setHead(node);
+                p.next = null; // help GC
+                failed = false;
+                return interrupted;
+            }
+            if (shouldParkAfterFailedAcquire(p, node) &&
+                parkAndCheckInterrupt())
+                interrupted = true;
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+```
+
+#### signal
+
+![EFNjcw](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/EFNjcw.png)
+
+ConditionObject中signal方法用于唤醒等待队列头部的节点线程，实质操作就是将等待队列头部节点移除并添加到AQS同步队列中，让那个线程拥有竞争AQS资源的权限
+
+```java
+public final void signal() {
+  //当前线程必须是锁持有者
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    Node first = firstWaiter;
+    if (first != null)
+        doSignal(first);
+}
+```
+
+doSignal方法中实现了三个操作
+
+1. 等待队列头节点出队
+2. 调用transferForSignal方法将出队的头节点添加到AQS同步队列尾部
+3. 将该节点在同步队列的前驱节点状态设置为-1，或者唤醒该节点线程
+
+```java
+private void doSignal(Node first) {
+    do {
+        if ( (firstWaiter = first.nextWaiter) == null)
+            lastWaiter = null;
+        first.nextWaiter = null;
+    } while (!transferForSignal(first) &&
+             (first = firstWaiter) != null);
+}
+```
+
+调用AQS的transferForSignal将该节点添加到AQS同步队列，并设置其前驱节点状态为SIGNAL，否则唤醒该线程
+
+```java
+final boolean transferForSignal(Node node) {
+    //将节点状态设置为 0 
+    if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+        return false;
+    //调用AQS的enq方法，将当前节点添加到AQS同步队列尾部，并返回前驱节点
+    Node p = enq(node);
+    int ws = p.waitStatus;
+    //如果前驱节点不是-1，唤醒该线程
+    if (ws > 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+        LockSupport.unpark(node.thread);
+    return true;
+}
+```
+
+### 其他方法
+
+AQS中doAcquireInterruptibly方法提供了可中断锁的实现
 
   ```java
   private void doAcquireInterruptibly(int arg)
@@ -476,79 +731,42 @@ static final class Node {
   }
   ```
 
-- 超时获取锁
+AQS中doAcquireInterruptibly方法提供了带超时锁的实现
 
-  ```java
-  private boolean doAcquireNanos(int arg, long nanosTimeout)
-          throws InterruptedException {
-      if (nanosTimeout <= 0L)
-          return false;
-      final long deadline = System.nanoTime() + nanosTimeout;
-      final Node node = addWaiter(Node.EXCLUSIVE);//入等待队列
-      boolean failed = true;
-      try {
-          for (;;) {
-              final Node p = node.predecessor();
-              if (p == head && tryAcquire(arg)) {
-                  setHead(node);
-                  p.next = null; // help GC
-                  failed = false;
-                  return true;
-              }
-              nanosTimeout = deadline - System.nanoTime();
-              if (nanosTimeout <= 0L)//等待够时间后直接返回false
-                  return false;
-            //自旋够设置时间后 阻塞一段时间
-              if (shouldParkAfterFailedAcquire(p, node) &&
-                  nanosTimeout > spinForTimeoutThreshold)
-                  LockSupport.parkNanos(this, nanosTimeout);
-              if (Thread.interrupted())
-                  throw new InterruptedException();
-          }
-      } finally {
-          if (failed)
-              cancelAcquire(node);
-      }
-  }
-  ```
+```java
+private boolean doAcquireNanos(int arg, long nanosTimeout)
+        throws InterruptedException {
+    if (nanosTimeout <= 0L)
+        return false;
+    final long deadline = System.nanoTime() + nanosTimeout;
+    final Node node = addWaiter(Node.EXCLUSIVE);//入等待队列
+    boolean failed = true;
+    try {
+        for (;;) {
+            final Node p = node.predecessor();
+            if (p == head && tryAcquire(arg)) {
+                setHead(node);
+                p.next = null; // help GC
+                failed = false;
+                return true;
+            }
+            nanosTimeout = deadline - System.nanoTime();
+            if (nanosTimeout <= 0L)//等待够时间后直接返回false
+                return false;
+          //自旋够设置时间后 阻塞一段时间
+            if (shouldParkAfterFailedAcquire(p, node) &&
+                nanosTimeout > spinForTimeoutThreshold)
+                LockSupport.parkNanos(this, nanosTimeout);
+            if (Thread.interrupted())
+                throw new InterruptedException();
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+```
 
-- 设置为取消状态
 
-  ```java
-  private void cancelAcquire(Node node) {
-      // Ignore if node doesn't exist
-      if (node == null)
-          return;
-      node.thread = null;
-      // Skip cancelled predecessors
-      Node pred = node.prev;
-      while (pred.waitStatus > 0)
-          node.prev = pred = pred.prev;
 
-      // predNext is the apparent node to unsplice. CASes below will
-      // fail if not, in which case, we lost race vs another cancel
-      // or signal, so no further action is necessary.
-      Node predNext = pred.next;
-      //设置为取消状态
-      node.waitStatus = Node.CANCELLED;
-      //如果当前节点为队尾，直接移除
-      if (node == tail && compareAndSetTail(node, pred)) {
-          compareAndSetNext(pred, predNext, null);
-      } else {
-          // If successor needs signal, try to set pred's next-link
-          // so it will get one. Otherwise wake it up to propagate.
-          int ws;
-          if (pred != head &&
-              ((ws = pred.waitStatus) == Node.SIGNAL ||
-               (ws <= 0 && compareAndSetWaitStatus(pred, ws, Node.SIGNAL))) &&
-              pred.thread != null) {
-              Node next = node.next;
-              if (next != null && next.waitStatus <= 0)
-                  compareAndSetNext(pred, predNext, next);
-          } else {
-              unparkSuccessor(node);
-          }
-          node.next = node; // help GC
-      }
-  }
-  ```
+
