@@ -17,6 +17,7 @@ categories:
 - ReentrantLock使用的AQS的独占模式，所以需要覆写tryAcquire和tryRelease方法，在该方法中ReentrantLock的内部类通过操作和判断AQS的state状态来获取同步状态。当state=0代表可以获取同步状态;当state>0代表同步状态已被占用，然后判断占用同步状态的线程是否是本线程
 - ReentrantLock公平锁和非公平锁的区别主要在于，公平锁在CAS设置state之前要先判断AQS同步队列中是否有排在当前线程之前的节点，保证AQS同步队列中的线程优先获取执行权
 - ReentrantLock是重入锁，每次重入state+1，释放的时候需要每次state-1，当state为0的时候，锁释放
+- 非公平锁可能会导致锁饥饿问题
 
 ## ReentrantLock和synchronized的区别
 

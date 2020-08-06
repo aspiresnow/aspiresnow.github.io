@@ -284,7 +284,7 @@ public Thread newThread(Runnable r) {
 
 - 避免操作共享变量，多例
 - 多读单一写
-- 共享变量设计为不可变对象，如没有set方法或者final对象
+- 共享变量设计为不可变对象，对象和对象中的属性都被final修饰，属性在构造器中初始化
 - CAS操作
 - 加锁
 
@@ -337,4 +337,26 @@ public static void main(String[] args) {
         });
     }
 ```
+
+## 提升锁性能
+
+1. 减少持有锁的时间
+
+   对于不需要加锁的方法和流程，放到锁外面，减少持有锁的时间，降低锁竞争
+
+2. 减小锁粒度
+
+   锁粒度越小，持有锁的时间越短，并发时竞争越小，1.8之前的ConcurrentHashMap就是基于该思想实现的
+
+3. 锁粗化
+
+   减小锁粒度的反向思维，频繁的添加和释放锁也是很耗性能的，当一个流程中很多小粒度的同步流程，可以考虑合并到一个大的同步流程中。
+
+4. 读写分离
+
+   允许并发读，可以通过读写分离提高并发度，ReadWriteLock就是基于该思想实现
+
+5. 锁分离
+
+   LinkedBlockingQueue对比ArrayBlockingQueue就是使用了锁分离思想。ArrayBlockingQueue中使用了一个锁和该锁的两个Condition，LinkedBlockingQueue使用了两个锁
 

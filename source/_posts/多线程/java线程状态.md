@@ -88,7 +88,3 @@ public enum State {
       now = System.currentTimeMillis() - base;
     }
    ```
-
-## 参考资料
-
-[我是一个线程](http://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&mid=416915373&idx=1&sn=f80a13b099237534a3ef777d511d831a&scene=25#wechat_redirect)

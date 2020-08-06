@@ -10,11 +10,32 @@ categories:
 
 #  java synchronized原理
 
+https://tech.meituan.com/2018/11/15/java-lock.html
+
+https://juejin.im/post/6844903805121740814
+
+https://www.jianshu.com/p/19f861ab749e
+
+https://www.cnblogs.com/bjlhx/p/10555194.html
+
+轻量级锁只是简单的将对象头部作为指针，指向持有锁的线程堆栈内部，来判断一个线程是否持有对象锁。如果线程获取轻量级锁成功，则可以顺利进入临界区，如果轻量级锁加锁失败，则表示其他线程抢先夺到锁，那么当前线程的锁请求会膨胀为重量级锁
+
+任何对象都有 一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。线程执行到monitorenter 指令时，将会尝试获取对象所对应的monitor的所有权，即尝试获得对象的锁。
+锁膨胀后，为了避免线程操作系统层面挂起，自旋，自旋一段时间后还是无法获取锁，则在操作系统层面挂起线程
+
+
+
 在java多线程编程中，最常用的加锁方式就是使用synchronized关键字。synchronized可以加在方法上、代码块上实现线程安全，当一个线程进入synchronized代码块后，其他线程会被阻塞在代码块外面，处于对象的锁池中，这时不再消耗cpu资源，等待对象锁的释放，然后从阻塞状态切换为可运行状态，参与竞争对象锁。
 
 synchronized在获锁的过程中是不能被中断的，意思是说如果产生了死锁，则不可能被中断
 
 <!--more-->
+
+Java 中的每一个对象都可以作为锁。
+
+- 对于同步方法，锁是当前实例对象。
+- 对于静态同步方法，锁是当前对象的 Class 对象。
+- 对于同步方法块，锁是 Synchonized 括号里配置的对象。
 
 ## synchronized使用方式
 
@@ -104,7 +125,7 @@ public void test1() {
 }
 ```
 
-偏向锁：**当线程访问同步方法或者同步代码块的时候，会先判断对象头存储的线程是否为当前线程，而不需要进行CAS操作进行加锁和解锁，避免轻量级锁。**用于处理只有一个线程进入同步块中的情况**
+偏向锁：**当线程访问同步方法或者同步代码块的时候，会先判断对象头存储的线程是否为当前线程，而不需要进行CAS操作进行加锁和解锁，避免轻量级锁。**用于处理只有一个线程进入同步块中的情况
 
 **轻量级锁：**假设大部分同步代码一般都处于无锁竞争状态，在无竞争的情况下应该尽量避免使用锁，取而代之的是在monitorenter和monitorexit中只需要依靠一条CAS原子指令就可以完成锁的获取及释放。当存在锁竞争的情况下，执行CAS指令失败的线程将调用操作系统互斥锁进入到阻塞状态，当锁被释放的时候被唤醒。**用于处理多个线程交替进入同步块的情况**
 
@@ -200,7 +221,9 @@ synchronized static void method2() {}
 3. 检查rfThis是否大于0，设置Owner为空然后唤醒一个正在阻塞或等待的线程再一次试图获取锁，如果等于0则进入到步骤4
 4. 将对象头的LockWord置为空，解除和monitor对象的关联，释放对象锁，同时将这个空的monitor对象再次放入线程的可用monitor列表。        
 
+### 锁消除
 
+jvm虚拟机在编译时，通过扫描运行上下文，去除不可能出现并发安全的锁，节省无意义的加锁、解锁
 
 ### 总结
 
@@ -216,9 +239,3 @@ synchronized static void method2() {}
 
 ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync5.jpg?raw=true)
 
-
-## 参考资料
-
-[深入浅出synchronized](http://www.jianshu.com/p/19f861ab749e)
-
-[Java中synchronized的实现原理与应用](http://www.infoq.com/cn/articles/java-se-16-synchronized/)
