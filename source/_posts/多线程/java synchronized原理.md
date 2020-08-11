@@ -1,6 +1,6 @@
 ---
 title: java synchronized原理
-date: 2017-09-01 16:52:24
+date: 2017-09-01
 tags:
 - 多线程
 categories:
@@ -10,100 +10,235 @@ categories:
 
 #  java synchronized原理
 
-https://tech.meituan.com/2018/11/15/java-lock.html
+## 思考
 
-https://juejin.im/post/6844903805121740814
+- 当synchronized加的是偏向锁或者轻量级锁的时候，调用 wait方法会怎样
+  - 对象的wait方法要依赖Monitor对象的实现，而且需要有个队列来存储阻塞等待的线程，偏向锁和轻量级锁都不涉及线程的阻塞，所以，我猜测会进行锁膨胀为重量级锁，然后调用Monitor对象的wait方法
+- 为什么重量级锁叫锁膨胀
+  - 重量级锁会将对象头Mark World指向一个Monitor对象，Monitor对象更像是对象头的补充，在该对象中存储了持有锁的线程ID、阻塞线程队列、等待线程队列，当这俩队列中有信息时，这个Monitor对象就得一直挂在对象头上。就像是对对象要实现锁功能的补充，所以叫锁膨胀
+- 假如一个重入3次的线程调用wait方法，怎么处理
+  - 当前线程阻塞，并加入到Monitor的等待队列，节点Node至少要有两个信息，一个线程ID，一个重入次数
 
-https://www.jianshu.com/p/19f861ab749e
+## 知识导读
 
-https://www.cnblogs.com/bjlhx/p/10555194.html
+- synchronized方法依赖标记flag为ACC_SYNCHRONIZED，同步代码块依赖monitorenter和monitorexit指令
+- synchronized在获锁的过程中是不能被中断的，意思是说如果产生了死锁，则不可能被中断
+- 同步方法、同步代码块中抛出异常，锁自动释放
+- synchronized是可重入的非公平锁实现
+- 无锁、偏向锁、轻量级锁不会出现线程阻塞的情况，这也是JVM优化的最重要的一个目的
+- 无锁、偏向锁、轻量级锁、自旋锁、重量级锁的优化场景及锁升级过程
+- 锁对象的方法实现依赖Monitor对象的实现，Monitor对象依赖操作系统的Mutex互斥锁实现
+- Monitor对象可以类比AQS，封装了持有锁的线程，被阻塞线程队列、等待线程队列、重入次数等信息
 
-轻量级锁只是简单的将对象头部作为指针，指向持有锁的线程堆栈内部，来判断一个线程是否持有对象锁。如果线程获取轻量级锁成功，则可以顺利进入临界区，如果轻量级锁加锁失败，则表示其他线程抢先夺到锁，那么当前线程的锁请求会膨胀为重量级锁
+## 对象锁
 
-任何对象都有 一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。线程执行到monitorenter 指令时，将会尝试获取对象所对应的monitor的所有权，即尝试获得对象的锁。
-锁膨胀后，为了避免线程操作系统层面挂起，自旋，自旋一段时间后还是无法获取锁，则在操作系统层面挂起线程
-
-
-
-在java多线程编程中，最常用的加锁方式就是使用synchronized关键字。synchronized可以加在方法上、代码块上实现线程安全，当一个线程进入synchronized代码块后，其他线程会被阻塞在代码块外面，处于对象的锁池中，这时不再消耗cpu资源，等待对象锁的释放，然后从阻塞状态切换为可运行状态，参与竞争对象锁。
-
-synchronized在获锁的过程中是不能被中断的，意思是说如果产生了死锁，则不可能被中断
-
-<!--more-->
-
-Java 中的每一个对象都可以作为锁。
+Java 中的每一个对象都可以作为锁
 
 - 对于同步方法，锁是当前实例对象。
-- 对于静态同步方法，锁是当前对象的 Class 对象。
 - 对于同步方法块，锁是 Synchonized 括号里配置的对象。
+- 对于静态同步方法，锁是当前对象的 Class 对象。
 
-## synchronized使用方式
+对象在内存的分布分为3个部分：对象头，实例数据，和对齐填充。在对象头中的Mark Word存储了对象的锁信息。Java中锁对象有四种状态，**无锁状态，偏向锁状态，轻量级锁状态和重量级锁状态**，它会随着竞争情况逐渐升级。锁可以升级但不能降级，目的是为了提高获得锁和释放锁的效率
 
-Synchronized本质上是当前线程获取指定对象相关联的monitor对象，这个过程是互斥性的，也就是说同一时刻只有一个线程能够成功，其它失败的线程会被阻塞，并放入到锁池中，进入阻塞状态。
+![TrB4lz](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/TrB4lz.png)
 
-- synchronized代码块：
+## 原理
 
-  javap查看同步块的入口位置和退出位置分别插入monitorenter和monitorexit字节码指令
+**synchronized方法**
 
-  ```java
-  public void test(){
-    synchronized (this) {
-      
-    }
+javap查看synchronized方法会被编译成方法的flags加上标志ACC_SYNCHRONIZED.
+
+线程执行方法时会检查方法的`ACC_SYNCHRONIZED`标志，如果设置了线程需要先去获取对象锁，执行完毕后线程再释放对象锁，在方法执行期间，同一时刻只有一个线程能成功获取锁
+
+```java
+public synchronized void test(){
+System.out.println("test");
+}
+
+public synchronized void test();
+    descriptor: ()V
+    flags: ACC_PUBLIC, ACC_SYNCHRONIZED
+    Code:
+      stack=0, locals=1, args_size=1
+       0: return
+```
+
+**synchronized代码块**
+
+javap查看同步块的入口位置和退出位置分别插入monitorenter和monitorexit字节码指令。原理同synchronized方法一致
+
+```java
+public void test(){
+  synchronized (this) {
+    
   }
-  public void test();
-      descriptor: ()V
-      flags: ACC_PUBLIC
-      Code:
-        stack=2, locals=3, args_size=1
-           0: aload_0
-           1: dup
-           2: astore_1
-           3: monitorenter
-           4: aload_1
-           5: monitorexit
-           6: goto          14
-           9: astore_2
-          10: aload_1
-          11: monitorexit
-          12: aload_2
-          13: athrow
-          14: return
-            
-  ```
+}
+public void test();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=3, args_size=1
+         0: aload_0
+         1: dup
+         2: astore_1
+         3: monitorenter
+         4: aload_1
+         5: monitorexit
+         6: goto          14
+         9: astore_2
+        10: aload_1
+        11: monitorexit
+        12: aload_2
+        13: athrow
+        14: return
+          
+```
 
-  
+### 内存语义
 
-- synchronized方法
+- 当线程获取锁时，JMM会把该线程对应的本地内存置为无效，同步代码块必须去主内存读取所需的共享变量。
+- 当线程释放锁时，JMM会将当前线程工作内存中的共享变量刷新到主内存中
 
-  javap查看synchronized方法会被编译成方法的flags加上标志ACC_SYNCHRONIZED，在Class文件的方法表中将该方法的access_flags字段中的synchronized标志位置1，表明该方法使用自身对象或者自身Class对象作为锁对象
+## 优化
 
-  ```java
-  public synchronized void test(){
-    System.out.println("test");
-  }
+synchronized重量级锁依赖操作系统的mutex互斥锁实现，需要阻塞线程，由于线程的阻塞和重启涉及CPU内核切换，非常耗费性能，Jdk1.6之后针对synchronized做了一些优化，来降低线程阻塞的几率，主要包括如锁粗化、锁消除、轻量级锁、偏向锁、适应性自旋、重量级锁等技术来减少锁操作的开销。
 
-  public synchronized void test();
-      descriptor: ()V
-      flags: ACC_PUBLIC, ACC_SYNCHRONIZED
-      Code:
-        stack=0, locals=1, args_size=1
-           0: return
-  ```
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync5.jpg?raw=true)
 
-  
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/synclock.png?raw=true)
 
-## synchronized对内存空间的影响
+### 无锁
 
-- 进入synchronized同步代码块后，JVM会把该线程对应的本地内存置为无效，从而强制线程去主内存读取共享数据。
-- 出synchronized同步代码块前，线程会将当前工作内存中的缓存写入主内存。
+无锁没有对资源进行锁定，所有的线程都能访问并修改同一个资源，但同时只有一个线程能修改成功。
 
-## synchronized锁优化
+无锁的实现主要依赖CAS操作，一般在一个循环中不断的进行CAS操作直到成功。循环次数过多会导致CPU负载升高
 
-由于线程的阻塞和重启涉及CPU内核切换，非常耗费性能，Jdk1.6之后针对synchronized做了一些优化，主要包括如锁粗化、锁消除、轻量级锁、偏向锁、适应性自旋、重量级锁等技术来减少锁操作的开销。
+### 偏向锁
 
-**锁粗化：**在已经持有该对象锁的情况下，再次调用synchronized该对象，不再判断，如StringBuilder.append().apend()
+锁对象头`Mark Word`中会记录偏向线程ID，线程获取锁的时候会判断偏向线程ID是否是本线程，如果是直接获取执行权，不需要进行CAS操替换对象头或者其他加锁操作，提高了效率
 
+- 线程成功获取偏向锁后修改`Mark Word`记录偏向线程ID,同时修改`Mark Word`中偏向锁标志为1
+- 线程执行完成退出同步代码块后，只修改`Mark Word`中偏向锁标志为0，对象头中的偏向线程ID继续保留，下次直接比对，同一线程无需CAS替换
+
+#### 优化背景
+
+偏向锁的目的是消除无竞争情况下的加锁操作。大多数情况下锁不存在竞争，总是由同一个线程操作锁，通过在对象头记录偏向锁id，避免对象头的CAS替换操作
+
+#### 加锁
+
+1. 检查锁对象头的Mark Word是否为锁状态是否是01，即无锁或者偏向锁
+   1. 如果锁状态不是01，进入轻量级锁或者重量级锁加锁流程
+   2. 如果是01，可偏向锁，检查`Mark Word`储存的偏向线程ID是否为当前线程ID
+      1. 如果存储的偏向线程ID为空，CAS将Mark Word偏向线程ID设置为本线程，CAS成功设置偏向锁标志为1，偏向锁加锁成功
+      2. 如果是当前线程ID，当前线程直接获取到锁，修改Mark Word中偏向锁标志为1，执行代码
+      3. 如果对象头存储的偏向线程ID不是当前线程ID，判断对象头的偏向锁标志值
+         1. 如果偏向锁标志为 0，表示当前没有偏向锁，CAS将Mark Word偏向线程ID设置为本线程，CAS成功设置偏向锁标志为1，偏向锁加锁成功
+         2. 如果偏向锁标志为 1，表示当前有其他线程添加了偏向锁，进入释放偏向锁并升级为轻量级锁流程
+
+#### 释放锁
+
+**偏向锁使用了一种等到竞争出现才释放锁的机制**，持有偏向锁的线程不会主动释放偏向锁，需要等待其他线程来竞争的时候才会释放偏向锁。当前线程竞争偏向锁时，进入以下流程
+
+1. 当前线程检查持有偏向锁的线程是否还存活
+   1. 偏向锁线程不处于活动状态，将对象头设置为无锁状态，清除`Mark Word`中的偏向ID，设置偏向锁标志为0，当前线程进入获取偏向锁流程
+   2. 偏向锁线程处于活动状态，升级为轻量级锁。
+      1. 当到达全局安全点(在这个时间点上没有字节码正在执行)时挂起持有偏向锁的线程
+      2. 将`Mark Word`指向当前堆栈最近的一个lock record，**即指向拥有偏向锁线程的栈空间**
+      3. 将对象头锁状态修改为`00`,升级为轻量级锁
+      4. **恢复被挂起的线程**，**持有偏向锁的线程获取执行权**，当前线程CAS自旋获取轻量级锁
+
+**注意：**在竞争激烈的时候，偏向锁会成为一种累赘，要频繁的暂停线程，可以通过设置 `-XX:UseBiasedLocking=false`关闭偏向锁功能
+
+### 轻量级锁
+
+在当前线程的栈帧中开辟一块锁记录（Lock Record）的空间，拷贝锁对象目前的Mark Word到栈帧的Lock Record，将使用CAS操作尝试将对象的`Mark Word`指向Lock Record。如果修改对象头成功，则加锁成功，如果失败，表示其他线程占用轻量级锁，那么当前线程会自旋尝试CAS更新`Mark Word`，自旋一定次数还没成功则膨胀为重量级锁
+
+#### 优化背景
+
+大部分占用锁时间不会太长，通过短暂的自旋后可以获取到锁，避免线程阻塞和唤醒。轻量级锁通过简单的将对象头指向持有锁的栈来标记加锁成，当发生竞争时，先自旋CAS更新`Mark World`指向本线程来竞争锁。
+
+#### 加锁
+
+1. 判断锁对象`Mark Word`中存储的锁记录是否指向当前线程栈帧
+   1. 如果指向当前线程栈帧，说明是重入锁，当前线程直接获取执行权
+   2. 如果没有指向当前线程栈帧，说明其他线程已经获取了轻量级锁。在当前线程栈帧中开辟锁记录空间，用于存放锁对象中的`Mark Word`的拷贝(Displaced Mark Word),CAS将锁对象的`Mark Word`指向当前栈空间的锁记录
+      1. CAS更新成功，成功获取轻量级锁，将`Mark Word`的锁标志置为00，执行同步代码块
+      2. CAS更新失败，进入自旋锁流程，当前线程尝试使用自旋来获取锁，直到获取到锁或者升级为重量级锁后阻塞当前线程
+
+#### 释放锁
+
+1. 从当前线程的栈帧中取出Displaced Mark Word存储的锁记录的内容
+2. 当前线程尝试使用CAS将锁记录中复制的`Displaced Mark Word`替换到锁对象中的`Mark Word`中 
+   1. CAS更新成功，则释放锁成功，释放轻量级锁，将锁标志位置为01无锁状态
+   2. CAS更新失败，对象头已经由其他竞争的线程修改为10，Mark World已经膨胀指向Monitor对象，当前锁升级为重量级锁，所以当前线程需要执行重量级锁释放锁流程，请看下文
+
+### 自旋锁
+
+线程的阻塞和唤醒需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，自旋锁就是避免线程进入阻塞状态。在大多数情况下，线程持有锁的时间都不会太长，所以希望通过短时间的重复尝试去获取锁，避免线程阻塞。
+
+当线程在获取轻量级锁的过程中执行CAS更新`Mark World`失败时，为了避免线程真实地在操作系统层面挂起，虚拟机通过自旋不断尝试CAS更新`Mark World`。
+
+1. 自旋若干次后，CAS修改`Mark World`成功则成功获取轻量级锁，线程获取执行权。
+2. 自旋若干次后还是获取锁失败，当前线程进入阻塞状态，升级为重量级锁
+
+**注意：**自旋等待虽然避免了线程切换的开销，但它要占用处理器时间。如果锁被占用的时间很短，自旋等待的效果就会非常好。反之，如果锁被占用的时间很长，那么自旋的线程只会白浪费处理器资源。所以，自旋等待的时间必须要有一定的限度，如果自旋超过了限定次数（默认是10次，可以使用-XX:PreBlockSpin来更改）没有成功获得锁，就应当挂起线程。
+
+#### 自适应自旋锁　　
+
+自旋是需要消耗CPU性能的，为了避免竞争激烈情况下无意义的自旋，JDK1.6引入自适应的自旋锁，自适应就意味着自旋的次数不再是固定的，它是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。线程如果自旋成功了，则下次自旋的次数会更多，如果自旋失败了，则自旋的次数就会减少。
+
+1. 某个某个锁对象自旋成功获取轻量级锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也很有可能再次成功，进而它将允许自旋持续相对更长的时间。
+2. 如果某个对象锁自旋很少成功获得，下次会减少自旋的次数，很快升级为重量级锁进入阻塞状态，避免CPU资源浪费
+
+### 重量级锁
+
+重量级锁涉及到了线程的阻塞，所以需要有一个容器队列来存储所有阻塞的线程。对象锁还支持wait方法，允许持有锁的线程释放锁并进入阻塞等待状态，也需要一个容器队列来存储所有阻塞等待的线程。Monitor就是做这件事的。通过将锁对象头的`Mark World`指向Monitor对象，实现对象头的补充膨胀效果。Monitor对象更像是对对象头的功能补充
+
+重量级锁的实现是依靠Monitor对象实现，Monitor的本质是依赖于底层操作系统的MutexLock(互斥锁)实现，MutexLock会导致线程的阻塞和唤醒，操作系统实现线程之间的切换需要从用户态到内核态的转换，成本非常高。同时Monitor维护了持有锁线程、阻塞线程队列、阻塞等待线程队列、重入次数等信息
+
+#### monitor锁对象
+
+monitor是线程私有的数据结构，存储在栈中，每一个线程都有一个可用monitor列表，同时还有一个全局的可用列表，当线程可用monitor列表为空的时候会请求全局可用列表补充。？？？
+
+![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync2.jpg?raw=true)
+
+**Owner**：初始时为NULL表示当前没有任何线程拥有该monitor，线程加锁成功后记录持有锁的线程ID，当锁释放后设置为NULL；
+**EntryQ**: 链表，用于存储所有阻塞在该锁对象上的线程。存有两个队列，entry-set用于存储正在阻塞竞争的线程，wait-set用于存储调用wait方法等待唤醒的线程
+**RcThis**: 表示所有阻塞或者等待在该锁对象上的线程个数
+**Nest**:   记录锁对象重入的次数
+**HashCode**: 保存从对象头拷贝过来的HashCode值
+**Candidate**: 0表示没有需要唤醒的线程1表示要唤醒一个继任线程来竞争锁。
+
+对象锁的API实现依赖Monitor的实现，Monitor提供了获取锁(enter)、释放锁(exit)、等待(wait)、notify(唤醒)、notifyAll(唤醒所有)功能
+
+#### 加锁 
+
+线程CAS自旋获取轻量级锁失败后，将锁膨胀为重量级锁
+
+1. 从当前线程可用Monitor列表中取出一个Monitor对象，修改`Mark World`指向Monitor对象
+2. 修改Monitor对象的Owner为持有轻量级锁的线程ID,Nest初始为1
+3. 修改对象头的锁状态为重量级锁(10)
+4. 当前线程加入到Monitor的entry-set队列中，进入阻塞状态
+
+当一个新的线程来竞争重量级锁或者当阻塞队列中的线程被唤醒，竞争重量级锁
+
+1. 当前线程判断对象头的锁状态为重量级锁(10)，然后根据`Mark World`引用获取Monitor对象
+2. 当前线程调用Monitor对象的获取锁(enter)方法
+   1. 如果Monitor锁没有被其他线程获取，当前线程成功获取锁，修改Monitro的Owner为当前线程
+   2. 如果Monitor锁已经被其他线程获取，判断Owner是否为当前线程
+      1. 如果相同，重入锁，Nest++，当前线程继续持有锁
+      2. 如果不同，当前线程加入到entry-set中，进入阻塞状态
+
+#### 释放锁
+
+1. 将Monitor对象的Next字段减去 0 ,判断减去后的值是否为0(可能重入)
+   1. Nest>0，说明重入锁还未释放锁，当前线程继续持有锁
+   2. Next=0, 重入锁释放完成，设置Owner为空，检查rfThis是否大于0，用于判读是否需要唤醒被阻塞的线程
+      1. rfThis>0，唤醒阻塞队列中一个被阻塞的线程，该线程竞争重量级锁
+      2. rfThis=0，没有其他线程在竞争锁，也没有阻塞中的线程了，当前Monior已经没有用了，彻底释放锁，将`Mark World`指向为null，设置锁状态为01(无锁),将解除关联的monitor对象重新放入线程可用monitor列表中
+
+### 锁粗化
+在已经持有该对象锁的情况下，再次调用synchronized该对象，不再判断，如StringBuilder.append().apend()
 ```java
 public void test() {
   synchronized (this) {
@@ -114,8 +249,9 @@ public void test() {
   }
 }
 ```
+### 锁消除
 
-**锁消除：**通过运行时JIT编译器的逃逸分析来消除一些没有操作共享变量的同步操作
+通过运行时JIT编译器的逃逸分析来消除一些没有操作共享变量的同步操作
 
 ```java
 public void test1() {
@@ -125,117 +261,7 @@ public void test1() {
 }
 ```
 
-偏向锁：**当线程访问同步方法或者同步代码块的时候，会先判断对象头存储的线程是否为当前线程，而不需要进行CAS操作进行加锁和解锁，避免轻量级锁。**用于处理只有一个线程进入同步块中的情况
-
-**轻量级锁：**假设大部分同步代码一般都处于无锁竞争状态，在无竞争的情况下应该尽量避免使用锁，取而代之的是在monitorenter和monitorexit中只需要依靠一条CAS原子指令就可以完成锁的获取及释放。当存在锁竞争的情况下，执行CAS指令失败的线程将调用操作系统互斥锁进入到阻塞状态，当锁被释放的时候被唤醒。**用于处理多个线程交替进入同步块的情况**
-
-**适应性自旋：**当线程在获取轻量级锁的过程中执行CAS操作失败时，升级为重量级锁，当前线程会自旋，自旋一定时间再次尝试获取锁，成功则避免进入阻塞状态，减少CPU的切换消耗，如果自旋后尝试还是无法获取则进入阻塞状态，等待其他线程释放对象锁。java虚拟机内部会对自旋的次数自动调整，如果上次自旋后成功获取锁则减少下次自旋次数，如果自旋后还是无法获取到对象锁，会减少下次的自旋字数，避免在自旋长期占用CPU资源。
-
-**重量级锁**：**用于多个线程同时进入同步块的情况**
-
-## 锁优化实现原理
-
-### java 对象头
-
-在java中每个对象都可以作为一个锁，继承Object中的wait和notify方法，在hotspot虚拟机中，对象在内存的分布分为3个部分：对象头，实例数据，和对齐填充。在对象头中的Mark Word存储了对象的锁信息，Mark Word被设计成一个非固定的数据结构以便在极小的空间内存存储尽量多的数据，它会根据对象的状态复用自己的存储空间，也就是说，Mark Word会随着程序的运行发生变化，变化状态如下
-
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/objectHead.png?raw=true)
-
-当对象状态为偏向锁的时候，Mark World存储的是偏向的线程id，当状态为轻量级锁的时候，Mark World存储的是指向线程栈中Lock Record的指针，当状态为重量级锁的时候，Mark World存储的是指向**堆**中monitor对象的指针
-
-### monitor锁对象
-
-**monitor是线程私有的数据结构，存储在栈中**，每一个线程都有一个可用monitor列表，同时还有一个全局的可用列表，当线程可用monitor列表为空的时候会请求全局可用列表补充。
-
-在 java 虚拟机中，线程一旦进入到被synchronized修饰的方法或代码块时，指定的锁对象的对象头存储指向monitor对象的指针，这个过程称为锁对象的膨胀。同时monitor 中的Owner存放拥有该对象锁的线程的唯一标识，确保一次只能有一个线程执行该部分的代码，线程在获取锁之前不允许执行该部分的代码。
-
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync2.jpg?raw=true)
-
-**Owner**：初始时为NULL表示当前没有任何线程拥有该monitor record，当线程成功拥有该锁后保存持有锁的线程唯一标识，当锁被释放时又设置为NULL；
-
-**EntryQ**:关联一个系统互斥锁（semaphore），阻塞所有试图锁住monitor record失败的线程。
-
-**RcThis**:表示blocked或waiting在该monitor record上的所有线程的个数。
-
-**Nest**:用来实现重入锁的计数。
-
-**HashCode**:保存从对象头拷贝过来的HashCode值（可能还包含GC age）。
-
-**Candidate**:用来避免不必要的阻塞或等待线程唤醒，因为每一次只有一个线程能够成功拥有锁，如果每次前一个释放锁的线程唤醒所有正在阻塞或等待的线程，会引起不必要的上下文切换（从阻塞到就绪然后因为竞争锁失败又被阻塞）从而导致性能严重下降。Candidate只有两种可能的值0表示没有需要唤醒的线程1表示要唤醒一个继任线程来竞争锁。
-
-Java中锁有四种状态，**无锁状态，偏向锁状态，轻量级锁状态和重量级锁状态**，它会随着竞争情况逐渐升级。锁可以升级但不能降级，目的是为了提高获得锁和释放锁的效率。
-
-### 偏向锁
-
-**引入背景**：大多数情况下锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了让线程获得锁的代价更低而引入了偏向锁。当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程 ID，以后该线程在进入和退出同步块时不需要花费CAS操作来加锁和解锁，而只需简单的测试一下对象头的Mark Word里是否存储着指向当前线程的偏向锁，如果测试成功，表示线程已经获得了锁，如果测试失败，则需要再测试下 Mark Word中偏向锁的标识是否设置成 1（表示当前是偏向锁），如果没有设置，则使用 CAS 竞争锁，如果设置了，则尝试使用 CAS 将对象头的偏向锁指向当前线程。
-
-```java
-public static void main(String[] args) {
-  method1();
-  method2();
-}
-synchronized static void method1() {}
-synchronized static void method2() {}
-```
-
-**加锁**：当Thread#1进入临界区时，JVM会将lockObject的对象头Mark Word的锁标志位设为“01”，同时会用CAS操作把Thread#1的线程ID记录到Mark Word中，此时进入偏向模式。所谓“偏向”，指的是这个锁会偏向于Thread#1，若接下来没有其他线程进入临界区，则Thread#1再出入临界区无需再执行任何同步操作。也就是说，若只有Thread#1会进入临界区，实际上只有Thread#1初次进入临界区时需要执行CAS操作，以后再出入临界区都不会有同步操作带来的开销。
-
-然而情况一是一个比较理想的情况，更多时候Thread#2也会尝试进入临界区。若Thread#2尝试进入时Thread#1已退出临界区，即此时lockObject处于未锁定状态，这时说明偏向锁上发生了竞争（对应情况二），此时会撤销偏向，Mark Word中不再存放偏向线程ID，而是存放hashCode和GC分代年龄，同时锁标识位变为“01”（表示未锁定），这时Thread#2会获取lockObject的轻量级锁。因为此时Thread#1和Thread#2交替进入临界区，所以偏向锁无法满足需求，需要膨胀到轻量级锁。
-
-![偏向锁](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/偏向锁.png?raw=true)
-
-**解除锁**：**偏向锁使用了一种等到竞争出现才释放锁的机制**，所以当其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁。
-
-1. 在一个安全点(在这个时间点上没有字节码正在执行)停止持有偏向锁的线程
-2. 遍历线程栈，判断是否存在锁记录，修复锁记录和对象头的Mark World，变为无锁状态
-3. 唤醒当前持有偏向锁的线程，升级为轻量级锁
-
-在竞争激烈的时候，偏向锁会成为一种累赘，需要频繁的暂停线程，可以通过设置 `-XX:UseBiasedLocking=false`关闭偏向锁功能
-
-![偏向锁](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync3.jpg?raw=true)
-
-### 轻量级锁
-
-**引入背景**：线程持有锁的时间短，多个线程可以错开时间来获取锁，当有冲突的时候，由于锁持有时间短，其他线程可以先自旋尝试获取锁，避免线程进入阻塞状态。
-
-**加锁**： 线程在执行同步块之前， 线程首先从自己的可用moniter record列表中取得一个空闲的monite对象，初始Nest和Owner值分别被预先设置为1和该线程自己的标识，并将对象头中的Mark Word复制到锁记录中，官方称为Displaced Mark Word。然后线程尝试使用 CAS 将对象头中的Mark Word替换为指向monitor对象的指针。如果成功，当前线程获得锁，如果失败，表示其他线程竞争锁，当前线程便尝试使用**自旋**来获取锁。自旋失败后锁膨胀为重量级锁
-
-如果Mark Word中已经指向一个monitor对象，并且该monitor对象中的Owner中保存的线程标识是线程自己，这就是重入锁的情况，只需要简单的将Nest加1即可
-
-**释放锁**:首先使用原子的 CAS 操作来将Displaced Mark Word替换回对象头，如果成功，则表示没有竞争发生。如果失败，表示当前锁存在竞争，锁就会膨胀成重量级锁。
-
-![轻量级锁](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync4.jpg?raw=true)
-
-### 自旋锁
-
-当轻量级锁竞争的时候，未获取锁的线程会自旋获取锁，如果一直获取不到锁，自旋一定次数后升级为重量级锁，进入阻塞状态。自旋是需要消耗CPU性能的，JDK采用了自适应自旋，如果线程自旋成功获取锁了，那么下次遇到竞争自旋的次数会变多，如果自旋获取锁失败了，那么下次自旋的次数会减少。
-
-### 重量级锁
-
-**加锁**：Mark Word标记为10，其他线程进入同步阻塞状态
-
-**释放锁**：
-
-1. 检查该对象是否处于膨胀状态并且该线程是这个锁的拥有者，如果发现不对则抛出异常。
-2. 检查Nest字段是否大于1，如果大于1则简单的将Nest减1并继续拥有锁，如果等于1，则进入到步骤3。
-3. 检查rfThis是否大于0，设置Owner为空然后唤醒一个正在阻塞或等待的线程再一次试图获取锁，如果等于0则进入到步骤4
-4. 将对象头的LockWord置为空，解除和monitor对象的关联，释放对象锁，同时将这个空的monitor对象再次放入线程的可用monitor列表。        
-
-### 锁消除
-
-jvm虚拟机在编译时，通过扫描运行上下文，去除不可能出现并发安全的锁，节省无意义的加锁、解锁
-
-### 总结
-
-- 偏向锁、轻量级锁都是乐观锁，重量级锁是悲观锁。 没有任何线程来访问同步块的时候，对象锁是可偏向的，这意味着当有第一个线程进入同步块的访问锁对象的时候，会获取对象的偏向锁，这个线程在修改锁对象的对象头成为偏向锁的时候使用CAS操作，并将对象头中的ThreadID改成自己的ID，之后该线程再次访问该锁对象，只需要对比ID，不需要再使用CAS在进行操作。
-
-
-- 一旦有第二个线程访问锁对象，因为偏向锁不会主动释放，所以第二个线程可以看到对象时偏向状态，这时表明在这个对象上已经存在竞争了，检查原来持有该对象锁的线程是否依然存活，如果挂了，则可以将对象变为无锁状态，然后重新偏向新的线程，如果原来的偏向的线程依然存活，则马上执行那个线程的操作栈，检查该对象的使用情况，如果仍然需要持有偏向锁，则偏向锁升级为轻量级锁，（**偏向锁就是这个时候升级为轻量级锁的**）。如果不存在使用了，则可以将对象回复成无锁状态，然后重新偏向。
-- 轻量级锁认为竞争存在，但一般两个线程对于同一个锁的操作都会错开，或者存在竞争时线程进行几次**自旋**，另一个线程就会释放锁。 但是当自旋超过一定的次数后还无法获得对象锁，轻量级锁膨胀为重量级锁，重量级锁使除了拥有锁的线程以外的线程都阻塞，防止CPU空转。
-
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/synclock.png?raw=true)
 
 
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync5.jpg?raw=true)
 

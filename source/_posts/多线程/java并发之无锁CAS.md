@@ -1,6 +1,6 @@
 ---
 title: java并发之无锁CAS
-date: 2017-10-29 09:28:53
+date: 2017-10-29
 tags:
 - 多线程
 categories:
@@ -9,94 +9,92 @@ categories:
 
 # java并发之无锁CAS
 
+## CAS思想
 
+CAS是乐观锁思想的一种实现，无锁。
+
+乐观锁总是假设不存在竞争，线程可以正常执行，无需加锁或者等待。一旦发生竞争导致操作失败，然后会不停的重试直到成功为止
+
+乐观锁更好的用在读多写少、竞争比较低的场景，如果竞争激烈，线程会浪费很多CPU资源，并且最后还失败。
 
 CAS算法涉及到三个操作数：
 
-需要读写的内存值 V。
-进行比较的值 A。
-要写入的新值 B。
-当且仅当 V 的值等于 A 时，CAS通过原子方式用新值B来更新V的值（“比较+更新”整体是一个原子操作），否则不会执行任何操作。一般情况下，“更新”是一个不断重试的操作。
+- 需要修改的内存值 V
 
-CAS虽然很高效，但是它也存在三大问题，这里也简单说一下：
+- 进行比较的值 A
 
-1.ABA问题。CAS需要在操作值的时候检查内存值是否发生变化，没有发生变化才会更新内存值。但是如果内存值原来是A，后来变成了B，然后又变成了A，那么CAS进行检查时会发现值没有发生变化，但是实际上是有变化的。ABA问题的解决思路就是在变量前面添加版本号，每次变量更新的时候都把版本号加一，这样变化过程就从“A－B－A”变成了“1A－2B－3A”。
-JDK从1.5开始提供了AtomicStampedReference类来解决ABA问题，具体操作封装在compareAndSet()中。compareAndSet()首先检查当前引用和当前标志与预期引用和预期标志是否相等，如果都相等，则以原子方式将引用值和标志的值设置为给定的更新值。
-2.循环时间长开销大。CAS操作如果长时间不成功，会导致其一直自旋，给CPU带来非常大的开销。
-3.只能保证一个共享变量的原子操作。对一个共享变量执行操作时，CAS能够保证原子操作，但是对多个共享变量操作时，CAS是无法保证操作的原子性的。Java从1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
+- 要写入的新值 B
 
-
-
-上面的乐观锁用到的机制就是CAS，Compare and Swap。
-
-CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当且仅当预期值A和内存值V相同时，将内存值V修改为B，否则什么都不做。
-
-非阻塞算法 （nonblocking algorithms）
-
-一个线程的失败或者挂起不应该影响其他线程的失败或挂起的算法。
-
-现代的CPU提供了特殊的指令，可以自动更新共享数据，而且能够检测到其他线程的干扰，而 compareAndSet() 就用这些代替了锁定。
-
-在没有锁的机制下可能需要借助volatile原语，保证线程间的数据是可见的（共享的）。
-
-
-
-在这里采用了CAS操作，每次从内存中读取数据然后将此数据和+1后的结果进行CAS操作，如果成功就返回结果，否则重试直到成功为止。
-
-而compareAndSet利用JNI来完成CPU指令的操作。
-
-public final boolean compareAndSet(int expect, int update) {   
-
-​    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
-
-​    }
-
-整体的过程就是这样子的，利用CPU的CAS指令，同时借助JNI来完成Java的非阻塞算法。其它原子操作都是利用类似的特性完成的。
-
-而整个J.U.C都是建立在CAS之上的，因此对于synchronized阻塞算法，J.U.C在性能上有了很大的提升。
-
-CAS看起来很爽，但是会导致“ABA问题”。
-
-CAS算法实现一个重要前提需要取出内存中某时刻的数据，而在下时刻比较并替换，那么在这个时间差类会导致数据的变化。
-
-比如说一个线程one从内存位置V中取出A，这时候另一个线程two也从内存中取出A，并且two进行了一些操作变成了B，然后two又将V位置的数据变成A，这时候线程one进行CAS操作发现内存中仍然是A，然后one操作成功。尽管线程one的CAS操作成功，但是不代表这个过程就是没有问题的。如果链表的头在变化了两次后恢复了原值，但是不代表链表就没有变化。因此前面提到的原子操作AtomicStampedReference/AtomicMarkableReference就很有用了。这允许一对变化的元素进行原子操作。
-
-<!--more-->
+当且仅当 V 的值等于 A 时，CAS通过原子方式用新值B来更新V的值，否则不会执行任何操作，返回失败
 
 ### 无锁优点
 
-- 当获取所有权失败后可以选择下一步操作，而不是只能被阻塞
-- 避免死锁和锁饿死情况
-- 线程不会被阻塞，线程的阻塞和恢复是非常
-- 耗费性能的，cpu 需要在内核态和用户态切换
-- 降低线程的延迟，少去阻塞和激活环节，提高了线程的响应速度
+1. 避免线程被阻塞，线程的阻塞和恢复是非常耗费性能的，cpu 需要在内核态和用户态切换
+2. 避免死锁和锁饥饿问题
+3. 当获取所有权失败后可以选择下一步操作，而不是只能被阻塞
 
-1. ABA问题
+### 无锁缺点
 
-2. 循环开销大
+1. ABA问题，解决思路是使用AtomicStampedReference，该类多为了一个一个时间戳字段，通过给变量加上时间戳作为版本号解决ABA问题
+2. 自旋长时间不成功会占用大量CPU资源，解决思路是让JVM支持处理器提供的pause指令，可以让CPU睡眠一小段时间后继续自旋
+3. 只能保证一个共享变量的原子操作，可以通过使用AtomicReference实现对象的原子操作
 
-3. 只能保证一个共享变量的原子操作。
+## Java实现
 
-乐观锁更好的用在竞争比较低的场景，如果竞争激烈，线程会浪费很多cpu时间周期做无谓的变量拷贝和修改，并且最后还失败。
+为了保证内存可见性，要修改的变量需要使用volatile修饰，CAS操作基于unsafe类实现。
 
-1、使用CAS在线程冲突严重时，会大幅降低程序性能；CAS只适合于线程冲突较少的情况使用。
+unsafe类中的方法都是native方法，具体实现与操作系统好CPU相关，通过内存地址直接修改
 
-2、synchronized在jdk1.6之后，已经改进优化。synchronized的底层实现主要依靠Lock-Free的队列，基本思路是自旋后阻塞，竞争切换后继续竞争锁，稍微牺牲了公平性，但获得了高吞吐量。在线程冲突较少的情况下，可以获得和CAS类似的性能；而线程冲突严重的情况下，性能远高于CAS。
+```java
+private volatile int value;
+public final boolean compareAndSet(int expect, int update) {   
+	return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
+}
+```
 
-使用AutomicReference 的时候，修改时会拷贝一个对象，然后修改拷贝后的对象，cas设置变量指针指向新的对象，当对象很大的时候，会浪费很多cpu 时间周期进行对象的拷贝
+CAS操作允许失败，失败一般会不断重试，在一个循环中不停的重试去CAS操作，直到成功
 
+```java
+public final int getAndUpdate(IntUnaryOperator updateFunction) {
+    int prev, next;
+    do {
+        prev = get();
+        next = updateFunction.applyAsInt(prev);
+    } while (!compareAndSet(prev, next));
+    return prev;
+}
+```
 
+## CAS工具类介绍
 
-synchronized锁机制存在以下问题：
+### 常量类原子操作
 
-（1）在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。
+#### AtomicInteger
 
-（2）一个线程持有锁会导致其它所有需要此锁的线程挂起。
+#### AtomicBoolean
 
-（3）如果一个优先级高的线程等待一个优先级低的线程释放锁会导致优先级倒置，引起性能风险。
+#### AtomicLong
 
-volatile是不错的机制，但是volatile不能保证原子性。因此对于同步最终还是要回到锁机制上来。
+#### LongAdder
 
-独占锁是一种悲观锁，synchronized就是一种独占锁，会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁。而另一个更加有效的锁就是乐观锁。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。
+#### DoubleAdder
 
+### 对象类原子操作
 
+#### AtomicReference
+
+使用AutomicReference 的时候，修改时会拷贝一个对象，然后修改拷贝后的对象，CAS设置变量指针指向新的对象，当对象很大的时候，会浪费很多cpu 时间周期进行对象的拷贝
+
+#### AtomicStampedReference
+
+一种特殊的AtomicReference，用于解决ABA问题。维护了一个内部类，内部类维护一个变量和stamp时间戳字段
+
+#### 对象字段原子操作
+
+### 数组类原子操作
+
+#### AtomicIntegerArray
+
+#### AtomicLongArray
+
+#### AtomicReferenceArray
