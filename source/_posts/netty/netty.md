@@ -17,7 +17,7 @@ Netty 的主要构件块:
 
 - Channel：它代表一个到实体(如一个硬件设备、一个文件、一个网络套接字或者一个能够执行一个或者多个不同的I/O操作的程序组件)的开放连接，如读操作和写操作 。 目前，可以把 Channel 看作是传入(入站)或者传出(出站)数据的载体。因此，它可以被打开或者被关闭，连接或者断开连接。
 
--  回调：被通知回调的方法。Netty 在内部使用了回调来处理事件;当一个回调被触发时，相关的事件可以被一个 interface-ChannelHandler 的实现处理
+- 回调：被通知回调的方法。Netty 在内部使用了回调来处理事件;当一个回调被触发时，相关的事件可以被一个 interface-ChannelHandler 的实现处理
 
 - Future：Future 提供了另一种在操作完成时通知应用程序的方式，它将在未来的某个时刻完成，并提供对其结果的访问。每个 Netty 的出站 I/O 操作都将返回一个 ChannelFuture;也就是说，它们都不会阻塞。netty中的大部分方法都是异步的，返回值都是通过回调通知的，如connect方法不会阻塞，它将会注册一个ChannelFutureListener
 
@@ -99,7 +99,7 @@ exec-maven-plugin
 
   - ChannelInActive：channel没有连接到远程节点
 
-    ​
+    
     channel在声明周期的每次状态变化都会有事件通知到ChannelPipeline链中的每个ChannelHandler
 
     在多个ChannelPipeline中安装同一个ChannelHandler的一个常见的原因是用于收集跨越多个 Channel 的统计信息。
@@ -194,9 +194,9 @@ Netty 的引导类为应用程序的网络层配置提供了容器，这涉及�
 
   ​	因为服务器需要两组不同的 Channel。第一组将只包含一个 ServerChannel，代表服务 器自身的已绑定到某个本地端口的正在监听的套接字。而第二组将包含所有已创建的用来处理传 入客户端连接(对于每个服务器已经接受的连接都有一个)的 Channel。 与 ServerChannel 相关联的 EventLoopGroup 将分配一个负责为传入连接请求创建 Channel 的 EventLoop。一旦连接被接受，第二个 EventLoopGroup 就会给它的 Channel 分配一个 EventLoop。
 
-  ​
+  
 
-  ​
+  
 ##ByteBuf、ByteBufHolder
 
 网络传输中的数据都是字节，java提供了ByteBuffer用来存储字节，netty对ByteBuffer进行了优化，使用ByteBuf来存储，
