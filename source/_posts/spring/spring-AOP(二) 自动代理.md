@@ -35,10 +35,10 @@ spring的动态代理实质就是对象创建完毕之后，查找筛选能够�
 
 Spring中定义了 AbstractAutoProxyCreator 类用于实现自动代理。
 
-- AbstractAutoProxyCreator封装了自动创建代理的总逻辑，将对Advisor的处理交由子类实现
-- AbstractAdvisorAutoProxyCreator封装了查找Advisor、筛选Advisor、排序Advisor的逻辑，最终返回应用于目标对象的Advisor列表，
+- AbstractAutoProxyCreator 封装了自动创建代理的总逻辑，将对Advisor的处理交由子类实现
+- AbstractAdvisorAutoProxyCreator 封装了查找Advisor、筛选Advisor、排序Advisor的逻辑，最终返回应用于目标对象的Advisor列表，
 - AspectJAwareAdvisorAutoProxyCreator 封装了基于 @Aspect声明的同一切面下通知的排序逻辑
-- AnnotationAwareAspectJAutoProxyCreator扩展了获取Advisor的途径，可以扫描@Aspect注解获取Advisor
+- AnnotationAwareAspectJAutoProxyCreator 扩展了获取Advisor的途径，可以扫描@Aspect注解获取Advisor
 
 ![mcPmVb](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/mcPmVb.png)
 
@@ -152,7 +152,7 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
    if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
       return bean;
    }
-  //快速判断是否跳过对目标的代理，如果目标类是AOP基础类或者查找不到应用的该类的 Advisor，无需代理，并且缓存下来，避免下次再次解析判断
+  //快速判断是否跳过对目标的代理，如果目标类是AOP基础类或者查找不到应用该类的 Advisor，无需代理，并且缓存下来，避免下次再次解析判断
    if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
       this.advisedBeans.put(cacheKey, Boolean.FALSE);
       return bean;
@@ -499,7 +499,7 @@ public Advice getAdvice(Method candidateAdviceMethod, AspectJExpressionPointcut 
          springAdvice = new AspectJMethodBeforeAdvice(
                candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
          break;
-      case AtAfter:
+      case AtAfter://最终通知  在finnaly里面
          springAdvice = new AspectJAfterAdvice(
                candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
          break;

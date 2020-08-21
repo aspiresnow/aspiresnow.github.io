@@ -11,6 +11,7 @@ categories:
 
 ## 知识导读
 
+- ThreadLocal主要作用于线程的上下文，而不是线程安全，如果ThreadLocal中放一个共享对象，是无法保证线程安全的，如果是基本类型可以保证线程安全
 - ThreadLocal是对**当前线程**的threadLocals(Map)变量的一种封装管理。提供了该map的get和set方法，在当前线程执行上下文中可以随时获取该值。
 - ThreadLocal实例就是一个Map的key，每个线程都有一个私有的Map，在使用ThreadLocal时要有这个概念，使用起来就方便了
 - ThreadLocalMap的Entry的key值是ThreadLocal实例，是一个弱引用。value是实际set的值，是一个强引用

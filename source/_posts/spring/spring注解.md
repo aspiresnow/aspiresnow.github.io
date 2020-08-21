@@ -151,10 +151,3 @@ public class ServiceConfig {
 }
 ```
 
-`@Conditional`
-
-`@PropertySource`
-
-`@EnableLoadTimeWeaving`
-
-classpath:和classpath*的区别是后者会加载所有重名的配置文件，前者只是找到第一个匹配的就返回

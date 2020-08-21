@@ -25,6 +25,7 @@ categories:
   - 新开启事务(newTransaction=true):提交commit 回滚 rollback
   - 在当前事务中运行(newTransaction=false):提交不进行任何操作，回滚标记rollbacOnly=true然后不进行操作
   - 嵌套事务，创建保存点(hasSavePoint&newTransaction=false):提交删除保存点，回滚则回滚到保存点
+- 可以通过TransactionSynchronizationManager的registerSynchronization方法添加监听事务提交前、提交后、回滚前、回滚后、完成前、完成后的事件。
 
 ## spring事务管理
 
@@ -57,7 +58,7 @@ public interface PlatformTransactionManager {
 
 spring事务管理的整体实现由抽象类 AbstractPlatformTransactionManager 实现。在下面的源码分析中会看到。
 
-开启事务的参数是一个TransactionDefinition对象，该类封装了事务的配置属性，传播行为、超时配置、回滚异常、隔离级别等信息。事务开启后返回TransactionStatus对象，提交和回滚都是操作该对象
+开启事务的参数是一个TransactionDefinition对象，该类封装了事务的配置属性，包括传播行为、超时配置、回滚异常、隔离级别等信息。事务开启后返回TransactionStatus对象，提交和回滚都是操作该对象
 
 子类如DataSourceTransactionManager主要负责实现具体事务对象(connection)的管理，如获取、保存同步、开启事务、提交、回滚等操作。
 
@@ -75,6 +76,7 @@ spring中使用TransactionStatus的实现类DefaultTransactionStatus，在这个
 
 - transaction: 事务对象，一般返回的是一个包装了connection的对象
 - suspendedResources: 挂起对的事务对象，包含被挂起的connection对象和被挂起的事务配置
+- 声明式事务的配置信息
 
 ## 编程式开启事务
 
@@ -116,9 +118,9 @@ public <T> T execute(TransactionCallback<T> action) throws TransactionException 
 
 AbstractPlatformTransactionManager实现了事务管理器的getTransaction，在该方法中完成了事务的开启和事务传播行为的处理。
 
-1. 通过子类实现的doGetTransaction获取一个transaction事务对象，类型是Object的可想而知兼容不好处理啊，但是在这里也做了取巧动作，虽然返回的是Object类型，但是在父类中不会对该事务对象进行任何操作处理，所有关于事务对象的操作都交由子类覆写实现。比如isExistingTransaction(判断是否已存在事务)、doBegin(开启事务)。我们先不考虑子类的具体实现，首先看事务处理的整体逻辑
+1. 通过子类实现的doGetTransaction获取一个transaction事务对象，类型是Object的，可想而知兼容不好处理啊，但是在这里也做了取巧动作，虽然返回的是Object类型，但是在父类中不会对该事务对象进行任何操作处理，所有关于事务对象的操作都交由子类覆写实现。比如isExistingTransaction(判断是否已存在事务)、doBegin(开启事务)。我们先不考虑子类的具体实现，首先看事务处理的整体逻辑
 
-2. 获取到事务对象后，通过子类覆写逻辑判断如果已经开启事务，则根据事务的传播行为判断多事务共存的情形，然后返回TransactionStatus。
+2. 获取到事务对象后，通过子类覆写逻辑判断如果已经开启事务(是否有个autoCommit=false的connection)，则根据事务的传播行为判断多事务共存的情形，然后返回TransactionStatus。
 
 3. 如果当前还未开启事务，则根据事务传播行为判断是否需要开启事务，如果需要则调用子类覆写逻辑 doBegin方法，将事务对象transaction传递下去开启事务，然后封装好TransactionStatus对象返回
 
@@ -301,7 +303,8 @@ protected final SuspendedResourcesHolder suspend(@Nullable Object transaction) t
       try {
          Object suspendedResources = null;
          if (transaction != null) {
-           //子类覆写实现 事务挂起，同时返回被挂起事务的信息，其实就是将transaction中的connection移除并封装到suspendedResources中返回
+           //子类覆写实现 事务挂起，同时返回被挂起事务的信息
+           //其实就是将transaction中的connection移除并封装到suspendedResources中返回
             suspendedResources = doSuspend(transaction);
          }
         //获取被挂起事务存储在ThreadLocal中的配置，封装被挂起事务的配置信息返回
@@ -362,7 +365,7 @@ DataSourceTransactionManager覆写了AbstractPlatformTransactionManager的方法
 
 DataSourceTransactionManager返回的事务对象是DataSourceTransactionObject，里面主要就是封装了一个ConnectionHolder对象，ConnectionHolder主要用于存储一个数据库连接Connection对象。
 
-注意这里不是直接通过DataSource去获取Connection的，而是通过TransactionSynchronizationManager去ThreadLocal获取。如果能获取到证明可能已存在事务返回connection，如果获取不到Connection，就是返回一个null。
+注意这里不是直接通过DataSource去获取Connection的，而是通过TransactionSynchronizationManager去ThreadLocal获取。如果能获取到证明可能已存在事务,返回connection; 如果获取不到Connection，就是返回一个null。
 
 在spring中sql的执行也是会先通过TransactionSynchronizationManager去ThreadLocal中获取Connection，这样就实现了开启事务和sql执行用的是一个Connection
 
@@ -415,7 +418,9 @@ private static Object doGetResource(Object actualKey) {
 
 #### 判断是否已在一个事务中
 
-TransactionSynchronizationManager实现了isExistingTransaction方法。接收Object类型的transaction对象。因为这个对象就是该实现类自己创建的，所以可以直接强转为DataSourceTransactionObject类型，事务开启的条件为txObject中存在一个TransactionActive = true 的ConnectionHolder，当事务开启成功后会设置 transactionActive = true
+TransactionSynchronizationManager实现了isExistingTransaction方法。接收Object类型的transaction对象。因为这个对象就是该实现类自己创建的，所以可以直接强转为DataSourceTransactionObject类型，事务开启的条件为txObject中存在一个TransactionActive = true 的ConnectionHolder
+
+**注意：当事务开启成功后(setAutoCommit=false)会设置 transactionActive = true**
 
 ```java
 @Override
@@ -439,7 +444,7 @@ protected void doBegin(Object transaction, TransactionDefinition definition) {
    DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
    Connection con = null;
    try {
-     //开启事务前获取事务连接 connection，如果已经在事务中的有了connection就不需要获取了，如果没有去DataSource中获取一个新的connection，构建一个新的ConnectionHolder
+     //开启事务前获取事务连接 connection，如果事务对象中的有了connection就不需要获取了，如果没有去DataSource中获取一个新的connection，构建一个新的ConnectionHolder
       if (!txObject.hasConnectionHolder() ||
             txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
         //从数据源中获取connection
@@ -471,7 +476,7 @@ protected void doBegin(Object transaction, TransactionDefinition definition) {
          TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
       }
    } catch (Throwable ex) {
-     //异常关闭 connection 连接，重置 txObject
+     //异常则关闭 connection 连接，重置 txObject
       if (txObject.isNewConnectionHolder()) {
          DataSourceUtils.releaseConnection(con, obtainDataSource());
          txObject.setConnectionHolder(null, false);
@@ -481,7 +486,7 @@ protected void doBegin(Object transaction, TransactionDefinition definition) {
 }
 ```
 
-新获取的connection则通过TransactionSynchronizationManager将开启事务的connection放到ThreadLocal中。
+新获取的connection需要通过TransactionSynchronizationManager将开启事务的connection放到ThreadLocal中。保证事务过程中用的connection能够被执行sql的代码拿到
 
 ```java
 public static void bindResource(Object key, Object value) throws IllegalStateException {
@@ -558,7 +563,7 @@ protected void doResume(@Nullable Object transaction, Object suspendedResources)
 
 AbstractPlatformTransactionManager.commit定义了提交事务的流程，在事务提交的时候首先要判断下TransactionStatus的rollbackOnly状态，如果是true，则回滚事务。否则调用processCommit方法提交
 
-如果当前是运行在原有事务中，发生异常，不方便直接回滚，则标记rollbackOnly=true，当外层执行提交的时候再进行回滚
+如果当前是运行在外层事务中，发生异常，不方便直接回滚，则标记rollbackOnly=true，当外层执行提交的时候再进行回滚
 
 ```java
 public final void commit(TransactionStatus status) throws TransactionException {

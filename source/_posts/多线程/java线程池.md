@@ -10,16 +10,31 @@ categories:
 
 #  线程池
 
-当需要使用多线程的时候，通常需要创建一个新的线程去执行程序，但是如果不停的创建线程，会消耗更多的内存，增加cpu切换的速度，那么这时就需要使用线程池控制对线程进行有效的控制,线程池不是为了提供性能，而是为了控制线程数量从而达到控制资源，防止内存溢出。
+## 知识导读
 
-<!--more-->
+- CPU密集性配置N+1个线程的，即使当计算（CPU）密集型的线程偶尔由于页缺失故障或者其他原因而暂停时，这个“额外”的线程也能确保 CPU 的时钟周期不会被浪费。
+- 对于IO密集型任务，提高CPU利用率，将线程数设置为2*N；或者通过时间计算 **线程数=cpu个数 * (1+等待时间/CPU时间)** 
+- 线程池调优配置主要就是3个参数，可以做个基于配置中心动态调整到线程池，线程池支持setCorePoolSize、setMaximumPoolSize、setKeepAliveTime，队列不支持动态修改长度，但是可以自定义一个支持的
+  - corePoolSize
+  - maximumPoolSize
+  - 阻塞队列长度
+- 线程池创建后是没有线程的，可以通过prestartAllCoreThreads方法预热，创建出所有的核心线程。prestartCoreThread创建出一个核心线程
+- 任务拒绝策略要结合报警、人工介入处理
+
+## 线程池介绍
 
 线程池的优点：
+
 1. 降低系统资源消耗，通过重用已存在的线程，降低线程创建和销毁造成的消耗；
 2. 有效的控制线程的最大并发数，线程若是无限制的创建，会增加资源竞争，导致CPU切换严重引起阻塞、引发oom等。线程池能有效管控线程，统一分配、调优，提供资源使用率；
 3. 提高系统响应速度，当有任务到达时，立即执行，无需等待新线程的创建；
 4. 能够对线程进行简单的管理并提供定时执行、间隔执行等功能。
 
+线程池解决的核心问题就是资源管理问题。在并发环境下，系统不能够确定在任意时刻中，有多少任务需要执行，有多少资源需要投入。这种不确定性将带来以下若干问题：
+
+1. 频繁申请/销毁资源和调度资源，将带来额外的消耗，可能会非常巨大。
+2. 对资源无限申请缺少抑制手段，易引发系统资源耗尽的风险。
+3. 系统无法合理管理内部的资源分布，会降低系统的稳定性。
 
 ExecutorService基于池化的线程来执行用户提交的任务，通常可以简单的通过Executors提供的工厂方法来创建ThreadPoolExecutor实例。
 
@@ -43,7 +58,7 @@ ExecutorService基于池化的线程来执行用户提交的任务，通常可�
 
 ### 线程池的实现方式
 
-					`ThreadPoolExecutor的构造函数`
+ThreadPoolExecutor的构造函数
 
 ```java
 public ThreadPoolExecutor(int corePoolSize,
@@ -83,43 +98,45 @@ public ThreadPoolExecutor(int corePoolSize,
 
 2. 当调用 execute() 方法添加一个任务时，线程池会做如下判断：
 
-   - 如果正在运行的线程数量小于 corePoolSize，那么马上创建线程运行这个任务,即使线程池中的线程都处于空闲状态，也要创建新的线程来处理被添加的任务
+   1. 首先检测线程池运行状态，如果不是RUNNING，则直接拒绝，线程池要保证在RUNNING的状态下执行任务。
 
-   - 如果正在运行的线程数量大于或等于 corePoolSize，那么将这个任务放入队列
+   2. 如果正在运行的线程数量小于 corePoolSize，那么马上创建线程运行这个任务,即使线程池中的线程都处于空闲状态，也要创建新的线程来处理被添加的任务
 
-   - 如果这时候队列满了，而且正在运行的线程数量小于 maximumPoolSize，那么还是要创建非核心线程立刻运行这个任务
+   3. 如果正在运行的线程数量大于或等于 corePoolSize，那么将这个任务放入队列
 
-   - 如果队列满了，而且正在运行的线程数量大于或等于 maximumPoolSize，那么线程池会抛出异常RejectExecutionException。
+   4. 如果这时候队列满了，而且正在运行的线程数量小于 maximumPoolSize，那么还是要创建非核心线程立刻运行这个任务
 
-     ```java
-     public void execute(Runnable command) {
-       if (command == null)
-         throw new NullPointerException();
-       int c = ctl.get();
-       //小于核心线程，则新建核心线程并执行任务
-       if (workerCountOf(c) < corePoolSize) {
-         //添加时检查线程数据
-         if (addWorker(command, true))
-           return;
-         c = ctl.get();
-       }
-       //添加队列成功需要再次检查线程池状态和线程数量
-       if (isRunning(c) && workQueue.offer(command)) {
-         int recheck = ctl.get();
-         //如果线程池停掉了 从队列移除任务并拒绝
-         if (! isRunning(recheck) && remove(command))
-           reject(command);
-         //如果线程数小了，创建额外线程，对线程池进行补偿，但是不执行任务
-         else if (workerCountOf(recheck) == 0)
-           addWorker(null, false);
-       }
-       //创建小于maxSize的线程并执行任务
-       else if (!addWorker(command, false))
-         reject(command);//失败调用拒绝策略
+   5. 如果队列满了，而且正在运行的线程数量大于或等于 maximumPoolSize，那么线程池会抛出异常RejectExecutionException。
+
+   ```java
+   public void execute(Runnable command) {
+     if (command == null)
+       throw new NullPointerException();
+     int c = ctl.get();
+     //小于核心线程，则新建核心线程并执行任务
+     if (workerCountOf(c) < corePoolSize) {
+       //添加时检查线程数据
+       if (addWorker(command, true))
+         return;
+       c = ctl.get();
      }
-     ```
+     //添加队列成功需要再次检查线程池状态和线程数量
+     if (isRunning(c) && workQueue.offer(command)) {
+       int recheck = ctl.get();
+       //如果线程池停掉了 从队列移除任务并拒绝
+       if (! isRunning(recheck) && remove(command))
+         reject(command);
+       //如果线程数小了，创建额外线程，对线程池进行补偿，但是不执行任务
+       else if (workerCountOf(recheck) == 0)
+         addWorker(null, false);
+     }
+     //创建小于maxSize的线程并执行任务
+     else if (!addWorker(command, false))
+       reject(command);//失败调用拒绝策略
+   }
+   ```
 
-     
+   
 
    ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/tpool1.jpg?raw=true)
 
@@ -210,7 +227,7 @@ class Task implements Runnable{
 **有界队列：**
 
 - 有界队列如ArrayBlockingQueue帮助限制资源的消耗，但是不容易控制。队列长度和maximumPoolSize这两个值会相互影响，使用大的队列和小maximumPoolSize会最大限度地降低 CPU 使用率、操作系统资源和上下文切换开销，但是会降低吞吐量，如果任务被频繁的阻塞如IO线程，系统其实可以调度更多的线程。使用小的队列通常需要大maximumPoolSize，这时CPU 使用率较高，但是可能遇到不可接受的调度开销，这样也会降低吞吐量。
-- 总结一下**是IO密集型可以考虑调大maximumPoolSize多些线程来平衡CPU的使用，CPU密集型可以考虑调销maximumPoolSize少些线程减少线程调度的消耗。**
+- 总结一下**是IO密集型可以考虑调大maximumPoolSize多些线程来平衡CPU的使用，CPU密集型可以考虑调小maximumPoolSize少些线程减少线程调度的消耗。**
 
 #### 空闲线程回收
 
@@ -507,3 +524,5 @@ pool-1-thread-3:运行时间为：3001
 ## 参考资料
 
 [【从0到1学习Java线程池】Java线程池原理](http://blog.luoyuanhang.com/2017/02/27/thread-pool-in-java-2/)
+
+[Java线程池实现原理及其在美团业务中的实践](https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651751537&idx=1&sn=c50a434302cc06797828782970da190e&chksm=bd125d3c8a65d42aaf58999c89b6a4749f092441335f3c96067d2d361b9af69ad4ff1b73504c&scene=21#wechat_redirect)

@@ -10,6 +10,14 @@ categories:
 
 # BeanPostProcceser
 
+
+
+BeanFactoryPostProcessor 分为两种
+
+- 普通的调用postProcessBeanFactory(beanFactory)
+
+- BeanDefinitionRegistryPostProcessor 定义了postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)，在bean实例化前用于扩展添加BeanDefinition，如 ConfigurationClassPostProcessor
+
 applyMergedBeanDefinitionPostProcessors 这个方法中会调用 BeanPostProcessor的postProcessMergedBeanDefinition方法
 
 PostProcessorRegistrationDelegate 用于激活注册的BeanFactoryPostProcessor
@@ -51,42 +59,6 @@ BeanPostProcessor`s are scoped *per-container*. This is only relevant if you are
 ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
  ctx.registerShutdownHook();
 ```
-
-
-
-
-
-Spring 的lookup-method结合prototype bean实现运行期间每次获取新的bean？？？ 使用 aop:scoped-proxy
-
-使用 <aop:scoped-proxy/>  给生命周期短的bean暴露一个代理，这样生命周期长的bean就可以依赖注入了,使用的是cglib代理，可以通过指定 proxy-target-class="false"设置为jdk动态代理
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:aop="http://www.springframework.org/schema/aop"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/aop
-        http://www.springframework.org/schema/aop/spring-aop.xsd">
-
-    <!-- an HTTP Session-scoped bean exposed as a proxy -->
-    <bean id="userPreferences" class="com.foo.UserPreferences" scope="session">
-        <!-- instructs the container to proxy the surrounding bean -->
-        <aop:scoped-proxy/>
-    </bean>
-
-    <!-- a singleton-scoped bean injected with a proxy to the above bean -->
-    <bean id="userService" class="com.foo.SimpleUserService">
-        <!-- a reference to the proxied userPreferences bean -->
-        <property name="userPreferences" ref="userPreferences"/>
-    </bean>
-</beans>
-```
-
-
-
-
 
 
 
