@@ -10,13 +10,11 @@ categories:
 
 # spring-IOC BeanDifinition注册
 
----
-
 
 
 ## BeanFactory继承体系
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/beanFactory.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/sNL5sl.jpg)
 
 Spring中声明了BeanFactory接口，该接口提供了获取Bean的功能。从继承图可以看出，BeanFactory的继承主要分成两个体系，一条是spring-context中ApplicationContext的继承体系，一条是spring-core中XMLBeanFactory的继承体系。首先简单介绍下spring-core继承体系中各个继承类的功能
 
@@ -40,17 +38,17 @@ spring的加载bean配置的过程是将spring配置转换为spring内部数据�
 2. BeanDefinition构建， 将用户定义的<bean>配置表示为IOC容器内部的数据结构
 3. BeanDefinition注册，将BeanDefinition对象注册到一个HashMap中，以bean id为key
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/BeanDefinition.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/Vgsmcs.jpg)
 
 在spring-core中使用XmlBeanFactory作为BeanFactory的具体实现来作为spring容器。而其中最重要的一个容器类是**DefaultListableBeanFactory**,XmlBeanFactory完全继承了DefaultListableBeanFactory的功能，只是额外提供了加载BeanDefinition的功能实现。
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/XmlBeanFactory.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/7zRX6u.jpg)
 
 从图中可以看到，xmlBeanFactory继承了DefaultListableBeanFactory，容器的功能都是由DefaultListableBeanFactory提供的。图中大致可以分为两条继承线，一条是BeanFactory的继承线，一条是AliasRegistry的继承线。DefaultListableBean除了提供容器的功能，还通过实现BeanDefinitionRegistry接口实现了BeanDefinition的注册功能。
 
 ### 加载过程简述
 
-![](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/BeanLoad.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/wzKn1m.jpg)
 
 - ResourceLoader：资源加载，处理import的时候用了
 - BeanDefinitionReader：

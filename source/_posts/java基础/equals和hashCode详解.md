@@ -11,9 +11,7 @@ categories:
 
 覆写equals方法的时候，一定要覆写hashCode方法，这是为什么呢？
 
-​	经常有List<? super T>、Set<? extends T>的声明，是什么意思呢？<? super T>表示包括T在内的任何T的父类，<? extends T>表示包括T在内的任何T的子类。
-
-<!--more-->
+经常有List<? super T>、Set<? extends T>的声明，是什么意思呢？<? super T>表示包括T在内的任何T的父类，<? extends T>表示包括T在内的任何T的子类。
 
 equals和hashCode方法都是Object中的方法，首先来看Object中的实现
 

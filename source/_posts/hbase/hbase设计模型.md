@@ -11,7 +11,7 @@ categories:
 
 ## HBase基本组件
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase3.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/0mrgGL.jpg)
 
 - Client
 
@@ -33,7 +33,7 @@ categories:
 
 - HRegion Server
 
-  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase4.jpg?raw=true)
+  ![UoWEew](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/UoWEew.jpg)
 
   - 负责响应client的I\O请求，存储hbase的数据文件，查询并返回数据
   - HRS上存储多个Region
@@ -52,7 +52,7 @@ categories:
 
 - Namespace
   - 命名空间是对表的逻辑分组，同一个空间下的表有类似的用途
-  - 配额管理：制一个namespace可以使用的资源，资源包括region和table等
+  - 配额管理：限制一个namespace可以使用的资源，资源包括region和table等
   - 命名空间安全管理：提供了另一个层面的多租户安全管理
   - Region服务器组：一个命名空间或一张表，可以被固定到一组regionservers上，从而保证了数据隔离性
   - hbase内部有两个预定义的命名空间 hbase(系统表命名空间)和default(未指定命名空间的表自动归类)
@@ -71,20 +71,20 @@ categories:
 
   - HBase自动把表水平（按Row）划分成多个区域(region)，每个region会保存一个表里面某段连续的数据
 
-  - 每个表一开始只有一个region，随着数据不断插入表，region不断增大，当增大到一个阀值的时候，region就会等分会两个新的region；当table中的行不断增多，就会有越来越多的region。这样一张完整的表被保存在多个Region 上。拆分的同时会更新.META.表。
+  - 每个表一开始只有一个region，随着数据不断插入表，region不断增大，当增大到阀值的时候，region就会分裂为两个新的region；当table中的行不断增多，就会有越来越多的region。这样一张完整的表被保存在多个Region 上。拆分的同时会更新.META.表。
 
-  - Region是HBase中分布式存储和负载均衡的最小单元（默认256M）。最小单元表示不同的Region可以分布在不同的HRegionServer上。但一个Region不会拆分到多个server上。
+  - Region是HBase中分布式存储和负载均衡的最小单元（默认**256M**）最小单元表示不同的Region可以分布在不同的HRegionServer上。但一个Region不会拆分到多个server上。
 
   - 一个Region有多个Store，一个Store包含一个MemStore(内存数据)和多个StoreFile(磁盘数据)， 每个StoreFile保存一个ColumnFamily，其中StoreFile存储在HDFS上，对应为HFile文件。
 
-    ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase5.jpg?raw=true)
+    ![hYQ4Y4](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/hYQ4Y4.jpg)
 
     
 
 - Store
 
   - 一个Region包含多个Stroe，每个Store保存一个Column Family的所有数据
-  - 一个列族可以有多个StoreFile，但一个StoreFile只能存储一个列族的数据
+  - 一个列族可以存储在多个StoreFile，但一个StoreFile只能存储一个列族的数据
 
   - 一个Store包含一个位于内存中的MemStore和多个位于硬盘的StoreFile
 
@@ -105,7 +105,7 @@ categories:
 
 ## 数据模型
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase6.jpg?raw=true)
+![g4osG8](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/g4osG8.jpg)
 
 - Rowkey
 
@@ -146,7 +146,7 @@ categories:
 
 - KeyValue
 
-  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase7.jpg?raw=true)
+  ![8RuctR](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/8RuctR.jpg)
 
   - KeyValue就是一个简单的byte数组，以两个分别表示键长度和值长度的定长数字开始。通过这两个值可以忽略键直接访问值
   - 每一个KeyValue实例包含了行键、列键和时间戳索引和值 (Table,RowKey,Family,Column,Timestamp)—>value，(Timestamp是一个 64 位Java的long型)，数据按照一个四维坐标系统来组织：行键、列族、列限定符和时间版本

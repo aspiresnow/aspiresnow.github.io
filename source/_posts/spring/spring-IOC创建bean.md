@@ -8,7 +8,7 @@ categories:
 
 ---
 
-# spring-IOC创建bean
+# spring-IOC 创建bean
 
 ## 循环依赖
 
@@ -702,7 +702,7 @@ protected BeanWrapper instantiateUsingFactoryMethod(
 
 #### 循环依赖
 
-将反射创建的对象添加到缓存中，注意这个时候该bean还未进行依赖注入，这样在循环依赖中，其他bean就可以将未依赖注入的这个bean注入。而之后在将该bean的依赖注入后，bean的地址不会变。这是某些属性变化，不会影响。所以只有setter注入的单例模式bean才能解决循环依赖问题。
+将反射创建的对象添加到缓存中，注意这个时候该bean还未进行依赖注入，这样在循环依赖中，其他bean就可以将未依赖注入的这个bean注入。而之后在将该bean的依赖注入后，bean的地址不会变。只是某些属性变化，不会影响。所以只有setter注入的单例模式bean才能解决循环依赖问题。
 
 ```java
 boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&

@@ -20,6 +20,14 @@ categories:
 - JDK1.8的实现降低锁的粒度，JDK1.7版本锁的粒度是基于Segment的，包含多个HashEntry，而JDK1.8锁的粒度就是HashEntry（首节点）
 - JDK1.8使用红黑树来优化链表，基于长度很长的链表的遍历是一个很漫长的过程，而红黑树的遍历效率是很快的，代替一定阈值的链表，这样形成一个最佳拍档
 
+在JDK1.8主要设计上的改进有以下几点:
+
+1、**不采用segment而采用链表的头节点，减小了锁粒度**。
+ 2、设计了MOVED状态 当resize的中过程中 线程2还在put数据，线程2会帮助resize。
+ 3、使用3个**CAS操作来确保node的一些操作的原子性**，这种方式代替了锁。
+ 4、sizeCtl的不同值来代表不同含义，起到了控制的作用。
+ **采用synchronized而不是ReentrantLock**
+
 ### 源码解读
 
 #### put操作
@@ -111,7 +119,7 @@ put的操作流程
 4、 如果当前桶存在Node，不过状态是MOVED，代表当前正在进行resize 和rehash，则当前工作线程加入rehash过程，并发加快rehash过程。结束后重新赋值数组为扩容后的数组，再次进入循环尝试添加元素的操作
 5、如果找到头节点，使用Synchronized锁住头节点，如果是链表，创建新的节点添加到链表尾部，如果是红黑树，走红黑树添加节点流程，添加完成后释放锁。
 6、添加完成后判断当前链表是否达到阈值8，满足则转换为红黑树，转换过程中也对头结点进行加锁
-7、添加完成后更新map的size，同时如果达到阈值，进行resize
+7、添加完成后更新map的size，同时如果达到阈值，进行resize,注意更新size的时候使用了CAS
 
 #### 初始化map
 
@@ -146,7 +154,7 @@ private final Node<K,V>[] initTable() {
 
 #### 帮助resize和rehash
 
-判断桶的节点是否等于MOVED来判断当前是否在进行扩容，当前线程会假如扩容过程，加速扩容，然后返回扩容后的数组
+判断桶的节点是否等于MOVED来判断当前是否在进行扩容，当前线程会加入扩容过程，加速扩容，然后返回扩容后的数组
 
 ```java
 final Node<K,V>[] helpTransfer(Node<K,V>[] tab, Node<K,V> f) {
@@ -196,7 +204,7 @@ private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
     int nextn = nextTab.length;
     //创建一个扩容中的节点，并将扩容后的数组添加到这个节点中属性
     ForwardingNode<K,V> fwd = new ForwardingNode<K,V>(nextTab);
-   // 当advance == true时，表明该桶中的节点已经处理过了
+    //当advance == true时，表明该桶中的节点已经处理过了
     boolean advance = true;
     boolean finishing = false; // to ensure sweep before committing nextTab
     for (int i = 0, bound = 0;;) {
@@ -432,16 +440,6 @@ static final class ForwardingNode<K,V> extends Node<K,V> {
     }
 }
 ```
-
-### 在JDK1.7和JDK1.8中的区别
-
-在JDK1.8主要设计上的改进有以下几点:
-
-1、**不采用segment而采用链表的头节点，减小了锁粒度**。
- 2、设计了MOVED状态 当resize的中过程中 线程2还在put数据，线程2会帮助resize。
- 3、使用3个**CAS操作来确保node的一些操作的原子性**，这种方式代替了锁。
- 4、sizeCtl的不同值来代表不同含义，起到了控制的作用。
- **采用synchronized而不是ReentrantLock**
 
 ## 参考
 

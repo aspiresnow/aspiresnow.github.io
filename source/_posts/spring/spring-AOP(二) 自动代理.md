@@ -25,7 +25,7 @@ categories:
 
 下图是AOP自动代理的流程图
 
-![OvU9uS](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/OvU9uS.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/67Re7k.jpg)
 
 spring中已经定义了创建代理的工厂类 ProxyFactory，通过 ProxyFactory 创建代理，必须要一个被代理对象和一个增强Advisor列表
 
@@ -37,10 +37,10 @@ Spring中定义了 AbstractAutoProxyCreator 类用于实现自动代理。
 
 - AbstractAutoProxyCreator 封装了自动创建代理的总逻辑，将对Advisor的处理交由子类实现
 - AbstractAdvisorAutoProxyCreator 封装了查找Advisor、筛选Advisor、排序Advisor的逻辑，最终返回应用于目标对象的Advisor列表，
-- AspectJAwareAdvisorAutoProxyCreator 封装了基于 @Aspect声明的同一切面下通知的排序逻辑
-- AnnotationAwareAspectJAutoProxyCreator 扩展了获取Advisor的途径，可以扫描@Aspect注解获取Advisor
+- AspectJAwareAdvisorAutoProxyCreator 封装了基于 @Aspect 声明的同一切面下通知的排序逻辑
+- AnnotationAwareAspectJAutoProxyCreator 扩展了获取Advisor的途径，可以扫描 @Aspect 注解获取Advisor
 
-![mcPmVb](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/mcPmVb.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/epnEyA.jpg)
 
 ### 创建时机
 
@@ -373,7 +373,7 @@ spring定义了一个AspectJAdvisorFactory接口用于解析AOP的注解,接口�
 1. getAdvisors 解析切面，将通知方法和方法上的切点表达式封装为Advisor，返回Advisor列表
 2. getAdvice 根据通知方法上的各个注解类型选择使用不同的Advice实现类
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/spring/%E8%A7%A3%E6%9E%90AspectJ%E4%B8%BAAdvisor.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/CNPqEK.jpg)
 
 AspectJAdvisorFactory的实现类ReflectiveAspectJAdvisorFactory提供了具体实现
 

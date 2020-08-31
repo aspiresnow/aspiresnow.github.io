@@ -20,8 +20,7 @@ spring的设计原理是构造一个个原子功能，然后不断的通过设�
 - 代理的本质就是对目标方法执行的拦截增强
 - 创建代理最主要是提供 被代理对象 和 增强列表 AdvisorList
 - **Advisor封装了通知和切点，实质就是封装了一个可以决定在什么类的什么方法上进行增强的通知**
-- 代理的最终目的就是在方法的执行前后添加逻辑，最终构建ReflectiveMethodInvocation
-- 创建代理类的目的就是为了实现选择性的对目标对象方法的拦截，然后将方法调用封装为ReflectiveMethodInvocation
+- 代理的最终目的就是在方法的执行前后添加逻辑，最终构建 **ReflectiveMethodInvocation**，创建代理类的目的就是为了实现选择性的对目标对象方法的拦截，然后将方法调用封装为ReflectiveMethodInvocation
 - Pointcut提供了怎么筛选拦截哪些对象的哪些方法
 - 切面是通知的载体，通知是个方法，切面就是定义这些方法的对象。拦截器将这些通知按照顺序串成一个链
 
@@ -43,7 +42,7 @@ public interface Joinpoint {
 }
 ```
 
-![EjWI1h](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/EjWI1h.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/fZwewP.jpg)
 
 Joinpoint(连接点) 代表一个对象可以切入的地方，一般来说就是一个方法的执行，MehtodInvocation将方法的调用过程进行了封装。spring实现扩展了MethodInvocation，在ReflectiveMethodInvocation中既实现了方法调用的封装，又定义了拦截器链，用于在方法执行过程中进行拦截增强。
 
@@ -74,9 +73,9 @@ public interface MethodInterceptor extends Interceptor {
 
 spring对MethodInterceptor接口进行了具体实现，例如提供了前置通知、后置通知、最终通知、异常通知、环绕通知的实现类。
 
-![g7x9Sa](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/g7x9Sa.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/BfRb68.jpg)
 
-![TEqiy7](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/TEqiy7.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/d9juQF.jpg)
 
 ### 切点 Pointcut
 
@@ -95,7 +94,7 @@ public interface Pointcut {
 
 Pointcut 的具体实现，spring中Pointcut是很重的一块逻辑，可以单独出一篇文档
 
-![TU6XU0](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/TU6XU0.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/NscLC2.jpg)
 
 ### 增强 Advisor
 
@@ -117,7 +116,7 @@ public interface PointcutAdvisor extends Advisor {
 }
 ```
 
-![gBK7Zq](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/gBK7Zq.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/bgWnaP.jpg)
 
 ## 工厂方式创建代理对象
 
@@ -132,7 +131,7 @@ public interface PointcutAdvisor extends Advisor {
 
 下图是ProxyFactory的继承关系图，通过看各个层级的字段，可以看出ProxyFactory主要定义的是一些创建代理的配置信息。
 
-![XtwGpa](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/XtwGpa.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/dXcJii.jpg)
 
 ### AopProxy
 
@@ -143,7 +142,7 @@ public interface PointcutAdvisor extends Advisor {
 
 spring中定义了一个AopProxy接口，用于获取代理类，实现类是JdkProxy和cglibProxy，ProxyFactory提供了创建AopProxy的配置信息，创建代理类对象的工作交由AopProxy的实现类实现。
 
-![L63YVG](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/L63YVG.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/X2TMay.jpg)
 
 ### 通过ProxyFactory配置创建AopProxy实现
 
@@ -285,7 +284,7 @@ public Object getProxy(@Nullable ClassLoader classLoader) {
 
 ### jdk代理的方法调用
 
-![5xLBWL](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/5xLBWL.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/zsq7Kv.jpg)
 
 JdkDynamicAopProxy实现了InvocationHandler的invoke方法，代理类对象所有方法的执行都会通过invoke方法来调用
 
@@ -613,7 +612,7 @@ public Object aroundTest(ProceedingJoinPoint p) {
 }
 ```
 
-调用p.proceed() 的，在 MethodInvocationProceedingJoinPoint 会将原始的 MethodInvocation克隆一份，会将剩余拦截器链和下标复制下来，然后重新调用 proceed方法
+调用p.proceed() ，在 MethodInvocationProceedingJoinPoint 会将原始的 MethodInvocation克隆一份，会将剩余拦截器链和下标复制下来，然后重新调用 proceed方法
 
 ```java
 @Override

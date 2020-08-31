@@ -9,10 +9,6 @@ categories:
 
 # linux指令总结
 
-
-
-<!--more-->
-
 - 查看gc情况
 
   ```shell
@@ -32,6 +28,28 @@ categories:
   FGC：老年代垃圾回收次数
   FGCT：老年代垃圾回收消耗时间
   GCT：垃圾回收消耗总时间     
+  ```
+
+- 查看当前文件夹下所有子文件(夹)的大小
+
+  ```shell
+  du -sh *
+  ```
+
+- 根据端口号查询
+
+  ```she
+  netstat -ano|grep 8080
+  ```
+
+  ```shell
+  lsof -i:端口号
+  ```
+
+- 根据名称查询进程
+
+  ```shell
+  ps aux|grep java   ps -ef|grep java
   ```
 
   

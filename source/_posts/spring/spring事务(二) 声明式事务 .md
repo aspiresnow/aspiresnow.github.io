@@ -135,7 +135,7 @@ public boolean matches(Method method, Class<?> targetClass) {
 
 以下是TransactionAttributeSource的继承图，TransactionAttributeSource用于获取目标方法和目标类上配置的TransactionAttribute。主要逻辑由AbstractFallbackTransactionAttributeSource实现
 
-![80e2oT](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/80e2oT.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/D9NYin.jpg)
 
 在 AbstractFallbackTransactionAttributeSource主要调用computeTransactionAttribute解析获取TransactionAttribute，然后将结果进行了缓存。
 
@@ -231,7 +231,7 @@ protected TransactionAttribute determineTransactionAttribute(AnnotatedElement el
 
 spring中定义了TransactionAnnotationParser接口用于解析获取 @Annotation注解中的属性。
 
-![ADPXEH](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/ADPXEH.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/xjrVmB.jpg)
 
 SpringTransactionAnnotationParser 会解析 @Transaction注解中配置的属性，然后再封装为TransactionAttribute对象返回
 

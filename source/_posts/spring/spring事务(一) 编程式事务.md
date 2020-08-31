@@ -33,7 +33,7 @@ categories:
 
 spring中 PlatformTransactionManager 接口是spring事务管理器的根接口，定义了事务的操作行为：开启事务、提交事务、回滚事务
 
-![2AQyuv](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/2AQyuv.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/y2etvp.jpg)
 
 ```java
 public interface PlatformTransactionManager {
@@ -70,7 +70,7 @@ spring中TransactionStatus类用于封装事务的状态。spring中事务的开
 - rollbackOnly:标识事务需要回滚，在非独立新开启事务中用于回滚标记，在事务提交时的时候判断该值进行回滚
 - newTransaction :标识事务是否是一个独立新开启的事务或者运行在外层事务或者是否是嵌套事务
 
-![htWgnx](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/06/htWgnx.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/Mn5DHV.jpg)
 
 spring中使用TransactionStatus的实现类DefaultTransactionStatus，在这个类中封装了两个最重要的属性值
 

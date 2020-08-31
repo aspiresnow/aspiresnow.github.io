@@ -17,8 +17,6 @@ categories:
 -  4、实现Serializable接口，通过反系列化创建对象
 -  5、实现Cloneable接口，覆盖clone方法，通过克隆创建对象
 
-<!--more-->
-
 ```java
 package cn.zlz.createobj;
 

@@ -10,16 +10,6 @@ categories:
 
 # spring-Context
 
-PropertyPlaceholderHelper
-
-ObjectUtils
-
-AbstractPropertyResolver  PropertyResolver
-
-PostProcessorRegistrationDelegate
-
-PathMatchingResourcePatternResolver 用于解析配置文件位置
-
 ## 源码解读
 
 以ApplicationContext为例,创建一个ApplicationContext对象，指定配置文件的位置

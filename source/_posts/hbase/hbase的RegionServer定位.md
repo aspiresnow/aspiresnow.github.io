@@ -12,12 +12,12 @@ categories:
 ### Hbase 使用三层类似B+树的结构来保存region位置：
 
 1. 第一层是保存zookeeper里面的文件，它持有root region的位置。
-2. 第二层root region是.META.表的第一个region其中保存了.META.z表其它region的位置。通过root region，我们就可以访问.META.表的数据。
-3. .META.是第三层，它是一个特殊的表，保存了Hbase中所有数据表的region 位置信息。
+2. 第二层root region是.META.表的第一个region其中保存了.META.表其它region的位置。通过root region，我们就可以访问.META.表的数据。
+3. .META.是第三层，它是一个特殊的表，保存了Hbase中所有数据表的 region 位置信息。
 
 ### -ROOT- 和 .META. 表
 
-- -ROOT-表：记录了.META.表对应的HRS信息，**-ROOT-表永远不会被split，只有一个Region**。
+- -ROOT-表：记录了.META. 表对应的HRS信息，**-ROOT-表永远不会被split，只有一个Region**。
 
 - ZK中保存了-ROOT-表对应的HRS位置，默认的路径是 "/hbase/root-region-server"
 
@@ -45,11 +45,11 @@ categories:
 
 首先是RowKey，RowKey由三部分组成：TableName, StartKey 和 TimeStamp。RowKey存储的内容我们又称之为Region的Name。哦，还记得吗？我们在前面的文章中提到的，用来存放Region的文件夹的名字是RegionName的Hash值，因为RegionName可能包含某些非法字符。现在你应该知道为什么RegionName会包含非法字符了吧，因为StartKey是被允许包含任何值的。将组成RowKey的三个部分用逗号连接就构成了整个RowKey，这里TimeStamp使用十进制的数字字符串来表示的。这里有一个RowKey的例子： 
 
-Java代码  [![收藏代码](http://greatwqs.iteye.com/images/icon_star.png)]()
+Java代码 
 
 1. Table1,RK10000,12345678  
 
- 然后是表中最主要的Family：info，info里面包含三个Column：regioninfo, server, serverstartcode。其中regioninfo就是Region的详细信息，包括StartKey, EndKey 以及每个Family的信息等等。server存储的就是管理这个Region的RegionServer的地址。
+然后是表中最主要的Family：info，info里面包含三个Column：regioninfo, server, serverstartcode。其中regioninfo就是Region的详细信息，包括StartKey, EndKey 以及每个Family的信息等等。server存储的就是管理这个Region的RegionServer的地址。
 
 所以当Region被拆分、合并或者重新分配的时候，都需要来修改这张表的内容。
 
@@ -83,7 +83,7 @@ HBase的做法是用另外一个表来记录.META.的Region信息，就和.META.
 
 这么一来Client端就需要先去访问-ROOT-表。所以需要知道管理-ROOT-表的RegionServer的地址。这个地址被存在ZooKeeper中。默认的路径是： 
 
-Java代码  [![收藏代码](http://greatwqs.iteye.com/images/icon_star.png)]()
+Java代码
 
 1. /hbase/root-region-server  
 
@@ -129,5 +129,3 @@ Java代码
 \1. 在整个路由过程中并没有涉及到MasterServer，也就是说HBase日常的数据操作并不需要MasterServer，不会造成MasterServer的负担。
 
 \2. Client端并不会每次数据操作都做这整个路由过程，很多数据都会被Cache起来。至于如何Cache，则不在本文的讨论范围之内。
-
-原
