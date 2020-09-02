@@ -15,7 +15,7 @@ categories:
 
 运维开发了很长一段时间HBase，经常有业务同学咨询为什么客户端配置文件中没有配置RegionServer的地址信息，这里针对这种疑问简单的做下解释，客户端与HBase系统的交互阶段主要有如下几个步骤：
 
-![795841](http://hbasefly.com/wp-content/uploads/2016/12/795841.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/l0jCpA.jpg)
 
 ****
 
@@ -38,7 +38,7 @@ scanner体系的核心在于三层scanner：RegionScanner、StoreScanner以及St
 
 对应于建楼项目，一栋楼通常由好几个单元楼构成（每个单元楼对应于一个Store），每个单元楼会请一个监工（StoreScanner）负责该单元楼的建造。而监工一般不做具体的事情，他负责招募很多工人（StoreFileScanner），这些工人才是建楼的主体。下图是整个构建流程图：
 
-![818160](http://hbasefly.com/wp-content/uploads/2016/12/818160.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/seA2J3.jpg)
 
 ****
 
@@ -71,7 +71,7 @@ scanner体系的核心在于三层scanner：RegionScanner、StoreScanner以及St
 ![99091](http://hbasefly.com/wp-content/uploads/2016/12/99091.png)
 
         了解了KeyValue的逻辑结构后，我们不妨再进一步从原理的角度想想HBase的开发者们为什么如此对其设计。这个就得从HBase所支持的数据操作说起了，HBase支持四种主要的数据操作，分别是Get/Scan/Put/Delete，其中Get和Scan代表数据查询，Put操作代表数据插入或更新（如果Put的RowKey不存在则为插入操作、否则为更新操作），特别需要注意的是HBase中更新操作并不是直接覆盖修改原数据，而是生成新的数据，新数据和原数据具有不同的版本（时间戳）；Delete操作执行数据删除，和数据更新操作相同，HBase执行数据删除并不会马上将数据从数据库中永久删除，而只是生成一条删除记录，最后在系统执行文件合并的时候再统一删除。
-
+    
         HBase中更新删除操作并不直接操作原数据，而是生成一个新纪录，那问题来了，如何知道一条记录到底是插入操作还是更新操作亦或是删除操作呢？这正是KeyType和Timestamp的用武之地。上文中提到KeyType取值为分别为Put/Delete/Delete Column/Delete Family四种，如果KeyType取值为Put，表示该条记录为插入或者更新操作，而无论是插入或者更新，都可以使用版本号（Timestamp）对记录进行选择；如果KeyType为Delete，表示该条记录为整行删除操作；相应的KeyType为Delete Column和Delete Family分别表示删除某行某列以及某行某列族操作；
 
 - 不同KeyValue之间如何进行大小比较？
@@ -90,7 +90,7 @@ scanner体系的核心在于三层scanner：RegionScanner、StoreScanner以及St
 
 还记得Scanner体系构建的最终结果是一个由StoreFileScanner和MemstoreScanner组成的heap（最小堆）么，这里就派上用场了。下图是一张表的逻辑视图，该表有两个列族cf1和cf2（我们只关注cf1），cf1只有一个列name，表中有5行数据，其中每个cell基本都有多个版本。cf1的数据假如实际存储在三个区域，memstore中有r2和r4的最新数据，hfile1中是最早的数据。现在需要查询RowKey=r2的数据，按照上文的理论对应的Scanner指向就如图所示：
 
-![544501](http://hbasefly.com/wp-content/uploads/2016/12/544501.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/EsOVH3.jpg)
 
 这三个Scanner组成的heap为<MemstoreScanner，StoreFileScanner2, StoreFileScanner1>，Scanner由小到大排列。查询的时候首先pop出heap的堆顶元素，即MemstoreScanner，得到keyvalue = r2:cf1:name:v3:name23的数据，拿到这个keyvalue之后，需要进行如下判定：
 
@@ -113,7 +113,9 @@ scanner体系的核心在于三层scanner：RegionScanner、StoreScanner以及St
 
 回顾一下scan的整个流程，如下图所示：
 
-![55](http://hbasefly.com/wp-content/uploads/2017/06/55.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/ilbOqY.jpg)
+
+
 
 上图是一个简单的示意图，用户如果对整个流程比较感兴趣，可以阅读之前的文章，本文将会关注于隐藏在这个示意图中的核心细节。这里笔者挑出了其中五个比较重要的问题来说明，这些问题都是本人之前或早或晚比较困惑的问题，拿出来与大家分享。当然，如果大家有反馈想了解的其他细节，也可以单独交流探讨。
 
@@ -139,13 +141,13 @@ HBase中数据仅仅独立地存在于Memstore和StoreFile中，Blockcache中的
 
 看过笔者之前文章的童鞋都知道，BF数据实际上是和用户KV数据一样存储在HFile中的，那就需要先看看BF信息是如何存储在HFile中的，查看[官方文档](http://hbase.apache.org/book.html#_hfile_format_2)中HFile(v2)组织结构图如下：
 
-![56](http://hbasefly.com/wp-content/uploads/2017/06/56.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/zTlO13.jpg)
 
 HFile组织结构中关于BF有两个非常重要的结构－Bloom Block与Bloom Index。Bloom Block主要存储BF的实际数据，可能这会大家要问为什么Bloom Block要分布在整个HFile？分布的具体位置如何确定？其实很简单，HBase在写数据的时候就会根据row生成对应的BF信息并写到一个Block中，随着用户数据的不断写入，这个BF Block就会不断增大，当增大到一定阈值之后系统就会重新生成一个新Block，旧Block就会顺序加载到Data Block之后。这里隐含了一个关键的信息，随着单个文件的增大，BF信息会逐渐变的很大，并不适合一次性全部加载到内存，更适合的使用方式是使用哪块加载哪块！
 
 这些Bloom Block分散在HFile中的各个角落，就会带来一个问题：如何有效快速定位到这些BF Block？这就是Bloom Index的核心作用，与Data Index相同，Bloom Index也是一颗B+树，Bloom Index Block结构如下图所示：
 
-![57](http://hbasefly.com/wp-content/uploads/2017/06/57.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/DMSu2T.jpg)
 
 上图需要重点关注Bloom Block的Block Key：Block中第一个原始KV的RowKey。这样给定一个待检索的 rowkey，就可以很容易地通过Bloom Index定位到具体的Bloom Block，将Block加载到内存进行过滤。通常情况下，热点Bloom Block会常驻内存的！
 
@@ -174,7 +176,7 @@ scan.withStartRow(startRow) //设置检索起始row
 
 相比堆顶元素检查流程，笔者更想探讨堆顶元素kv检查之后的返回值－MatchCode，这个Code可不简单，它会告诉scanner是继续seek下一个cell，还是直接跳过部分cell直接seek到下一列（对应INCLUDE_AND_SEEK_NEXT_COL或SEEK_NEXT_COL），抑或是直接seek到下一行(对应INCLUDE_AND_SEEK_NEXT_ROW或SEEK_NEXT_ROW)。还是举一个简单的例子：
 
-![58](http://hbasefly.com/wp-content/uploads/2017/06/58.png)
+![image](http://hbasefly.com/wp-content/uploads/2017/06/58.png)
 
 上图是待查表，含有一个列族cf，列族下有四个列[c1, c2, c3, c4]，列族设置MaxVersions为2，即允许最多存在2个版本。现在简单构造一个查询语句如下：
 

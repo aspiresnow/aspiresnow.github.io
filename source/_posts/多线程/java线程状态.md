@@ -46,11 +46,11 @@ public enum State {
 - TIMED_WAITING：有限期等待，当前线程等待一段时间后自动进入RUNABLE状态。通过调用 sleep(time)、wait(time)、join(time)、parkNanos(time)、parkUntil() 线程进入该状态
 - TERMINATED
 
-![mIMBcF](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/mIMBcF.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/OmrCo1.png)
 
 操作系统层面线程状态状态流转
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts1.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/cHx5kP.png)
 
 ### 线程间的状态转换:
 

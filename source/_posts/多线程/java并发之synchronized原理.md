@@ -42,7 +42,7 @@ Java 中的每一个对象都可以作为锁
 
 对象在内存的分布分为3个部分：对象头，实例数据，和对齐填充。在对象头中的Mark Word存储了对象的锁信息。Java中锁对象有四种状态，**无锁状态，偏向锁状态，轻量级锁状态和重量级锁状态**，它会随着竞争情况逐渐升级。锁可以升级但不能降级，目的是为了提高获得锁和释放锁的效率
 
-![TrB4lz](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/TrB4lz.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/2MHGxs.jpg)
 
 **注意：**在偏向锁、轻量级锁、重量级锁状态下，对象头的hashCode位置被锁标志占用
 
@@ -111,9 +111,9 @@ public void test();
 
 synchronized重量级锁依赖操作系统的mutex互斥锁实现，需要阻塞线程，由于线程的阻塞和重启涉及CPU内核切换，非常耗费性能，Jdk1.6之后针对synchronized做了一些优化，来降低线程阻塞的几率，主要包括如锁粗化、锁消除、轻量级锁、偏向锁、适应性自旋、重量级锁等技术来减少锁操作的开销。
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync5.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/JOBlQp.jpg)
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/synclock.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/rj1q49.jpg)
 
 ### 无锁
 
@@ -206,7 +206,7 @@ synchronized重量级锁依赖操作系统的mutex互斥锁实现，需要阻塞
 
 monitor是线程私有的数据结构，存储在栈中，每一个线程都有一个可用monitor列表，同时还有一个全局的可用列表，当线程可用monitor列表为空的时候会请求全局可用列表补充。？？？
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/sync2.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/vvi6L2.jpg)
 
 **Owner**：初始时为NULL表示当前没有任何线程拥有该monitor，线程加锁成功后记录持有锁的线程ID，当锁释放后设置为NULL；
 **EntryQ**: 链表，用于存储所有阻塞在该锁对象上的线程。存有两个队列，entry-set用于存储正在阻塞竞争的线程，wait-set用于存储调用wait方法等待唤醒的线程

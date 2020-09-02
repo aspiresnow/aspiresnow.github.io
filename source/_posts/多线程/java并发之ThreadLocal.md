@@ -26,7 +26,7 @@ categories:
 
 - 保存线程上下文信息，在线程某个地方设置，在随后的任意地方都可以获取
 
-- 线程私有，以空间换时间，变量线程安全
+- 线程私有，以空间换时间
 
   **注意：**如果线程ThreadLocal中保存的是一个引用类型的共享对象，当修改共享对象内部值时会出现并发安全问题
 
@@ -46,7 +46,7 @@ java的Thread类有两个私有变量threadLocals和inheritableThreadLocals，�
 
 下图展示了ThreadLocal的引用情况，java堆中有ThreadLocal实例、value实例、Map实例，可能发生内存泄露的就是这三个实例
 
-![4HVAtw](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/4HVAtw.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/sZGYmb.jpg)
 
 - ThreadLocal实例由栈中变量指针强引用、线程的私有变量map的key弱引用
 - value实例可能由栈中变量指针强引用、线程的私有变量map的value强引用
@@ -63,7 +63,7 @@ ThreadLocal针对这种问题作出了部分优化
 
 - 如果线程能够消亡，线程到map的强引用断开，map到ThreadLocal实例和value实例的引用都会消失。将栈中各个实例的引用显示设置为null，ThreadLocal和value实例都可以被gc回收，不会发生内存泄露问题
 
-- 如果线程不消亡，并且每次调用ThreadLocal的get能获取到值或者以后再不调用ThreadLocal的get和set方法，会导致内存泄露，
+- 如果线程不消亡，并且**每次调用ThreadLocal的get能获取到值或者以后再不调用ThreadLocal的get和set方法**，会导致内存泄露，
   - value实例一直被Thread中map的value强引用，无法被垃圾回收，发生内存泄露
   - ThreadLocal实例被Thread中map的key弱引用，可以被gc回收
 
@@ -260,7 +260,7 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T> {
     protected T childValue(T parentValue) {
         return parentValue;
     }
-	//覆写 getMap 返回inheritableThreadLocals
+	//覆写 getMap 返回 inheritableThreadLocals
     ThreadLocalMap getMap(Thread t) {
        return t.inheritableThreadLocals;
     }

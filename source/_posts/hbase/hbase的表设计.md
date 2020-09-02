@@ -26,10 +26,6 @@ row key是按照字典序存储，因此，设计row key时，要充分利用这
 由于Hbase是一个面向列族的存储器，调优和存储都是在列族这个层次上进行的，最好使列族成员都有相同的"访问模式(access pattern)"和大小特征；
 在一张表里不要定义太多的column family。目前Hbase并不能很好的处理超过2~3个column family的表。因为某个column family在flush的时候，它邻近的column family也会因关联效应被触发flush，最终导致系统产生更多的I/O。
 
-
-
-在一张表里不要定义太多的column family。目前Hbase并不能很好的处理超过2~3个column family的表。因为某个column family在flush的时候，它邻近的column family也会因关联效应被触发flush，最终导致系统产生更多的I/O。
-
 - family越多，那么获取每一个cell数据的优势越明显，因为io和网络都减少了，而如果只有一个family，那么每一次读都会读取当前rowkey的所有数据，网络和io上会有一些损失。
   ​    当然如果要获取的是固定的几列数据，那么把这几列写到一个family中比分别设置family要更好，因为只需一次请求就能拿回所有数据。
 

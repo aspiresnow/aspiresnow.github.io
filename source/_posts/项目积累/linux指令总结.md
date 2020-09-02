@@ -39,7 +39,7 @@ categories:
 - 根据端口号查询
 
   ```she
-  netstat -ano|grep 8080
+  netstat -ano|grep 8080    netstat -lntp
   ```
 
   ```shell

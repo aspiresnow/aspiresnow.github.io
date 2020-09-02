@@ -31,7 +31,7 @@ categories:
 
 AQS是java concurrent包下并发组件实现的基础。AQS定义了同步队列的基本实现
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts2.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/uPpse5.jpg)
 
 AQS使用了模板方法模式，只定义了自旋+队列存储的基本实现。定义了一个volatile修饰的int类型state变量，然后声明了两个方法由子类实现。
 
@@ -119,7 +119,7 @@ static final class Node {
 
 ### 独占模式获取执行权限
 
-![CqLr0z](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/CqLr0z.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/hewxpm.png)
 
 AQS中的acquire方法，调用钩子方法tryAcquire，tryAcquire由子类覆盖实现，如果获取资源成功，则当前线程获取执行权，如果失败，调用acquireQueued将当前线程加入等待队列，设置当前为独占锁模式，并阻塞当前线程
 
@@ -519,7 +519,7 @@ public class ConditionObject implements Condition, java.io.Serializable {
 }
 ```
 
-![v7buIP](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/v7buIP.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/Edy0C1.png)
 
 #### await
 
@@ -652,7 +652,7 @@ final boolean acquireQueued(final Node node, int arg) {
 
 #### signal
 
-![EFNjcw](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/07/EFNjcw.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/9YGP6s.png)
 
 ConditionObject中signal方法用于唤醒等待队列头部的节点线程，实质操作就是将等待队列头部节点移除并添加到AQS同步队列中，让那个线程拥有竞争AQS资源的权限
 
