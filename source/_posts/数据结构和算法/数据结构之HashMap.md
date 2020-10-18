@@ -38,7 +38,7 @@ HashMap 1.8 与 1.7 对比
 
 HashMap中采用了数组+链表的数据结构，在jdk8中，当链表节点的个数超过一定数量之后，会转换为红黑树，所以在jdk8中HashMap的数据结构为 树组+链表+红黑树。
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap4.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/F82bDI.jpg)
 
 主要的问题在于基于头插法的数据迁移，会有几率造成链表倒置，从而引发链表闭链，导致程序死循环，并吃满CPU
 
@@ -113,7 +113,7 @@ table[(n - 1) & hash]
 
 那么问题来了，为什么是异或，而不是&或者|呢，因为 &会产生大量的0，|会产生大量的1，高位和低位的影响都是单方面的，异或是高位和低位都会起作用，所以选择了异或操作，能够使hash&长度-1更分散。
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashMap1.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/NvRpUC.jpg)
 
 接下来就是我们要说的table的长度为什么必须是2的n次方：
 
@@ -125,7 +125,7 @@ table[(n - 1) & hash]
 
 ### put添加元素流程
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap2.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/LDpN1X.jpg)
 
 ```java
 public V put(K key, V value) {
@@ -277,7 +277,7 @@ final Node<K,V>[] resize() {
 
 这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。有兴趣的同学可以研究下JDK1.8的resize源码，写的很赞，如下:
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/hashmap3.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/wExG3m.jpg)
 
 ### get流程
 

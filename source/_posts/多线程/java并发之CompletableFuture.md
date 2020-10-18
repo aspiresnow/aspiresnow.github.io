@@ -1,5 +1,5 @@
 ---
-title: java8之CompletableFuture
+title: java并发之CompletableFuture
 date: 2017-08-05 12:58:46
 tags:
 - java8
@@ -8,17 +8,15 @@ categories:
 - java基础
 ---
 
-# java8之CompletableFuture
+# java并发之CompletableFuture
 
 CompletableFuture实现了Future接口，是jdk8新添加的对与并发编程的扩展支持。通过CompletableFuture可以方便的操作多个异步任务、执行结果的回调等操作。
-
-<!--more-->
 
 ## CompletableFuture优点
 
 jdk8之前的Future接口也可以构建异步任务，并且通过get()阻塞获取异步任务的结果。但是依然存在一些局限性，只能阻塞或者轮询去监控获取异步任务的结果，jdb8中的CompletableFuture实现了Future接口，同时扩展了异步编程中更多的需求
 
-- 可以再异步任务异常或者完成的时候回调通知监听者
+- 可以在异步任务异常或者完成的时候回调通知监听者
 - 异步任务完成之后直接参与下个流程
 - 将两个异步任务合并为一个异步任务，其中的两个异步任务可以依次依赖执行，也可以同时执行
 - 仅获取多个异步任务中最快结束的任务返回结果

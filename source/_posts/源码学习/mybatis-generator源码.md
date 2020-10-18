@@ -36,11 +36,11 @@ categories:
 
 ## 二、整体过程
 
-![](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/mybatis/codeGene1.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/kP3umw.jpg)
 
 配置解析按照元素及属性顺序解析
 
-![](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/mybatis/codeGene2.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/qnzbSj.jpg)
 
 ## 三、代码片段
 
@@ -141,7 +141,7 @@ public class GeneratedJavaFile extends GeneratedFile {
 
 生成文件的元素对象关系图
 
-![](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/mybatis/codeGene3.jpg?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/xcXHyv.jpg)
 
 最终生成的java文件都是`TopLevelClass`、`Interface`、`TopLevelEnumeration`,都继承了`CompilationUnit`类。在这些元素对象中实现了默认的格式化输出，当调用`JavaFormatter`的时候会调用元素的默认实现
 

@@ -9,6 +9,8 @@ categories:
 
 # redis分布式锁-实现2
 
+## 实现2
+
 redis分布式锁的另一种实现。
 
 redis分布式锁实现是一种AP实现。redis实现主要依赖redis的 sexnx指令，即只有key不存在的时候才能设置一个key，在实现的时候需要考虑以下几种情况

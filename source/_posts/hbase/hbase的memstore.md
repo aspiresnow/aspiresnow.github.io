@@ -13,7 +13,7 @@ Memstore是HBase框架中非常重要的组成部分之一，是HBase能够实�
 
 HBase中，Region是集群节点上最小的数据服务单元，用户数据表由一个或多个Region组成。在Region中每个ColumnFamily的数据组成一个Store。每个Store由一个Memstore和多个HFile组成，如下图所示：
 
-![0](http://hbasefly.com/wp-content/uploads/2016/03/0.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/4yaGX2.jpg)
 
 之前我们提到，HBase是基于LSM-Tree模型的，所有的数据更新插入操作都首先写入Memstore中（同时会顺序写到日志HLog中），达到指定大小之后再将这些修改操作批量写入磁盘，生成一个新的HFile文件，这种设计可以极大地提升HBase的写入性能；另外，HBase为了方便按照RowKey进行检索，要求HFile中数据都按照RowKey进行排序，Memstore数据在flush为HFile之前会进行一次排序，将数据有序化；还有，根据局部性原理，新写入的数据会更大概率被读取，因此HBase在读取数据的时候首先检查请求的数据是否在Memstore，写缓存未命中的话再到读缓存中查找，读缓存还未命中才会到HFile文件中查找，最终返回merged的一个结果给用户。
 

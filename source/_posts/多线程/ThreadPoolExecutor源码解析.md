@@ -14,7 +14,8 @@ categories:
 ## 知识导读
 
 - ThreadPoolExecutor中定义了一个clt变量，高3位表示线程池状态，低29位表示线程数量
-- Worker封装了任务和执行任务的线程，同时Worker也实现了Runnable接口，封装的线程传入的是Woker，在woker的run方法中低啊用封装的任务的run方法
+- Worker封装了任务和执行任务的线程，同时Worker也实现了Runnable接口，封装的线程传入的是Woker，在woker的run方法中调用封装的任务的run方法
+- worker继承了AQS实现了独占锁，当执行任务时lock，结束任务时unlock，在关闭线程池时，通过调用trylock判断线程是否是空闲状态，从而决定是否进行回收
 
 ## 源码待析
 
@@ -158,7 +159,7 @@ public void execute(Runnable command) {
 
 添加工作线程，首先双层死循环判断是否应该新建工作线程并对变量原子操作workerCount +1，循环直到成功。然后创建Work，封装工作任务和任务线程，添加成功后start任务线程
 
-![UacXvf](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/UacXvf.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/nPkj3P.jpg)
 
 ```java
 private boolean addWorker(Runnable firstTask, boolean core) {
@@ -321,7 +322,7 @@ final void runWorker(Worker w) {
 
 检验通过后去任务对列获取线程，任务对列是BlockQueue，用于阻塞线程，如果允许空闲线程销毁，调用poll(time)，经过一定时间后销毁线程，如果不允许销毁，直接调用take()方法阻塞活动线程，线程池中任务线程处于空闲状态，等待任务队列任务进行消费。
 
-![C0qR13](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/C0qR13.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/SLbksB.jpg)
 
 ```java
 private Runnable getTask() {

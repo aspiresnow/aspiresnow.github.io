@@ -33,12 +33,9 @@ HBase中可以通过设置WAL的持久化等级决定是否开启WAL机制、以
 ### HLog File
 
 - HBase中WAL的存储格式{HLogKey,WALEdit}，物理上是Hadoop的Sequence File
-
 - HLog文件就是一个普通的Hadoop Sequence File，Sequence File 的Key是HLogKey对象，HLogKey中记录了写入数据的归属信息，除了table和region名字外，同时还包括 sequence number和timestamp，timestamp是“写入时间”，sequence number的起始值为0，或者是最近一次存入文件系统中sequence number。
-
 - HLog Sequece File的Value是HBase的KeyValue对象，即对应HFile中的KeyValue.
-
-  ![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/hbase/hbase2.jpg?raw=true)
+- ![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/fDAbXn.jpg)
 
 region name和table name分别表征该段日志属于哪个region以及哪张表；cluster ids用于将日志复制到集群中其他机器上。
 

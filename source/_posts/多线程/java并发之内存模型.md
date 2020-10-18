@@ -39,7 +39,7 @@ categories:
          ```
    
 3. 内存系统的重排序。由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。
-   
+  
 
 **注意：**编译器和处理器都不会改变存在数据依赖关系的两个操作的执行顺序，保证单线程环境下程序能够得出正确的执行结果
 
@@ -66,11 +66,9 @@ JMM屏蔽了不同处理器内存模型的差异，为Java程序员呈现了一�
 
 JMM定义了线程和主内存之间的抽象关系，JMM规定了对共享变量的写入操作在何时将对其他线程可见。
 
-设计JMM时的核心目标就是找到一个 好的平衡点:一方面，要为程序员提供足够强的内存可见性保证;另一方面，对编译器和处理器的限制要尽可能地放松，竟可能的让其优化程序
+设计JMM时的核心目标就是找到一个 好的平衡点:一方面，要为程序员提供足够强的内存可见性保证;另一方面，对编译器和处理器的限制要尽可能地放松，尽可能的让其优化程序
 
-
-
-![JHyhHl](https://raw.githubusercontent.com/aspiresnow/aspiresnow.github.io/hexo/source/blog_images/2020/08/JHyhHl.png)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/JH8znn.jpg)
 
 从图可以得出结论
 
@@ -83,7 +81,7 @@ JMM定义了线程和主内存之间的抽象关系，JMM规定了对共享变�
 
 JMM定义了8个操作来完成共享变量从主内存和工作内存的交互细节
 
-![image](https://github.com/aspiresnow/aspiresnow.github.io/blob/hexo/source/blog_images/%E5%B9%B6%E5%8F%91/ts4.png?raw=true)
+![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/unX6GJ.jpg)
 									`java中线程工作内存跟主内存的交互`
 
 JMM规定了工作内存与主内存之间交互的协议，首先是定义了8种原子操作：
