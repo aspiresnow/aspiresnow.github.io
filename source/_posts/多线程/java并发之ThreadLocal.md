@@ -292,7 +292,7 @@ private void init(ThreadGroup g, Runnable target, String name,
 }
 ```
 
-ThreadLocal中对父线程中的inheritableThreadLocals属性进行了浅拷贝，key和value都是原来的引用地址，这样子线程通过InheritableThreadLocal的get方法就能获取到父线程中定义的引用，通过引用访问变量
+ThreadLocal中对父线程中的inheritableThreadLocals属性进行了浅拷贝，key和value都是原来的引用地址，这样子线程通过InheritableThreadLocal的get方法就能获取到父线程中定义的引用，通过引用访问变量z
 
 ```java
 static ThreadLocalMap createInheritedMap(ThreadLocalMap parentMap) {

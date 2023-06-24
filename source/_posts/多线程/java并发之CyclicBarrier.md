@@ -16,6 +16,7 @@ categories:
 - CyclicBarrier可以循环使用
 - CyclicBarrier是基于ReentrantLock和ReentrantLock的一个Condition实现，每次调用await方法后加锁，然后计数减1，减之后不为0,则调用Condition的await方法，当前线程进入阻塞等待状态；当计数减之后为0则signalAll，激活所有等待线程。
 - CyclicBarrier上阻塞的线程，任意一个线程被中断、超时、执行异常都会导致CyclicBarrier被打破，从而导致所有阻塞线程被唤醒
+- 应用场景,类似一个缓冲，当访问线程数达到指定数量后，线程在排队一个个再去访问处理
 
 ## 原理
 

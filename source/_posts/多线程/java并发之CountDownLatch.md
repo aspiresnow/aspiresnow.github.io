@@ -17,6 +17,7 @@ categories:
 - 调用await时，只需要判断state的值，如果等于0则获取执行权，如果大于0则阻塞。
 - 覆写的tryAcquireShared方法只查询state值，不会修改，所以state值只会通过countDown方法减，一旦等于0，所有的阻塞线程都可以获取到同步状态，都会被唤醒。
 - 调用countDown，每次调用将state-1，当state=0的时候tryReleaseShared返回true触发唤醒同步队列中第一个阻塞线程，然后一直传播唤醒所有的阻塞线程
+- 应用场景,如依赖资源还未准备后，所有访问线程全部阻塞，当依赖的资源全部准备好，其他地调用CountDownLatch.countDown方法，建为0的时候，等待全部一起同时往后处理
 
 ## 原理
 
@@ -96,5 +97,4 @@ public void countDown() {
     sync.releaseShared(1);
 }
 ```
-
 

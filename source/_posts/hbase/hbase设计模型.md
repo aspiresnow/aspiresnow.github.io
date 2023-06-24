@@ -11,7 +11,7 @@ categories:
 
 ## HBase基本组件
 
-![image](https://blog-1257941127.cos.ap-beijing.myqcloud.com/uPic/0mrgGL.jpg)
+![image](/Users/zhanglizhi/Downloads/0mrgGL.png)
 
 - Client
 
